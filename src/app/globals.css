@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Helvetica Neue Condensed Black";
+  src:
+    local("Helvetica Neue Condensed Black"),
+    local("HelveticaNeue-CondensedBlack"),
+    url("/fonts/HelveticaNeue-BlackCond.otf") format("opentype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  /* Colores principales */
+  --color-brand-navy: #19243e;
+  --color-brand-cyan: #65bdcc;
+  --color-brand-green: #3aaa35;
+
+  /* Colores secundarios */
+  --color-neutral-light: #c4c5c5;
+  --color-neutral-dark: #737472;
+  --color-brand-navy-alt: #1f2d4e;
+
+  /* Tipografía */
+  --font-display:
+    "Helvetica Neue Condensed Black", "Helvetica Neue", "Arial Narrow", Arial,
+    sans-serif;
+  --font-sans: Arial, "Helvetica Neue", Helvetica, sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-brand-navy);
+  background-color: #ffffff;
+  line-height: 1.5;
+}
+
+/* Foco visible para quien navega con teclado; el azul marino contrasta bien sobre fondos claros. */
+:focus-visible {
+  outline: 2px solid var(--color-brand-navy);
+  outline-offset: 2px;
+}
+
+/* Respeta la preferencia del sistema de reducir el movimiento. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 900;
+}
