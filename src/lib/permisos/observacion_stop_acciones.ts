@@ -8,6 +8,7 @@ import {
   stopSignatures,
   stopSlug,
 } from "@/config/observacion_stop";
+import { adminRoleCode } from "@/config/permisos";
 import type { WorkPermit } from "@/domain/permisos";
 import { get_session } from "@/lib/auth/sesion";
 import { get_repositories } from "@/lib/data/proveedor_datos";
@@ -170,7 +171,9 @@ export async function sign_stop_observation(formData: FormData): Promise<void> {
     permit.signatures.some((item) => item.employeeNumber === employeeNumber) ||
     (key === "observed" &&
       (permit.requestedByEmployeeNumber === employeeNumber || permit.fields.observerEmployee === employeeNumber));
-  if (alreadyInvolved) redirect(`${detailPath}?error=same_person`);
+  const session = await get_session();
+  const isAdmin = session?.kind === "EMPLEADO" && session.roleCodes.includes(adminRoleCode);
+  if (alreadyInvolved && !isAdmin) redirect(`${detailPath}?error=same_person`);
 
   const image = read_text(formData, "signatureImage");
   if (!image.startsWith(pngDataUrlPrefix) || image.length > maxSignatureLength) {

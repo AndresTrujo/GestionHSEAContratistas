@@ -185,7 +185,7 @@ export async function sign_heights_permit(formData: FormData): Promise<void> {
       (item) =>
         find_heights_signature(permit, item.key)?.employeeNumber === employeeNumber,
     );
-    if (alreadySigned) redirect(`${detailPath}?error=same_person`);
+    if (alreadySigned && !actor.isAdmin) redirect(`${detailPath}?error=same_person`);
 
     if (key === "medical_service") {
       // La evaluación médica de cada ejecutante se registra al firmar.

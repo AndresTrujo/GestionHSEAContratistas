@@ -310,9 +310,10 @@ export async function read_jsa_participants(
 /**
  * ¿Puede esta persona firmar la posición de participante? Si está ligado a un empleado TFS, solo ese empleado; si lo
  * está a un colaborador de proveedor, un usuario de su proveedor (muchos colaboradores no tienen cuenta propia).
- * Un participante sin liga (solo texto) lo firma quien sea, como antes.
+ * Un participante sin liga (solo texto) lo firma quien sea, como antes. El ADMIN_HSEA puede firmar por cualquiera.
  */
 export async function can_sign_participant(actor: PermitActor, permitId: string, position: number): Promise<boolean> {
+  if (actor.isAdmin) return true;
   const { participants, providerEmployees } = get_repositories();
   const linked = (await participants.list_by_permit(permitId)).find(
     (item) => item.role === "participant" && item.position === position,

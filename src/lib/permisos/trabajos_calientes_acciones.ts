@@ -190,7 +190,7 @@ export async function sign_hot_work_permit(formData: FormData): Promise<void> {
     const alreadySigned = hotWorkApprovalSignatures.some(
       (item) => find_signature(permit, item.key)?.employeeNumber === employeeNumber,
     );
-    if (alreadySigned) redirect(`${detailPath}?error=same_person`);
+    if (alreadySigned && !actor.isAdmin) redirect(`${detailPath}?error=same_person`);
   } else {
     if (permit.status !== "approved") redirect(detailPath);
     const validUntil = get_valid_until(permit);

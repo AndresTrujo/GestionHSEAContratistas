@@ -10,6 +10,8 @@ interface SignatureBoxProps {
   permit: WorkPermit;
   signatureKey: string;
   label: string;
+  /** Texto de apoyo que se muestra dentro del recuadro, debajo del título. */
+  description?: string;
   canSign: boolean;
   action: (formData: FormData) => Promise<void>;
   buttonLabel?: string;
@@ -22,6 +24,7 @@ export function SignatureBox({
   permit,
   signatureKey,
   label,
+  description,
   canSign,
   action,
   buttonLabel,
@@ -36,7 +39,7 @@ export function SignatureBox({
 
   return (
     <div className={`flex h-full flex-col rounded-xl border-2 p-3 text-sm ${tone}`}>
-      <p className="mb-2 flex items-center justify-between gap-2 font-bold">
+      <p className={`flex items-center justify-between gap-2 font-bold ${description ? "mb-1" : "mb-2"}`}>
         <span>{label}</span>
         <span
           className={`shrink-0 rounded-full px-2 py-0.5 text-xs ring-1 ring-inset ${
@@ -50,6 +53,7 @@ export function SignatureBox({
           {signature ? "✓ Firmado" : canSign ? "Por firmar" : "Pendiente"}
         </span>
       </p>
+      {description && <p className="mb-2 text-xs text-neutral-dark">{description}</p>}
       {signature ? (
         <div>
           {signature.image && (

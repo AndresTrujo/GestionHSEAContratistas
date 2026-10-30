@@ -464,8 +464,10 @@ async function can_sign_db(db: Queryable, request: CanSignRequest): Promise<Sign
     if (!employee.activo) return deny("ACTOR_INACTIVO");
 
     const permission = get_required_permission(request.role);
+    // El ADMIN_HSEA firma cualquier rol, sin importar permiso ni alcance.
     if (
       permission &&
+      !(await is_hsea_admin_db(db, request.signer.employeeNumber)) &&
       !(await has_permission_db(db, request.signer.employeeNumber, permission, request.area))
     ) {
       return deny("SIN_PERMISO_O_ALCANCE");

@@ -216,7 +216,7 @@ export async function sign_confined_permit(formData: FormData): Promise<void> {
   if (find_confined_signature(permit, key)) redirect(detailPath);
 
   // Segregación: una misma persona no puede firmar dos roles del permiso.
-  if (permit.signatures.some((item) => item.employeeNumber === employeeNumber)) {
+  if (!actor.isAdmin && permit.signatures.some((item) => item.employeeNumber === employeeNumber)) {
     redirect(`${detailPath}?error=same_person`);
   }
 

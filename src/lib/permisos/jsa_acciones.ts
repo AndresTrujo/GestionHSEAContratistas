@@ -188,7 +188,7 @@ export async function sign_jsa(formData: FormData): Promise<void> {
   }
 
   // Segregación: cada persona firma una sola vez en todo el JSA.
-  if (permit.signatures.some((item) => item.employeeNumber === employeeNumber)) {
+  if (!actor.isAdmin && permit.signatures.some((item) => item.employeeNumber === employeeNumber)) {
     redirect(`${detailPath}?error=same_person`);
   }
 

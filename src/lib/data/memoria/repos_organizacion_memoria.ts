@@ -220,6 +220,13 @@ export function create_organization_repositories(
     );
   }
 
+  function is_admin_signer(signer: SignerIdentity): boolean {
+    return (
+      signer.kind === "EMPLEADO" &&
+      list_current_assignments(signer.employeeNumber).some((a) => a.roleCode === adminRoleCode)
+    );
+  }
+
   function deny(reason: SignDenialReason): SignDecision {
     return { allowed: false, reason };
   }
@@ -240,8 +247,13 @@ export function create_organization_repositories(
       if (!employee) return deny("ACTOR_NO_ENCONTRADO");
       if (!employee.active) return deny("ACTOR_INACTIVO");
 
+      // El ADMIN_HSEA firma cualquier rol, sin importar permiso ni alcance.
       const permission = get_required_permission(request.role);
-      if (permission && !has_permission_sync(employee.employeeNumber, permission, request.area)) {
+      if (
+        permission &&
+        !is_admin_signer(request.signer) &&
+        !has_permission_sync(employee.employeeNumber, permission, request.area)
+      ) {
         return deny("SIN_PERMISO_O_ALCANCE");
       }
     } else if (request.signer.kind === "USUARIO_PROVEEDOR") {
@@ -266,10 +278,7 @@ export function create_organization_repositories(
 
     const permitSignatures = store.signatures.filter((s) => s.permitId === request.permitId);
     if (permitSignatures.some((s) => s.signerRole === request.role)) return deny("ROL_YA_FIRMADO");
-    const isAdmin =
-      request.signer.kind === "EMPLEADO" &&
-      list_current_assignments(request.signer.employeeNumber).some((a) => a.roleCode === adminRoleCode);
-    if (!isAdmin && permitSignatures.some((s) => is_same_signer(s.signer, request.signer))) {
+    if (!is_admin_signer(request.signer) && permitSignatures.some((s) => is_same_signer(s.signer, request.signer))) {
       return deny("PERSONA_YA_FIRMO_OTRO_ROL");
     }
     return { allowed: true };

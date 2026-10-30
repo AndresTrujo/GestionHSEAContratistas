@@ -104,7 +104,7 @@ export async function sign_phone_permit(formData: FormData): Promise<void> {
   }
 
   // Segregación: una misma persona no puede firmar dos roles.
-  if (permit.signatures.some((item) => item.employeeNumber === employeeNumber)) {
+  if (!actor.isAdmin && permit.signatures.some((item) => item.employeeNumber === employeeNumber)) {
     redirect(`${detailPath}?error=same_person`);
   }
 

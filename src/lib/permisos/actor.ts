@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import type { ActorType } from "@/domain/auditoria";
 import type { WorkPermit } from "@/domain/permisos";
-import { providerSignerRoles } from "@/config/permisos";
+import { adminRoleCode, providerSignerRoles } from "@/config/permisos";
 import { get_session } from "@/lib/auth/sesion";
 
 /** Quien crea o firma un permiso: empleado TFS o usuario de un proveedor. */
@@ -12,6 +12,8 @@ export interface PermitActor {
   /** Proveedor del usuario; null para empleados. */
   providerId: string | null;
   providerUserId: number | null;
+  /** ADMIN_HSEA: exento de las reglas de segregación de firmas (puede firmar varios roles). */
+  isAdmin?: boolean;
 }
 
 /** Pasos de firma que un usuario de proveedor puede firmar (siempre en permisos de su propia empresa). */
@@ -21,13 +23,20 @@ export async function require_permit_actor(): Promise<PermitActor> {
   const session = await get_session();
   if (!session) redirect("/login");
   if (session.kind === "EMPLEADO") {
-    return { actorType: "EMPLEADO", actorId: session.employeeNumber, providerId: null, providerUserId: null };
+    return {
+      actorType: "EMPLEADO",
+      actorId: session.employeeNumber,
+      providerId: null,
+      providerUserId: null,
+      isAdmin: session.roleCodes.includes(adminRoleCode),
+    };
   }
   return {
     actorType: "USUARIO_PROVEEDOR",
     actorId: `P-${session.providerUserId}`,
     providerId: String(session.providerId),
     providerUserId: session.providerUserId,
+    isAdmin: false,
   };
 }
 

@@ -59,6 +59,7 @@ export default async function JsaDetailPage({ params, searchParams }: JsaDetailP
     (question) => permit.fields[question.field] === "yes",
   );
   const permitType = find_permit_type(jsaSlug);
+  const jsaPath = `/permisos-trabajo/${jsaSlug}`;
 
   return (
     <>
@@ -80,6 +81,14 @@ export default async function JsaDetailPage({ params, searchParams }: JsaDetailP
           <span className={`inline-block rounded px-2.5 py-1 text-sm font-bold ${maxLevel.className}`}>
             Riesgo máximo {maxRisk} · {maxLevel.label}
           </span>
+        </p>
+        <p className="mb-5">
+          <a
+            href={`${jsaPath}/${permit.id}/pdf`}
+            className="inline-flex min-h-11 items-center rounded-xl bg-brand-navy px-4 py-2 text-sm font-bold text-white hover:bg-brand-navy-alt focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-cyan"
+          >
+            Descargar PDF
+          </a>
         </p>
         {error && errorMessages[error] && <FormAlert>{errorMessages[error]}</FormAlert>}
         {maxRisk > 12 && (
@@ -123,8 +132,8 @@ export default async function JsaDetailPage({ params, searchParams }: JsaDetailP
                   <th scope="col" className={thClass}>Pasos del trabajo</th>
                   <th scope="col" className={thClass}>N° peligro</th>
                   <th scope="col" className={thClass}>Medidas de control</th>
-                  <th scope="col" className={thClass}>P</th>
-                  <th scope="col" className={thClass}>S</th>
+                  <th scope="col" className={thClass}>Probabilidad</th>
+                  <th scope="col" className={thClass}>Severidad</th>
                   <th scope="col" className={thClass}>R</th>
                 </tr>
               </thead>
@@ -227,16 +236,15 @@ export default async function JsaDetailPage({ params, searchParams }: JsaDetailP
         <SectionCard title="Aprobaciones">
           <div className="grid gap-3 sm:grid-cols-3">
             {jsaApprovalSignatures.map((item) => (
-              <div key={item.key}>
-                {item.help && <p className="mb-1 text-xs text-neutral-dark">{item.help}</p>}
-                <SignatureBox
-                  action={sign_jsa}
-                  permit={permit}
-                  signatureKey={item.key}
-                  label={item.label}
-                  canSign={permit.status === "submitted"}
-                />
-              </div>
+              <SignatureBox
+                key={item.key}
+                action={sign_jsa}
+                permit={permit}
+                signatureKey={item.key}
+                label={item.label}
+                description={item.help}
+                canSign={permit.status === "submitted"}
+              />
             ))}
           </div>
         </SectionCard>
