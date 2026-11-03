@@ -32,6 +32,11 @@ jobs:
           mkdir -p .next/standalone/.next
           cp -r .next/static .next/standalone/.next/static
           if [ -d public ]; then cp -r public .next/standalone/public; fi
+          # La plantilla del JSA se lee en ejecución con process.cwd(): el rastreo del build no la incluye.
+          if [ -d plantillas ]; then cp -r plantillas .next/standalone/plantillas; fi
+          # Azure arranca con `npm start`; el package.json del paquete debe levantar server.js (no `next start`)
+          # y escuchar en todas las interfaces: en el contenedor HOSTNAME es el id del contenedor y rompe el sondeo.
+          node -e "const fs=require('fs');const f='.next/standalone/package.json';const p=fs.existsSync(f)?JSON.parse(fs.readFileSync(f,'utf8')):{name:'tfs-hsea',version:'0.0.0'};p.scripts={start:'HOSTNAME=0.0.0.0 node server.js'};fs.writeFileSync(f,JSON.stringify(p,null,2))"
 
       - name: Subir artifact
         uses: actions/upload-artifact@v4

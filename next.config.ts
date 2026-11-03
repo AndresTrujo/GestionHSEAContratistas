@@ -10,8 +10,9 @@ const nextConfig: NextConfig = {
     "*.*.devtunnels.ms",
   ],
   reactStrictMode: true,
-  // `pg` usa módulos nativos de Node (fs, net, tls): se carga desde node_modules, no se empaqueta.
-  serverExternalPackages: ["pg"],
+  // `mssql` y `tedious` (driver de SQL Server) usan requires dinámicos, `net` y `tls`: se cargan desde
+  // node_modules (que el modo standalone copia), no se empaquetan.
+  serverExternalPackages: ["mssql", "tedious"],
   experimental: {
     // Los documentos de contratistas se suben con acciones de servidor (máx. 5 MB por archivo).
     serverActions: {
