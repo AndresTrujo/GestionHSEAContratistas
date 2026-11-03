@@ -66,7 +66,6 @@ import {
 import {
   append_audit_db,
   has_permission_db,
-  is_hsea_admin_db,
   require_permission_db,
   to_employee_int,
 } from "./repos_organizacion_azure";
@@ -1477,7 +1476,7 @@ export function create_contractor_repositories_azure(): ContractorRepositories {
               [version.documento_id],
             );
             if (latest.rows[0]?.id !== version.id) throw new ValidationError("Solo se revisa la versión más reciente");
-            if (version.subido_por === actorEmployeeNumber && !(await is_hsea_admin_db(db, actorEmployeeNumber))) {
+            if (version.subido_por === actorEmployeeNumber) {
               throw new ValidationError("No puedes revisar un documento que tú mismo subiste");
             }
             const reason = optional_text(input.reason);
