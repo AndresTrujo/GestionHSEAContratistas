@@ -7,7 +7,7 @@ import {
   type DocumentTypeDefinition,
   type WorkTypeCode,
 } from "@/config/documentos_contratista";
-import { adminRoleCode, type PermissionCode } from "@/config/permisos";
+import type { PermissionCode } from "@/config/permisos";
 import { lockoutMinutes, maxFailedAttempts } from "@/config/seguridad";
 import { find_contractor_type, type ContractorTypeCode } from "@/config/tipos_contratista";
 import type { ActorIdentity } from "@/domain/acceso";
@@ -275,12 +275,6 @@ export function create_contractor_repositories(
     if (!(await access.has_permission(employeeNumber, permission))) {
       throw new AccessDeniedError(`el permiso ${permission}`);
     }
-  }
-
-  /** El administrador HSEA es la única excepción a no revisar lo que él mismo subió. */
-  async function is_hsea_admin(employeeNumber: string): Promise<boolean> {
-    const assignments = await access.list_assignments_by_employee(employeeNumber, { onlyCurrent: true });
-    return assignments.some((assignment) => assignment.roleCode === adminRoleCode);
   }
 
   function get_provider_or_throw(providerId: number) {
@@ -939,7 +933,7 @@ export function create_contractor_repositories(
         if (store.reviews.some((r) => r.versionId === version.id)) {
           throw new ValidationError("Esta versión ya fue revisada");
         }
-        if (version.uploadedBy === actorEmployeeNumber && !(await is_hsea_admin(actorEmployeeNumber))) {
+        if (version.uploadedBy === actorEmployeeNumber) {
           throw new ValidationError("No puedes revisar un documento que tú mismo subiste");
         }
         const reason = optional_text(input.reason);
