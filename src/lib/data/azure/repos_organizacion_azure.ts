@@ -38,15 +38,28 @@ import { get_scope_of_area_ref } from "../alcance";
 import { AccessDeniedError, NotFoundError, ValidationError } from "../errores";
 import { get_signer_actor_id, get_signer_actor_type } from "../identidad";
 import type { DataRepositories } from "../repositorios";
-import { insert_audit_event } from "./auditoria_railway";
+import { insert_audit_event } from "./auditoria_azure";
 import {
   get_db,
-  get_pg_error,
-  pgForeignKeyViolation,
-  pgUniqueViolation,
+  get_sql_error,
+  is_unique_violation,
   with_transaction,
   type Queryable,
 } from "./conexion";
+
+/** Violación de FOREIGN KEY (547 con texto "FOREIGN KEY"): se distingue de los CHECK por el mensaje. */
+function is_foreign_key_violation(error: unknown): boolean {
+  const { number, message } = get_sql_error(error);
+  return number === 547 && message.includes("FOREIGN KEY");
+}
+
+/** Restricción única de `firmas_permiso (permiso_id, rol_firma)`: un solo firmante por rol en cada permiso. */
+const uniqueRolePerPermitConstraint = "firmas_permiso_permiso_id_rol_firma_key";
+
+/** `columna IS NOT DISTINCT FROM $n` (T-SQL no lo trae en todos los niveles de compatibilidad). */
+function equals_nullable_int(column: string, placeholder: string): string {
+  return `(${column} = CAST(${placeholder} AS int) OR (${column} IS NULL AND CAST(${placeholder} AS int) IS NULL))`;
+}
 
 type OrganizationRepositories = Pick<
   DataRepositories,
@@ -125,7 +138,8 @@ interface RoleRow extends AuditCols {
   descripcion: string | null;
   es_sistema: boolean;
   activo: boolean;
-  permisos: string[];
+  // Arreglo JSON armado en la consulta (nvarchar): llega como texto.
+  permisos: string[] | string;
 }
 interface RoleAssignmentRow extends AuditCols {
   id: string;
@@ -240,7 +254,9 @@ function map_role(row: RoleRow): Role {
     description: row.descripcion,
     isSystem: row.es_sistema,
     active: row.activo,
-    permissions: row.permisos.filter(is_permission_code),
+    permissions: (typeof row.permisos === "string" ? (JSON.parse(row.permisos) as string[]) : row.permisos).filter(
+      is_permission_code,
+    ),
     ...map_audit(row),
   };
 }
@@ -361,15 +377,15 @@ export async function has_permission_db(
   const number = Number(employeeNumber);
   if (!Number.isSafeInteger(number)) return false;
   if (!area) {
-    const { rows } = await db.query<{ ok: boolean }>(
-      `SELECT EXISTS (SELECT 1 FROM v_permisos_empleado
-                       WHERE no_empleado = $1 AND permiso_codigo = $2) AS ok`,
+    const { rows } = await db.query<{ ok: number }>(
+      `SELECT CASE WHEN EXISTS (SELECT 1 FROM v_permisos_empleado
+                                 WHERE no_empleado = $1 AND permiso_codigo = $2) THEN 1 ELSE 0 END AS ok`,
       [number, permission],
     );
-    return rows[0]?.ok === true;
+    return rows[0]?.ok === 1;
   }
   const { rows } = await db.query<{ ok: boolean }>(
-    `SELECT tiene_permiso($1::int, $2::text, $3::int, $4::int) AS ok`,
+    `SELECT dbo.tiene_permiso(CAST($1 AS int), CAST($2 AS nvarchar(450)), CAST($3 AS int), CAST($4 AS int)) AS ok`,
     [number, permission, area.departmentId, area.subdepartmentId],
   );
   return rows[0]?.ok === true;
@@ -379,11 +395,12 @@ export async function has_permission_db(
 export async function is_hsea_admin_db(db: Queryable, employeeNumber: string): Promise<boolean> {
   const number = Number(employeeNumber);
   if (!Number.isSafeInteger(number)) return false;
-  const { rows } = await db.query<{ ok: boolean }>(
-    `SELECT EXISTS (SELECT 1 FROM v_roles_vigentes WHERE no_empleado = $1 AND rol_codigo = $2) AS ok`,
+  const { rows } = await db.query<{ ok: number }>(
+    `SELECT CASE WHEN EXISTS (SELECT 1 FROM v_roles_vigentes WHERE no_empleado = $1 AND rol_codigo = $2)
+                 THEN 1 ELSE 0 END AS ok`,
     [number, adminRoleCode],
   );
-  return rows[0]?.ok === true;
+  return rows[0]?.ok === 1;
 }
 
 export async function require_permission_db(
@@ -536,7 +553,7 @@ async function check_pin_db(
   const filter = build_signer_filter(signer, 1);
   if (!filter) return "PIN_NO_ACTIVADO";
   const { rows } = await db.query<CredentialRow>(
-    `SELECT * FROM credenciales_firma WHERE ${filter.sql} AND estado <> 'REVOCADA' FOR UPDATE`,
+    `SELECT * FROM credenciales_firma WITH (UPDLOCK, ROWLOCK) WHERE ${filter.sql} AND estado <> 'REVOCADA'`,
     [filter.value],
   );
   const credential = rows[0];
@@ -565,7 +582,7 @@ async function check_pin_db(
   const locked = attempts >= maxFailedAttempts;
   await db.query(
     `UPDATE credenciales_firma
-        SET intentos_fallidos = $2, estado = $3, bloqueada_hasta = $4
+        SET intentos_fallidos = $2, estado = $3, bloqueada_hasta = CAST($4 AS datetimeoffset(3))
       WHERE id = $1`,
     [
       credential.id,
@@ -585,7 +602,7 @@ async function check_pin_db(
  * Repositorios
  * ------------------------------------------------------------------- */
 
-export function create_organization_repositories_railway(): OrganizationRepositories {
+export function create_organization_repositories_azure(): OrganizationRepositories {
   return {
     employees: {
       async find_by_number(employeeNumber) {
@@ -599,10 +616,10 @@ export function create_organization_repositories_railway(): OrganizationReposito
       },
       async list_by_department(departmentId, options) {
         const params: unknown[] = [departmentId, options?.includeInactive === true];
-        let sql = `SELECT * FROM empleados WHERE departamento_id = $1 AND (activo OR $2::boolean)`;
+        let sql = `SELECT * FROM empleados WHERE departamento_id = $1 AND (activo = 1 OR $2 = 1)`;
         if (options?.subdepartmentId !== undefined) {
           params.push(options.subdepartmentId);
-          sql += ` AND subdepartamento_id IS NOT DISTINCT FROM $3::int`;
+          sql += ` AND ${equals_nullable_int("subdepartamento_id", "$3")}`;
         }
         const { rows } = await get_db().query<EmployeeRow>(`${sql} ORDER BY apellido_paterno, primer_nombre`, params);
         return rows.map(map_employee);
@@ -611,16 +628,16 @@ export function create_organization_repositories_railway(): OrganizationReposito
         const terms = normalize_text(query).split(/\s+/).filter(Boolean);
         if (terms.length === 0) return [];
         const params: unknown[] = [options?.includeInactive === true, options?.limit ?? 25];
-        const haystack = `translate(lower(no_empleado::text || ' ' || concat_ws(' ', primer_nombre, segundo_nombre, apellido_paterno, apellido_materno, puesto)), 'áéíóúñü', 'aeiounu')`;
+        const haystack = `TRANSLATE(LOWER(CONCAT(CAST(no_empleado AS nvarchar(20)), N' ', CONCAT_WS(N' ', primer_nombre, segundo_nombre, apellido_paterno, apellido_materno, puesto))), N'áéíóúñü', N'aeiounu')`;
         const conditions = terms.map((term) => {
-          params.push(`%${term.replace(/[\\%_]/g, "\\$&")}%`);
-          return `${haystack} LIKE $${params.length}`;
+          // El carácter de escape es "\": se escapan también los comodines de T-SQL (%, _ y [).
+          params.push(`%${term.replace(/[\\%_[]/g, "\\$&")}%`);
+          return `${haystack} LIKE $${params.length} ESCAPE '\\'`;
         });
         const { rows } = await get_db().query<EmployeeRow>(
-          `SELECT * FROM empleados
-            WHERE (activo OR $1::boolean) AND ${conditions.join(" AND ")}
-            ORDER BY apellido_paterno, primer_nombre
-            LIMIT $2`,
+          `SELECT TOP ($2) * FROM empleados
+            WHERE (activo = 1 OR $1 = 1) AND ${conditions.join(" AND ")}
+            ORDER BY apellido_paterno, primer_nombre`,
           params,
         );
         return rows.map(map_employee);
@@ -634,14 +651,14 @@ export function create_organization_repositories_railway(): OrganizationReposito
       },
       async list_departments(commandLineId) {
         const { rows } = await get_db().query<DepartmentRow>(
-          `SELECT * FROM departamentos WHERE ($1::int IS NULL OR linea_mando_id = $1) ORDER BY id`,
+          `SELECT * FROM departamentos WHERE (CAST($1 AS int) IS NULL OR linea_mando_id = CAST($1 AS int)) ORDER BY id`,
           [commandLineId ?? null],
         );
         return rows.map(map_department);
       },
       async list_subdepartments(departmentId) {
         const { rows } = await get_db().query<SubdepartmentRow>(
-          `SELECT * FROM subdepartamentos WHERE ($1::int IS NULL OR departamento_id = $1) ORDER BY id`,
+          `SELECT * FROM subdepartamentos WHERE (CAST($1 AS int) IS NULL OR departamento_id = CAST($1 AS int)) ORDER BY id`,
           [departmentId ?? null],
         );
         return rows.map(map_subdepartment);
@@ -656,9 +673,9 @@ export function create_organization_repositories_railway(): OrganizationReposito
         if (filter?.area) {
           params.push(filter.area.commandLineId, filter.area.departmentId, filter.area.subdepartmentId);
           conditions.push(
-            `c.linea_mando_id IS NOT DISTINCT FROM $${params.length - 2}::int
-             AND c.departamento_id IS NOT DISTINCT FROM $${params.length - 1}::int
-             AND c.subdepartamento_id IS NOT DISTINCT FROM $${params.length}::int`,
+            `${equals_nullable_int("c.linea_mando_id", `$${params.length - 2}`)}
+             AND ${equals_nullable_int("c.departamento_id", `$${params.length - 1}`)}
+             AND ${equals_nullable_int("c.subdepartamento_id", `$${params.length}`)}`,
           );
         }
         // v_cargos_vigentes ya filtra por vigencia y empleado activo.
@@ -683,12 +700,13 @@ export function create_organization_repositories_railway(): OrganizationReposito
               throw new ValidationError("El encargado se asigna a un departamento o subdepartamento");
             }
             const actorNumber = to_employee_int(actorEmployeeNumber);
+            // cargos_area tiene triggers: sin OUTPUT; se relee la fila con SCOPE_IDENTITY().
             const { rows } = await db.query<AreaAssignmentRow>(
               `INSERT INTO cargos_area
                  (no_empleado, cargo, linea_mando_id, departamento_id, subdepartamento_id,
                   vigente_desde, motivo, creado_por, actualizado_por)
-               VALUES ($1, $2, $3, $4, $5, COALESCE($6::date, hoy_mx()), $7, $8, $8)
-               RETURNING *`,
+               VALUES ($1, $2, $3, $4, $5, COALESCE(CAST($6 AS date), dbo.hoy_mx()), $7, $8, $8);
+               SELECT * FROM cargos_area WHERE id = SCOPE_IDENTITY();`,
               [
                 to_employee_int(input.employeeNumber),
                 input.position,
@@ -712,7 +730,7 @@ export function create_organization_repositories_railway(): OrganizationReposito
             return map_area_assignment(row);
           });
         } catch (error) {
-          if (get_pg_error(error).code === pgForeignKeyViolation) {
+          if (is_foreign_key_violation(error)) {
             throw new ValidationError("El área indicada no existe");
           }
           throw error;
@@ -722,12 +740,16 @@ export function create_organization_repositories_railway(): OrganizationReposito
         return with_transaction(async (db) => {
           await require_permission_db(db, actorEmployeeNumber, "organizacion:administrar");
           const motive = require_reason(reason);
+          // cargos_area tiene triggers: OUTPUT ... INTO una variable de tabla y se relee la fila actualizada
+          // (si ningún renglón cumple el filtro, la variable queda vacía y no se devuelve nada).
           const { rows } = await db.query<AreaAssignmentRow>(
-            `UPDATE cargos_area
-                SET vigente_hasta = GREATEST(vigente_desde, hoy_mx()), motivo = $2,
-                    actualizado_en = now(), actualizado_por = $3
-              WHERE id = $1 AND (vigente_hasta IS NULL OR vigente_hasta > hoy_mx())
-              RETURNING *`,
+            `DECLARE @changed TABLE (id bigint);
+             UPDATE cargos_area
+                SET vigente_hasta = CASE WHEN vigente_desde > dbo.hoy_mx() THEN vigente_desde ELSE dbo.hoy_mx() END,
+                    motivo = $2, actualizado_en = SYSDATETIMEOFFSET(), actualizado_por = $3
+               OUTPUT INSERTED.id INTO @changed
+              WHERE id = $1 AND (vigente_hasta IS NULL OR vigente_hasta > dbo.hoy_mx());
+             SELECT c.* FROM cargos_area c JOIN @changed ch ON ch.id = c.id;`,
             [assignmentId, motive, to_employee_int(actorEmployeeNumber)],
           );
           const row = rows[0];
@@ -761,7 +783,8 @@ export function create_organization_repositories_railway(): OrganizationReposito
           const actorNumber = to_employee_int(actorEmployeeNumber);
           const { rows } = await db.query<SubdepartmentRow>(
             `INSERT INTO subdepartamentos (departamento_id, nombre, creado_por, actualizado_por)
-             VALUES ($1, $2, $3, $3) RETURNING *`,
+             VALUES ($1, $2, $3, $3);
+             SELECT * FROM subdepartamentos WHERE id = SCOPE_IDENTITY();`,
             [departmentId, cleanName, actorNumber],
           );
           const row = rows[0];
@@ -778,9 +801,10 @@ export function create_organization_repositories_railway(): OrganizationReposito
     access: {
       async list_roles() {
         const { rows } = await get_db().query<RoleRow>(
-          `SELECT r.*, COALESCE(array_agg(rp.permiso_codigo) FILTER (WHERE rp.permiso_codigo IS NOT NULL), '{}') AS permisos
-             FROM roles r LEFT JOIN rol_permisos rp ON rp.rol_id = r.id
-            GROUP BY r.id ORDER BY r.id`,
+          `SELECT r.*,
+                  COALESCE((SELECT '[' + STRING_AGG('"' + STRING_ESCAPE(CAST(rp.permiso_codigo AS nvarchar(max)), 'json') + '"', ',') + ']'
+                              FROM rol_permisos rp WHERE rp.rol_id = r.id), '[]') AS permisos
+             FROM roles r ORDER BY r.id`,
         );
         return rows.map(map_role);
       },
@@ -800,7 +824,7 @@ export function create_organization_repositories_railway(): OrganizationReposito
             const motive = require_reason(input.reason);
             await require_active_employee_db(db, input.employeeNumber);
             const role = await db.query<{ id: number; codigo: string }>(
-              `SELECT id, codigo FROM roles WHERE codigo = $1 AND activo`,
+              `SELECT id, codigo FROM roles WHERE codigo = $1 AND activo = 1`,
               [input.roleCode],
             );
             const roleRow = role.rows[0];
@@ -821,12 +845,13 @@ export function create_organization_repositories_railway(): OrganizationReposito
             }
 
             const actorNumber = to_employee_int(actorEmployeeNumber);
+            // empleado_roles tiene triggers: sin OUTPUT; se relee la fila con SCOPE_IDENTITY().
             const { rows } = await db.query<Omit<RoleAssignmentRow, "rol_codigo">>(
               `INSERT INTO empleado_roles
                  (no_empleado, rol_id, alcance, linea_mando_id, departamento_id, subdepartamento_id,
                   vigente_desde, vigente_hasta, otorgado_por, motivo, creado_por, actualizado_por)
-               VALUES ($1, $2, $3, $4, $5, $6, COALESCE($7::date, hoy_mx()), $8::date, $9, $10, $9, $9)
-               RETURNING *`,
+               VALUES ($1, $2, $3, $4, $5, $6, COALESCE(CAST($7 AS date), dbo.hoy_mx()), CAST($8 AS date), $9, $10, $9, $9);
+               SELECT * FROM empleado_roles WHERE id = SCOPE_IDENTITY();`,
               [
                 to_employee_int(input.employeeNumber),
                 roleRow.id,
@@ -854,7 +879,7 @@ export function create_organization_repositories_railway(): OrganizationReposito
             return map_role_assignment({ ...row, rol_codigo: roleRow.codigo });
           });
         } catch (error) {
-          if (get_pg_error(error).code === pgForeignKeyViolation) {
+          if (is_foreign_key_violation(error)) {
             throw new ValidationError("El área indicada no existe");
           }
           throw error;
@@ -874,24 +899,28 @@ export function create_organization_repositories_railway(): OrganizationReposito
           );
           if (target.rows[0]?.rol_codigo === adminRoleCode) {
             await db.query(
-              `SELECT er.id FROM empleado_roles er JOIN roles r ON r.id = er.rol_id
-                WHERE r.codigo = $1 AND er.revocado_en IS NULL FOR UPDATE OF er`,
+              `SELECT er.id FROM empleado_roles er WITH (UPDLOCK, ROWLOCK) JOIN roles r ON r.id = er.rol_id
+                WHERE r.codigo = $1 AND er.revocado_en IS NULL`,
               [adminRoleCode],
             );
-            const others = await db.query<{ total: string }>(
-              `SELECT count(*) AS total FROM v_roles_vigentes WHERE rol_codigo = $1 AND id <> $2`,
+            const others = await db.query<{ total: number | string }>(
+              `SELECT COUNT(*) AS total FROM v_roles_vigentes WHERE rol_codigo = $1 AND id <> $2`,
               [adminRoleCode, assignmentId],
             );
             if (Number(others.rows[0]?.total ?? 0) === 0) throw new ValidationError(lastAdminMessage);
           }
 
           const { rows } = await db.query<RoleAssignmentRow>(
-            `WITH u AS (
-               UPDATE empleado_roles
-                  SET revocado_en = now(), revocado_por = $2, actualizado_en = now(), actualizado_por = $2
-                WHERE id = $1 AND revocado_en IS NULL
-                RETURNING *)
-             SELECT u.*, r.codigo AS rol_codigo FROM u JOIN roles r ON r.id = u.rol_id`,
+            `DECLARE @changed TABLE (id bigint);
+             UPDATE empleado_roles
+                SET revocado_en = SYSDATETIMEOFFSET(), revocado_por = $2,
+                    actualizado_en = SYSDATETIMEOFFSET(), actualizado_por = $2
+               OUTPUT INSERTED.id INTO @changed
+              WHERE id = $1 AND revocado_en IS NULL;
+             SELECT er.*, r.codigo AS rol_codigo
+               FROM empleado_roles er
+               JOIN @changed ch ON ch.id = er.id
+               JOIN roles r ON r.id = er.rol_id;`,
             [assignmentId, actorNumber],
           );
           const row = rows[0];
@@ -919,7 +948,8 @@ export function create_organization_repositories_railway(): OrganizationReposito
         if (!permission) return null;
         const { rows } = await get_db().query<EmployeeRow>(
           `SELECT e.* FROM empleados e
-            WHERE e.activo AND tiene_permiso(e.no_empleado, $1::text, $2::int, $3::int)
+            WHERE e.activo = 1
+              AND dbo.tiene_permiso(e.no_empleado, CAST($1 AS nvarchar(450)), CAST($2 AS int), CAST($3 AS int)) = 1
             ORDER BY e.apellido_paterno, e.primer_nombre`,
           [permission, area.departmentId, area.subdepartmentId],
         );
@@ -957,17 +987,21 @@ export function create_organization_repositories_railway(): OrganizationReposito
 
           const filter = build_signer_filter(signer, 2);
           if (!filter) throw new ValidationError("Firmante inválido");
-          const revoked = await db.query(
-            `UPDATE credenciales_firma
-                SET estado = 'REVOCADA', revocada_en = now(), revocada_por = $1
-              WHERE ${filter.sql} AND estado <> 'REVOCADA'`,
+          // credenciales_firma tiene triggers: OUTPUT ... INTO una variable de tabla para saber cuántas se revocaron.
+          const revoked = await db.query<{ id: string }>(
+            `DECLARE @changed TABLE (id bigint);
+             UPDATE credenciales_firma
+                SET estado = 'REVOCADA', revocada_en = SYSDATETIMEOFFSET(), revocada_por = $1
+               OUTPUT INSERTED.id INTO @changed
+              WHERE ${filter.sql} AND estado <> 'REVOCADA';
+             SELECT id FROM @changed;`,
             [adminEmployeeNumber, filter.value],
           );
           const { rows } = await db.query<CredentialRow>(
             `INSERT INTO credenciales_firma
                (firmante_tipo, no_empleado, usuario_proveedor_id, pin_hash, activada_por)
-             VALUES ($1, $2, $3, $4, $5)
-             RETURNING *`,
+             VALUES ($1, $2, $3, $4, $5);
+             SELECT * FROM credenciales_firma WHERE id = SCOPE_IDENTITY();`,
             [
               signer.kind,
               signer.kind === "EMPLEADO" ? to_employee_int(signer.employeeNumber) : null,
@@ -980,7 +1014,7 @@ export function create_organization_repositories_railway(): OrganizationReposito
           if (!row) throw new Error("No se pudo activar el PIN");
           await append_audit_db(db, employee_actor(adminEmployeeNumber), "establecer_pin", "credenciales_firma", row.id, {
             signer: get_signer_actor_id(signer),
-            replacedPrevious: revoked.rowCount > 0,
+            replacedPrevious: revoked.rows.length > 0,
           });
           return map_credential(row);
         });
@@ -996,10 +1030,12 @@ export function create_organization_repositories_railway(): OrganizationReposito
           const filter = build_signer_filter(signer, 2);
           if (!filter) throw new ValidationError("Firmante inválido");
           const { rows } = await db.query<{ id: string }>(
-            `UPDATE credenciales_firma
-                SET estado = 'REVOCADA', revocada_en = now(), revocada_por = $1
-              WHERE ${filter.sql} AND estado <> 'REVOCADA'
-              RETURNING id`,
+            `DECLARE @changed TABLE (id bigint);
+             UPDATE credenciales_firma
+                SET estado = 'REVOCADA', revocada_en = SYSDATETIMEOFFSET(), revocada_por = $1
+               OUTPUT INSERTED.id INTO @changed
+              WHERE ${filter.sql} AND estado <> 'REVOCADA';
+             SELECT id FROM @changed;`,
             [adminEmployeeNumber, filter.value],
           );
           const row = rows[0];
@@ -1051,28 +1087,26 @@ export function create_organization_repositories_railway(): OrganizationReposito
               const permission = get_required_permission(input.role);
               if (permission) {
                 const role = await db.query<{ empleado_rol_id: string }>(
-                  `SELECT pe.empleado_rol_id
+                  `SELECT TOP (1) pe.empleado_rol_id
                      FROM v_permisos_empleado pe
-                     JOIN departamentos d ON d.id = $3::int
+                     JOIN departamentos d ON d.id = CAST($3 AS int)
                     WHERE pe.no_empleado = $1 AND pe.permiso_codigo = $2
                       AND (pe.alcance = 'GLOBAL'
                         OR (pe.alcance = 'LINEA_MANDO'     AND pe.linea_mando_id = d.linea_mando_id)
-                        OR (pe.alcance = 'DEPARTAMENTO'    AND pe.departamento_id = $3::int)
-                        OR (pe.alcance = 'SUBDEPARTAMENTO' AND pe.subdepartamento_id = $4::int))
-                    LIMIT 1`,
+                        OR (pe.alcance = 'DEPARTAMENTO'    AND pe.departamento_id = CAST($3 AS int))
+                        OR (pe.alcance = 'SUBDEPARTAMENTO' AND pe.subdepartamento_id = CAST($4 AS int)))`,
                   [number, permission, input.area.departmentId, input.area.subdepartmentId],
                 );
                 roleAssignmentId = role.rows[0]?.empleado_rol_id ?? null;
               }
               const post = await db.query<{ id: string }>(
-                `SELECT c.id
+                `SELECT TOP (1) c.id
                    FROM v_cargos_vigentes c
-                   JOIN departamentos d ON d.id = $2::int
+                   JOIN departamentos d ON d.id = CAST($2 AS int)
                   WHERE c.no_empleado = $1
                     AND (c.linea_mando_id = d.linea_mando_id
-                      OR c.departamento_id = $2::int
-                      OR c.subdepartamento_id = $3::int)
-                  LIMIT 1`,
+                      OR c.departamento_id = CAST($2 AS int)
+                      OR c.subdepartamento_id = CAST($3 AS int))`,
                 [number, input.area.departmentId, input.area.subdepartmentId],
               );
               areaAssignmentId = post.rows[0]?.id ?? null;
@@ -1112,8 +1146,8 @@ export function create_organization_repositories_railway(): OrganizationReposito
                  (permiso_id, rol_firma, firmante_tipo, no_empleado, usuario_proveedor_id,
                   linea_mando_id, departamento_id, subdepartamento_id, empleado_rol_id, cargo_area_id,
                   credencial_firma_id, nombre_firmante, puesto_firmante, hash_documento, imagen_firma)
-               VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
-               RETURNING *`,
+               VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15);
+               SELECT * FROM firmas_permiso WHERE id = SCOPE_IDENTITY();`,
               [
                 input.permitId,
                 input.role,
@@ -1143,16 +1177,14 @@ export function create_organization_repositories_railway(): OrganizationReposito
             return { ok: true as const, signature: map_signature(row) };
           });
         } catch (error) {
-          const { code, constraint } = get_pg_error(error);
           // Carrera entre dos firmas simultáneas: las restricciones únicas son la última defensa.
-          if (code === pgUniqueViolation) {
-            const reason: SignDenialReason =
-              constraint === "firmas_permiso_permiso_id_rol_firma_key"
-                ? "ROL_YA_FIRMADO"
-                : "PERSONA_YA_FIRMO_OTRO_ROL";
+          if (is_unique_violation(error)) {
+            const reason: SignDenialReason = get_sql_error(error).message.includes(uniqueRolePerPermitConstraint)
+              ? "ROL_YA_FIRMADO"
+              : "PERSONA_YA_FIRMO_OTRO_ROL";
             return { ok: false, reason };
           }
-          if (code === pgForeignKeyViolation) throw new NotFoundError("Permiso", input.permitId);
+          if (is_foreign_key_violation(error)) throw new NotFoundError("Permiso", input.permitId);
           throw error;
         }
       },

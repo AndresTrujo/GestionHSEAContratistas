@@ -20,7 +20,7 @@ next-env.d.ts
 .env.*
 !.env.example
 
-# archivos subidos en desarrollo (documentos y fotos de personas; en producción viven en el volumen de Railway)
+# archivos subidos en desarrollo (documentos y fotos de personas; en producción viven en el disco persistente configurado en STORAGE_DIR)
 /almacenamiento_local
 
 # pruebas y cobertura
@@ -38,9 +38,8 @@ pnpm-debug.log*
 *.dump
 *.sql.bak
 
-# Vercel / Railway locales
+# Vercel locales
 .vercel
-.railway
 
 # sistema operativo
 .DS_Store

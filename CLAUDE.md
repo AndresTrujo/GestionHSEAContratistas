@@ -39,7 +39,7 @@ There is no test framework configured yet.
 - `permisos.ts` — `WorkPermit` with status lifecycle `draft → submitted → approved/rejected → closed`; type-specific data lives in `fields`.
 - `contratistas.ts` — `Provider` → `ProviderEmployee` (whose `profileSlug` determines required documents) → `EmployeeDocument` with versioned `EmployeeDocumentVersion`s (old versions kept; sha256, storage path) and a review status.
 
-**Data layer** (`src/lib/data`): the backend is not chosen yet. `repositorios.ts` defines the repository interfaces (`DataRepositories`: `audit`, `permits`, `providers`, `documents`); `proveedor_datos.ts` → `get_repositories()` is the single entry point and selects an implementation by the `DATA_PROVIDER` env var (`"memory"` — default, in-memory dummy data in `lib/data/memoria/`, lost on restart — `"firebase"` or `"railway"`/PostgreSQL). Firebase/Railway implementations are meant to go in `lib/data/firebase` and `lib/data/railway`; until then `get_repositories()` throws for them. App code must depend only on the interfaces, never on a specific provider. See `.env.example` for required env vars.
+**Data layer** (`src/lib/data`): `repositorios.ts` defines the repository interfaces (`DataRepositories`: `audit`, `permits`, `providers`, `documents`, ...); `proveedor_datos.ts` → `get_repositories()` is the single entry point and selects an implementation by the `DATA_PROVIDER` env var (`"memory"` — default, in-memory dummy data in `lib/data/memoria/`, lost on restart — or `"azure"`, Azure SQL Server via the `mssql` package in `lib/data/azure/`). The Azure schema is `lib/data/azure/esquema.sql` (T-SQL, batches separated by `GO`); future migrations go in `lib/data/azure/migraciones/NNN_nombre.sql` and are applied with `npm run db:migrar`. SQL in the repositories uses `$1, $2...` placeholders, which `azure/conexion.ts` translates to `@p1, @p2...`. App code must depend only on the interfaces, never on a specific provider. See `.env.example` for required env vars (`AZURE_SQL_CONNECTION_STRING`).
 
 ## Styling
 
@@ -60,7 +60,7 @@ Servicio web en la nube para manejar los permisos de trabajo de colaboradores y 
 
 ### Stack
 - Next.js y Tailwind CSS.
-- Base de datos en un servicio externo (Firebase o Railway), elegido con `DATA_PROVIDER`.
+- Base de datos: Azure SQL Server (`DATA_PROVIDER=azure`); `memory` solo para desarrollo con datos dummy.
 
 ### Datos y trazabilidad
 - Todas las decisiones de diseño y manejo de datos deben tomar en cuenta la trazabilidad de los datos y de los documentos a guardar.

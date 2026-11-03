@@ -1,13 +1,13 @@
 /**
  * Convierte a huella (HMAC) las CURP y NSS que aún estén guardados en claro en `empleados_proveedor`.
- * Es idempotente: lo que ya es una huella (64 hex) se omite. Requiere DATABASE_URL y PII_HASH_KEY.
+ * Es idempotente: lo que ya es una huella (64 hex) se omite. Requiere AZURE_SQL_CONNECTION_STRING y PII_HASH_KEY.
  *
  *   npm run db:hashear_pii
  *
  * Correrlo una vez, después de desplegar la versión que guarda huellas; antes de eso, hacer un respaldo.
  * Un valor en claro con formato inválido se reporta y se deja como está.
  */
-import { close_pool, get_db, with_transaction } from "../src/lib/data/railway/conexion";
+import { close_pool, get_db, with_transaction } from "../src/lib/data/azure/conexion";
 import { hash_pii, is_pii_hash } from "../src/lib/data/huella_pii";
 import { curpPattern, nssPattern } from "../src/lib/data/validaciones";
 
@@ -47,7 +47,7 @@ async function main(): Promise<void> {
           continue;
         }
         if (curpValue === row.curp && nssValue === row.nss) continue;
-        await db.query(`UPDATE empleados_proveedor SET curp = $2, nss = $3, actualizado_en = now() WHERE id = $1`, [
+        await db.query(`UPDATE empleados_proveedor SET curp = $2, nss = $3, actualizado_en = SYSDATETIMEOFFSET() WHERE id = $1`, [
           row.id,
           curpValue,
           nssValue,

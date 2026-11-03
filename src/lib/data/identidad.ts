@@ -41,7 +41,7 @@ export function get_today_mx(): string {
   return get_date_mx(new Date());
 }
 
-/** Suma meses a una fecha YYYY-MM-DD; si el día no existe en el mes destino, usa el último (como PostgreSQL). */
+/** Suma meses a una fecha YYYY-MM-DD; si el día no existe en el mes destino, usa el último (como SQL Server). */
 export function add_months_to_date(date: string, months: number): string {
   const [year = 0, month = 1, day = 1] = date.split("-").map(Number);
   const targetIndex = month - 1 + months;

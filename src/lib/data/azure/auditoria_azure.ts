@@ -2,6 +2,8 @@ import type { ActorType, AuditAction, AuditEvent } from "@/domain/auditoria";
 import type { AuditSearchFilter } from "../repositorios";
 import { get_db, type Queryable } from "./conexion";
 
+type AuditDetails = Record<string, string | number | boolean | null>;
+
 interface AuditRow {
   id: string;
   ocurrido_en: Date;
@@ -10,7 +12,15 @@ interface AuditRow {
   accion: AuditAction;
   entidad: string;
   entidad_id: string;
-  detalles: Record<string, string | number | boolean | null>;
+  // Las columnas JSON son nvarchar(max): llegan como texto.
+  detalles: AuditDetails | string;
+}
+
+/** Lee una columna JSON (nvarchar(max) con ISJSON) que llega como texto; tolera que ya venga parseada. */
+export function parse_json_record(value: AuditDetails | string | null): AuditDetails {
+  if (value === null) return {};
+  if (typeof value !== "string") return value;
+  return JSON.parse(value) as AuditDetails;
 }
 
 function map_event(row: AuditRow): AuditEvent {
@@ -22,13 +32,14 @@ function map_event(row: AuditRow): AuditEvent {
     actorType: row.actor_tipo,
     actorId: row.actor_id,
     occurredAt: row.ocurrido_en.toISOString(),
-    details: row.detalles,
+    details: parse_json_record(row.detalles),
   };
 }
 
 /**
  * Inserta el evento con la conexión dada. Dentro de una transacción usa la misma `db`
  * que la mutación, para que ambos se confirmen o se reviertan juntos.
+ * `eventos_auditoria` tiene triggers de inmutabilidad: no admite OUTPUT sin INTO, así que se lee con SCOPE_IDENTITY().
  */
 export async function insert_audit_event(
   db: Queryable,
@@ -36,8 +47,8 @@ export async function insert_audit_event(
 ): Promise<AuditEvent> {
   const { rows } = await db.query<AuditRow>(
     `INSERT INTO eventos_auditoria (ocurrido_en, actor_tipo, actor_id, accion, entidad, entidad_id, detalles)
-     VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb)
-     RETURNING *`,
+     VALUES (CAST($1 AS datetimeoffset(3)), $2, $3, $4, $5, $6, $7);
+     SELECT * FROM eventos_auditoria WHERE id = SCOPE_IDENTITY();`,
     [
       event.occurredAt,
       event.actorType,
@@ -53,7 +64,7 @@ export async function insert_audit_event(
   return map_event(row);
 }
 
-export function create_audit_repository_railway() {
+export function create_audit_repository_azure() {
   return {
     async append_event(event: Omit<AuditEvent, "id">): Promise<AuditEvent> {
       return insert_audit_event(get_db(), event);
@@ -76,13 +87,21 @@ export function create_audit_repository_railway() {
       if (filter.entityId) add("entidad_id = ?", filter.entityId);
       if (filter.actorId) add("actor_id = ?", filter.actorId);
       if (filter.action) add("accion = ?", filter.action);
-      if (filter.from) add("ocurrido_en >= (?::date)::timestamp AT TIME ZONE 'America/Mexico_City'", filter.from);
-      if (filter.to) add("ocurrido_en < ((?::date) + 1)::timestamp AT TIME ZONE 'America/Mexico_City'", filter.to);
+      // Día local de México: desde las 00:00 del día "from" hasta antes de las 00:00 del día siguiente a "to".
+      if (filter.from) {
+        add("ocurrido_en >= (CAST(CAST(? AS date) AS datetime2) AT TIME ZONE 'Central Standard Time (Mexico)')", filter.from);
+      }
+      if (filter.to) {
+        add(
+          "ocurrido_en < (DATEADD(day, 1, CAST(CAST(? AS date) AS datetime2)) AT TIME ZONE 'Central Standard Time (Mexico)')",
+          filter.to,
+        );
+      }
       params.push(filter.limit);
       const { rows } = await get_db().query<AuditRow>(
-        `SELECT * FROM eventos_auditoria
+        `SELECT TOP ($${params.length}) * FROM eventos_auditoria
           ${conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : ""}
-          ORDER BY id DESC LIMIT $${params.length}`,
+          ORDER BY id DESC`,
         params,
       );
       return rows.map(map_event);

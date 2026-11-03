@@ -180,7 +180,7 @@ export function DocumentPanel({
                   <input type="hidden" name="returnPath" value={returnPath} />
                   <div className="sm:col-span-3">
                     <label htmlFor={`file-${requirement.documentTypeCode}`} className={labelClass}>
-                      Archivo (PDF, JPG o PNG, máx. 10 MB)
+                      Archivo (PDF, JPG o PNG, máx. 5 MB)
                     </label>
                     <input
                       id={`file-${requirement.documentTypeCode}`}

@@ -7,11 +7,12 @@ import { ValidationError } from "../errores";
 import type { WorkPermitRepository } from "../repositorios";
 import {
   get_db,
-  get_pg_error,
-  pgForeignKeyViolation,
+  get_sql_error,
   with_transaction,
   type Queryable,
 } from "./conexion";
+
+type PermitFields = Record<string, string | number | boolean | null>;
 
 interface PermitRow {
   id: string;
@@ -25,7 +26,8 @@ interface PermitRow {
   proveedor_id: number | null;
   departamento_id: number | null;
   subdepartamento_id: number | null;
-  campos: Record<string, string | number | boolean | null>;
+  // Columnas JSON (nvarchar(max)): llegan como texto.
+  campos: PermitFields | string;
   firmas_formato: unknown;
   creado_en: Date;
   creado_por: string;
@@ -33,11 +35,32 @@ interface PermitRow {
   actualizado_por: string;
 }
 
-/** Valida lo leído de jsonb: cualquier elemento con otra forma se descarta. */
+/** Violación de FOREIGN KEY (547 con texto "FOREIGN KEY"); el mensaje de SQL Server trae el nombre de la restricción. */
+function is_foreign_key_violation(error: unknown): boolean {
+  const { number, message } = get_sql_error(error);
+  return number === 547 && message.includes("FOREIGN KEY");
+}
+
+function get_constraint_name(error: unknown): string {
+  return /constraint "([^"]+)"/i.exec(get_sql_error(error).message)?.[1] ?? "desconocida";
+}
+
+/** Lee una columna JSON que llega como texto; tolera que ya venga parseada. */
+function parse_json_column(value: unknown): unknown {
+  if (typeof value !== "string") return value;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return null;
+  }
+}
+
+/** Valida lo leído de JSON: cualquier elemento con otra forma se descarta. */
 function parse_signatures(value: unknown): PermitSignature[] {
-  if (!Array.isArray(value)) return [];
+  const parsed = parse_json_column(value);
+  if (!Array.isArray(parsed)) return [];
   const result: PermitSignature[] = [];
-  for (const item of value) {
+  for (const item of parsed) {
     if (typeof item !== "object" || item === null) continue;
     const { key, employeeNumber, signedAt, image } = item as Record<string, unknown>;
     if (typeof key !== "string" || typeof employeeNumber !== "string" || typeof signedAt !== "string") continue;
@@ -59,7 +82,7 @@ function map_permit(row: PermitRow): WorkPermit {
         ? null
         : { departmentId: row.departamento_id, subdepartmentId: row.subdepartamento_id },
     signatures: parse_signatures(row.firmas_formato),
-    fields: row.campos,
+    fields: (parse_json_column(row.campos) ?? {}) as PermitFields,
     createdAt: row.creado_en.toISOString(),
     createdBy: row.creado_por,
     updatedAt: row.actualizado_en.toISOString(),
@@ -87,11 +110,12 @@ async function load_role_signatures(
 ): Promise<Map<string, PermitSignature[]>> {
   const result = new Map<string, PermitSignature[]>();
   if (permitIds.length === 0) return result;
+  // Los ids viajan como un arreglo JSON (OPENJSON) para no toparse con el límite de 2100 parámetros.
   const { rows } = await db.query<RoleSignatureRow>(
     `SELECT permiso_id, rol_firma, no_empleado, usuario_proveedor_id, firmado_en,
-            ${includeImages ? "imagen_firma" : "NULL::text AS imagen_firma"}
-       FROM firmas_permiso WHERE permiso_id = ANY($1::text[]) ORDER BY id`,
-    [permitIds],
+            ${includeImages ? "imagen_firma" : "CAST(NULL AS nvarchar(max)) AS imagen_firma"}
+       FROM firmas_permiso WHERE permiso_id IN (SELECT value FROM OPENJSON($1)) ORDER BY id`,
+    [JSON.stringify(permitIds)],
   );
   for (const row of rows) {
     const list = result.get(row.permiso_id) ?? [];
@@ -126,19 +150,22 @@ function get_folio_prefix(permit: WorkPermit): string {
  * para que el contador sea único aunque dos personas creen a la vez. Las firmas de rol viven en
  * `firmas_permiso` y se unen al leer; `firmas_formato` guarda solo los pasos que no son un rol
  * (verificaciones, revalidación, participantes, solicitante) y las de permisos anteriores.
+ * `permisos_trabajo` tiene triggers: no se usa OUTPUT sin INTO, se relee la fila con SELECT.
  */
-export function create_permit_repository_railway(): WorkPermitRepository {
+export function create_permit_repository_azure(): WorkPermitRepository {
   return {
     async list_by_type(permitTypeSlug) {
       // Los listados no muestran firmas: se omiten los trazos (PNG en base64, pesados) de cada permiso.
       const { rows } = await get_db().query<PermitRow>(
-        `SELECT id, tipo_permiso_slug, anio, consecutivo, folio, estatus,
-                solicitante_no_empleado, solicitante_usuario_proveedor_id, proveedor_id,
-                departamento_id, subdepartamento_id, campos,
-                COALESCE((SELECT jsonb_agg(firma - 'image') FROM jsonb_array_elements(firmas_formato) AS firma),
-                         '[]'::jsonb) AS firmas_formato,
-                creado_en, creado_por, actualizado_en, actualizado_por
-           FROM permisos_trabajo WHERE tipo_permiso_slug = $1 ORDER BY anio, consecutivo`,
+        `SELECT p.id, p.tipo_permiso_slug, p.anio, p.consecutivo, p.folio, p.estatus,
+                p.solicitante_no_empleado, p.solicitante_usuario_proveedor_id, p.proveedor_id,
+                p.departamento_id, p.subdepartamento_id, p.campos,
+                COALESCE((SELECT '[' + STRING_AGG(CAST(JSON_MODIFY(f.value, '$.image', NULL) AS nvarchar(max)), ',')
+                                       WITHIN GROUP (ORDER BY CAST(f.[key] AS int)) + ']'
+                            FROM OPENJSON(p.firmas_formato) AS f),
+                         '[]') AS firmas_formato,
+                p.creado_en, p.creado_por, p.actualizado_en, p.actualizado_por
+           FROM permisos_trabajo p WHERE p.tipo_permiso_slug = $1 ORDER BY p.anio, p.consecutivo`,
         [permitTypeSlug],
       );
       const roleSignatures = await load_role_signatures(get_db(), rows.map((row) => row.id), false);
@@ -171,7 +198,7 @@ export function create_permit_repository_railway(): WorkPermitRepository {
       try {
         return await with_transaction(async (db) => {
           const existing = await db.query(
-            `SELECT 1 FROM permisos_trabajo WHERE id = $1 FOR UPDATE`,
+            `SELECT 1 AS ok FROM permisos_trabajo WITH (UPDLOCK, ROWLOCK) WHERE id = $1`,
             [permit.id],
           );
 
@@ -185,10 +212,10 @@ export function create_permit_repository_railway(): WorkPermitRepository {
             const { rows } = await db.query<PermitRow>(
               `UPDATE permisos_trabajo
                   SET estatus = $2, proveedor_id = $3, departamento_id = $4, subdepartamento_id = $5,
-                      campos = $6::jsonb, firmas_formato = $7::jsonb,
-                      actualizado_en = now(), actualizado_por = $8
-                WHERE id = $1
-                RETURNING *`,
+                      campos = $6, firmas_formato = $7,
+                      actualizado_en = SYSDATETIMEOFFSET(), actualizado_por = $8
+                WHERE id = $1;
+               SELECT * FROM permisos_trabajo WHERE id = $1;`,
               [
                 permit.id,
                 permit.status,
@@ -207,8 +234,9 @@ export function create_permit_repository_railway(): WorkPermitRepository {
             return { ...saved, signatures: merge_signatures(saved.signatures, roleSignatures) };
           }
 
+          // Procedimiento almacenado: devuelve una fila con anio_folio y consecutivo_folio.
           const counter = await db.query<{ anio_folio: number; consecutivo_folio: number }>(
-            `SELECT * FROM siguiente_consecutivo($1)`,
+            `EXEC dbo.siguiente_consecutivo $1`,
             [permit.permitTypeSlug],
           );
           const issued = counter.rows[0];
@@ -221,9 +249,9 @@ export function create_permit_repository_railway(): WorkPermitRepository {
                 solicitante_tipo, solicitante_no_empleado, solicitante_usuario_proveedor_id, proveedor_id,
                 departamento_id, subdepartamento_id, campos, firmas_formato,
                 creado_en, creado_por, actualizado_en, actualizado_por)
-             VALUES ($1, $2, $3, $4, $5, $6, $17, $7, $18, $8, $9, $10, $11::jsonb, $12::jsonb,
-                     $13, $14, $15, $16)
-             RETURNING *`,
+             VALUES ($1, $2, $3, $4, $5, $6, $17, $7, $18, $8, $9, $10, $11, $12,
+                     CAST($13 AS datetimeoffset(3)), $14, CAST($15 AS datetimeoffset(3)), $16);
+             SELECT * FROM permisos_trabajo WHERE id = $1;`,
             [
               permit.id,
               permit.permitTypeSlug,
@@ -250,10 +278,9 @@ export function create_permit_repository_railway(): WorkPermitRepository {
           return map_permit(row);
         });
       } catch (error) {
-        const { code, constraint } = get_pg_error(error);
-        if (code === pgForeignKeyViolation) {
+        if (is_foreign_key_violation(error)) {
           throw new ValidationError(
-            `El solicitante, el proveedor o el área del permiso no existen (restricción: ${constraint ?? "desconocida"})`,
+            `El solicitante, el proveedor o el área del permiso no existen (restricción: ${get_constraint_name(error)})`,
           );
         }
         throw error;

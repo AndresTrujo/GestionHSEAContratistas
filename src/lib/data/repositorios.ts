@@ -61,7 +61,7 @@ import type { ServerLogEntry, ServerLogLevel } from "@/domain/registro_servidor"
 import type { WorkPermit } from "@/domain/permisos";
 
 /**
- * Contratos de acceso a datos. Las implementaciones (Firebase o Railway)
+ * Contratos de acceso a datos. Las implementaciones (memoria o Azure SQL)
  * se eligen con DATA_PROVIDER; el resto de la app solo conoce estas interfaces.
  */
 export interface AuditRepository {

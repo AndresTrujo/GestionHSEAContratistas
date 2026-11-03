@@ -176,5 +176,5 @@ export function find_document_type(code: string): DocumentTypeDefinition | undef
 }
 
 /** Reglas de los archivos subidos (el almacenamiento real se define aparte). */
-export const maxDocumentFileBytes = 10 * 1024 * 1024;
+export const maxDocumentFileBytes = 5 * 1024 * 1024;
 export const allowedDocumentMimeTypes = ["application/pdf", "image/jpeg", "image/png"] as const;

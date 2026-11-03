@@ -2,7 +2,7 @@ import { LocalFileStorage } from "./archivos_locales";
 
 /**
  * Almacenamiento de los archivos subidos (documentos de contratistas). Hoy vive en una carpeta
- * (en Railway, un Volume); para pasar a otro lugar (p. ej. SharePoint) solo hay que escribir otra
+ * (en producción, un disco persistente); para pasar a otro lugar (p. ej. SharePoint) solo hay que escribir otra
  * implementación de esta interfaz. Las llaves son rutas relativas generadas por el sistema.
  */
 export interface FileStorage {
@@ -19,7 +19,7 @@ export function get_file_storage(): FileStorage {
   if (!globalStorage.fileStorage) {
     const directory = process.env.STORAGE_DIR;
     if (!directory && process.env.NODE_ENV === "production") {
-      throw new Error("STORAGE_DIR es obligatoria en producción (carpeta del Volume de Railway)");
+      throw new Error("STORAGE_DIR es obligatoria en producción (carpeta de un disco persistente)");
     }
     globalStorage.fileStorage = new LocalFileStorage(directory || "./almacenamiento_local");
   }

@@ -11,9 +11,9 @@ const nextConfig: NextConfig = {
   // `pg` usa módulos nativos de Node (fs, net, tls): se carga desde node_modules, no se empaqueta.
   serverExternalPackages: ["pg"],
   experimental: {
-    // Los documentos de contratistas se suben con acciones de servidor (máx. 10 MB por archivo).
+    // Los documentos de contratistas se suben con acciones de servidor (máx. 5 MB por archivo).
     serverActions: {
-      bodySizeLimit: "11mb",
+      bodySizeLimit: "6mb",
       allowedOrigins: [
         "localhost:3000",
         "10.10.16.36:3000",

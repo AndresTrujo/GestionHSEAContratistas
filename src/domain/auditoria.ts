@@ -3,7 +3,7 @@
  * toda mutación genera un AuditEvent inmutable (solo se agregan, nunca se editan).
  *
  * Los valores de AuditAction, ActorType y entityType son los mismos que guarda
- * la tabla `eventos_auditoria` (src/lib/data/railway/esquema.sql).
+ * la tabla `eventos_auditoria` (src/lib/data/azure/esquema.sql).
  */
 
 /**

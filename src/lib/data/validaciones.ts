@@ -1,6 +1,6 @@
 import { ValidationError } from "./errores";
 
-/** Validaciones de formato compartidas por las implementaciones de datos (memoria y Railway). */
+/** Validaciones de formato compartidas por las implementaciones de datos (memoria y Azure SQL). */
 export const taxIdPattern = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/;
 export const curpPattern = /^[A-Z]{4}\d{6}[HM][A-Z]{5}[A-Z0-9]\d$/;
 export const nssPattern = /^\d{11}$/;

@@ -57,9 +57,9 @@ import {
 import { hash_pii } from "../huella_pii";
 import {
   get_db,
-  get_pg_error,
-  pgForeignKeyViolation,
-  pgUniqueViolation,
+  get_sql_error,
+  is_constraint_violation,
+  is_unique_violation,
   with_transaction,
   type Queryable,
 } from "./conexion";
@@ -69,7 +69,7 @@ import {
   is_hsea_admin_db,
   require_permission_db,
   to_employee_int,
-} from "./repos_organizacion_railway";
+} from "./repos_organizacion_azure";
 
 type ContractorRepositories = Pick<
   DataRepositories,
@@ -93,6 +93,16 @@ interface ProviderAuditCols {
   actualizado_por: string | null;
 }
 
+/** Convierte la lista "A,B" de STRING_AGG en arreglo (tolera null/undefined). */
+function split_codes(value: string | null | undefined): string[] {
+  return value ? value.split(",").filter((code) => code.length > 0) : [];
+}
+
+/** Placeholders `$n, $n+1...` para un `IN (...)` con arreglo (sustituye a `= ANY($n::text[])`). */
+function in_placeholders(firstIndex: number, count: number): string {
+  return Array.from({ length: count }, (_, offset) => `$${firstIndex + offset}`).join(", ");
+}
+
 function map_audit(row: ProviderAuditCols) {
   return {
     createdAt: row.creado_en.toISOString(),
@@ -110,7 +120,8 @@ interface ProviderRow extends ProviderAuditCols {
   correo_contacto: string;
   telefono: string | null;
   estatus: ProviderStatus;
-  tipos: string[];
+  /** Códigos separados por coma (STRING_AGG); vacío si no hay. */
+  tipos: string;
 }
 interface UserRow extends ProviderAuditCols {
   id: number;
@@ -138,7 +149,8 @@ interface EmployeeRow extends ProviderAuditCols {
   puesto: string;
   activo: boolean;
   fecha_baja: string | null;
-  trabajos: string[];
+  /** Códigos separados por coma (STRING_AGG); vacío si no hay. */
+  trabajos: string;
 }
 interface EquipmentRow extends ProviderAuditCols {
   id: number;
@@ -251,7 +263,7 @@ function map_provider(row: ProviderRow): Provider {
     contactEmail: row.correo_contacto,
     phone: row.telefono,
     status: row.estatus,
-    contractorTypes: row.tipos.filter(
+    contractorTypes: split_codes(row.tipos).filter(
       (code): code is ContractorTypeCode => find_contractor_type(code) !== undefined,
     ),
     ...map_audit(row),
@@ -286,7 +298,7 @@ function map_employee(row: EmployeeRow): ProviderEmployee {
     jobTitle: row.puesto,
     active: row.activo,
     terminationDate: row.fecha_baja,
-    workTypes: row.trabajos.filter(is_work_type_code),
+    workTypes: split_codes(row.trabajos).filter(is_work_type_code),
     ...map_audit(row),
   };
 }
@@ -400,25 +412,25 @@ function map_participant(row: ParticipantRow): PermitParticipant {
 
 const providerSelect = `
   SELECT p.*,
-         COALESCE(array_agg(t.tipo_contratista_codigo)
-                  FILTER (WHERE t.tipo_contratista_codigo IS NOT NULL AND t.retirado_en IS NULL), '{}') AS tipos
-    FROM proveedores p
-    LEFT JOIN proveedor_tipos_contratista t ON t.proveedor_id = p.id`;
+         COALESCE((SELECT STRING_AGG(t.tipo_contratista_codigo, ',')
+                     FROM proveedor_tipos_contratista t
+                    WHERE t.proveedor_id = p.id AND t.retirado_en IS NULL), '') AS tipos
+    FROM proveedores p`;
 
 const employeeSelect = `
   SELECT ep.*,
-         COALESCE(array_agg(t.tipo_trabajo_codigo)
-                  FILTER (WHERE t.tipo_trabajo_codigo IS NOT NULL AND t.retirado_en IS NULL), '{}') AS trabajos
-    FROM empleados_proveedor ep
-    LEFT JOIN empleado_proveedor_trabajos t ON t.empleado_proveedor_id = ep.id`;
+         COALESCE((SELECT STRING_AGG(t.tipo_trabajo_codigo, ',')
+                     FROM empleado_proveedor_trabajos t
+                    WHERE t.empleado_proveedor_id = ep.id AND t.retirado_en IS NULL), '') AS trabajos
+    FROM empleados_proveedor ep`;
 
 async function find_provider_db(db: Queryable, providerId: number): Promise<Provider | null> {
-  const { rows } = await db.query<ProviderRow>(`${providerSelect} WHERE p.id = $1 GROUP BY p.id`, [providerId]);
+  const { rows } = await db.query<ProviderRow>(`${providerSelect} WHERE p.id = $1`, [providerId]);
   return rows[0] ? map_provider(rows[0]) : null;
 }
 
 async function find_employee_db(db: Queryable, employeeId: number): Promise<ProviderEmployee | null> {
-  const { rows } = await db.query<EmployeeRow>(`${employeeSelect} WHERE ep.id = $1 GROUP BY ep.id`, [employeeId]);
+  const { rows } = await db.query<EmployeeRow>(`${employeeSelect} WHERE ep.id = $1`, [employeeId]);
   return rows[0] ? map_employee(rows[0]) : null;
 }
 
@@ -487,7 +499,7 @@ async function get_subject_owner_db(
   const { rows } =
     subject.kind === "PROVEEDOR"
       ? await db.query<{ proveedor_id: number; activo: boolean }>(
-          `SELECT id AS proveedor_id, true AS activo FROM proveedores WHERE id = $1`,
+          `SELECT id AS proveedor_id, CAST(1 AS bit) AS activo FROM proveedores WHERE id = $1`,
           [subject.providerId],
         )
       : subject.kind === "EMPLEADO_PROVEEDOR"
@@ -542,7 +554,7 @@ async function list_requirements_db(db: Queryable, subject: DocumentSubject): Pr
        FROM tipos_documento td
        LEFT JOIN v_documentos_estado de
          ON ${isProvider ? "de.proveedor_id" : "de.equipo_proveedor_id"} = $1 AND de.tipo_documento_codigo = td.codigo
-      WHERE td.aplica_a = '${isProvider ? "PROVEEDOR" : "EQUIPO"}' AND td.activo AND td.obligatorio
+      WHERE td.aplica_a = '${isProvider ? "PROVEEDOR" : "EQUIPO"}' AND td.activo = 1 AND td.obligatorio = 1
       ORDER BY td.codigo`,
     [subject.kind === "PROVEEDOR" ? subject.providerId : subject.equipmentId],
   );
@@ -588,12 +600,12 @@ async function is_type_required_db(
   if (subject.kind === "PROVEEDOR") return type.appliesTo === "PROVEEDOR" && type.mandatory;
   if (type.mandatory) return type.appliesTo === "EMPLEADO_PROVEEDOR";
   if (!type.workTypeCode) return false;
-  const { rowCount } = await db.query(
-    `SELECT 1 FROM empleado_proveedor_trabajos
+  const { rows } = await db.query(
+    `SELECT 1 AS ok FROM empleado_proveedor_trabajos
       WHERE empleado_proveedor_id = $1 AND tipo_trabajo_codigo = $2 AND retirado_en IS NULL`,
     [subject.providerEmployeeId, type.workTypeCode],
   );
-  return rowCount > 0;
+  return rows.length > 0;
 }
 
 async function create_employee_db(
@@ -609,15 +621,15 @@ async function create_employee_db(
   const workTypes = validate_work_types(input.workTypes ?? []);
   const actorId = get_signer_actor_id(actor);
 
-  // Cada alta va en su propio SAVEPOINT: un rechazo (CURP/NSS repetido) no tumba el resto de una carga masiva.
-  await db.query("SAVEPOINT alta_colaborador");
+  // Cada alta va en su propio punto de guardado: un rechazo (CURP/NSS repetido) no tumba el resto de una carga masiva.
+  await db.query("SAVE TRANSACTION alta_colaborador");
   try {
     const { rows } = await db.query<{ id: number }>(
       `INSERT INTO empleados_proveedor
          (proveedor_id, primer_nombre, segundo_nombre, apellido_paterno, apellido_materno,
           curp, nss, puesto, creado_por, actualizado_por)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $9)
-       RETURNING id`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $9);
+       SELECT CAST(SCOPE_IDENTITY() AS int) AS id`,
       [
         providerId,
         require_text(input.firstName, "El nombre"),
@@ -639,18 +651,20 @@ async function create_employee_db(
         [id, workType, actorId],
       );
     }
-    await db.query("RELEASE SAVEPOINT alta_colaborador");
     await append_audit_db(db, to_audit_actor(actor), "crear", "empleados_proveedor", String(id), {
       providerId,
       workTypes: workTypes.join(","),
     });
     return await get_employee_or_throw(db, id);
   } catch (error) {
-    await db.query("ROLLBACK TO SAVEPOINT alta_colaborador");
-    const { code, constraint } = get_pg_error(error);
-    if (code === pgUniqueViolation) {
+    // Si la transacción ya no admite el retroceso (error de trigger), se propaga el error original.
+    await db.query("ROLLBACK TRANSACTION alta_colaborador").catch(() => undefined);
+    if (is_unique_violation(error)) {
+      // Restricciones esperadas: uq_empleados_proveedor_nss y uq_empleados_proveedor_curp.
       throw new ValidationError(
-        constraint?.includes("nss") ? "Ya existe un colaborador con ese NSS" : "Ya existe un colaborador con esa CURP",
+        get_sql_error(error).message.toLowerCase().includes("uq_empleados_proveedor_nss")
+          ? "Ya existe un colaborador con ese NSS"
+          : "Ya existe un colaborador con esa CURP",
       );
     }
     throw error;
@@ -661,7 +675,7 @@ async function create_employee_db(
  * Repositorios
  * ------------------------------------------------------------------- */
 
-export function create_contractor_repositories_railway(): ContractorRepositories {
+export function create_contractor_repositories_azure(): ContractorRepositories {
   return {
     providers: {
       async register_provider(input) {
@@ -681,8 +695,8 @@ export function create_contractor_repositories_railway(): ContractorRepositories
             const { rows } = await db.query<{ id: number }>(
               `INSERT INTO proveedores
                  (razon_social, rfc, registro_patronal_imss, correo_contacto, telefono, creado_por, actualizado_por)
-               VALUES ($1, $2, $3, $4, $5, 'AUTOREGISTRO', 'AUTOREGISTRO')
-               RETURNING id`,
+               VALUES ($1, $2, $3, $4, $5, 'AUTOREGISTRO', 'AUTOREGISTRO');
+               SELECT CAST(SCOPE_IDENTITY() AS int) AS id`,
               [name, taxId, optional_text(input.imssEmployerRegistration), contactEmail, optional_text(input.phone)],
             );
             const id = rows[0]?.id;
@@ -701,7 +715,7 @@ export function create_contractor_repositories_railway(): ContractorRepositories
             return await get_provider_or_throw(db, id);
           });
         } catch (error) {
-          if (get_pg_error(error).code === pgUniqueViolation) {
+          if (is_unique_violation(error)) {
             throw new ValidationError("Ya existe un proveedor con ese RFC");
           }
           throw error;
@@ -709,7 +723,7 @@ export function create_contractor_repositories_railway(): ContractorRepositories
       },
       async list_providers(filter) {
         const { rows } = await get_db().query<ProviderRow>(
-          `${providerSelect} WHERE ($1::text IS NULL OR p.estatus = $1) GROUP BY p.id ORDER BY p.id`,
+          `${providerSelect} WHERE (CAST($1 AS nvarchar(450)) IS NULL OR p.estatus = $1) ORDER BY p.id`,
           [filter?.status ?? null],
         );
         return rows.map(map_provider);
@@ -726,7 +740,7 @@ export function create_contractor_repositories_railway(): ContractorRepositories
           if (status === "SUSPENDIDO" && !motive) throw new ValidationError("El motivo es obligatorio al suspender");
 
           await db.query(
-            `UPDATE proveedores SET estatus = $2, actualizado_en = now(), actualizado_por = $3 WHERE id = $1`,
+            `UPDATE proveedores SET estatus = $2, actualizado_en = SYSDATETIMEOFFSET(), actualizado_por = $3 WHERE id = $1`,
             [providerId, status, actorEmployeeNumber],
           );
           await append_audit_db(db, { type: "EMPLEADO", id: actorEmployeeNumber }, "actualizar", "proveedores", String(providerId), {
@@ -748,21 +762,26 @@ export function create_contractor_repositories_railway(): ContractorRepositories
           await authorize_provider_db(db, actor, providerId, { requireAdmin: true });
           const actorId = get_signer_actor_id(actor);
           await db.query(
-            `UPDATE proveedor_tipos_contratista SET retirado_en = now()
-              WHERE proveedor_id = $1 AND retirado_en IS NULL AND NOT (tipo_contratista_codigo = ANY($2::text[]))`,
-            [providerId, unique],
+            `UPDATE proveedor_tipos_contratista SET retirado_en = SYSDATETIMEOFFSET()
+              WHERE proveedor_id = $1 AND retirado_en IS NULL
+                AND tipo_contratista_codigo NOT IN (${in_placeholders(2, unique.length)})`,
+            [providerId, ...unique],
           );
           for (const type of unique) {
+            // Equivale a ON CONFLICT DO UPDATE (solo si estaba retirado) / INSERT si no existe.
             await db.query(
-              `INSERT INTO proveedor_tipos_contratista (proveedor_id, tipo_contratista_codigo, asignado_por)
-               VALUES ($1, $2, $3)
-               ON CONFLICT (proveedor_id, tipo_contratista_codigo)
-               DO UPDATE SET retirado_en = NULL, asignado_en = now(), asignado_por = $3
-                 WHERE proveedor_tipos_contratista.retirado_en IS NOT NULL`,
+              `UPDATE proveedor_tipos_contratista
+                  SET retirado_en = NULL, asignado_en = SYSDATETIMEOFFSET(), asignado_por = $3
+                WHERE proveedor_id = $1 AND tipo_contratista_codigo = $2 AND retirado_en IS NOT NULL;
+               IF @@ROWCOUNT = 0 AND NOT EXISTS (
+                    SELECT 1 FROM proveedor_tipos_contratista WITH (UPDLOCK, HOLDLOCK)
+                     WHERE proveedor_id = $1 AND tipo_contratista_codigo = $2)
+                 INSERT INTO proveedor_tipos_contratista (proveedor_id, tipo_contratista_codigo, asignado_por)
+                 VALUES ($1, $2, $3)`,
               [providerId, type, actorId],
             );
           }
-          await db.query(`UPDATE proveedores SET actualizado_en = now(), actualizado_por = $2 WHERE id = $1`, [
+          await db.query(`UPDATE proveedores SET actualizado_en = SYSDATETIMEOFFSET(), actualizado_por = $2 WHERE id = $1`, [
             providerId,
             actorId,
           ]);
@@ -812,17 +831,16 @@ export function create_contractor_repositories_railway(): ContractorRepositories
           // El usuario son 8 caracteres con 2 dígitos aleatorios: ante colisión se reintenta.
           for (let attempt = 0; attempt < 50; attempt += 1) {
             const username = build_provider_username(firstName, paternalSurname, input.maternalSurname);
-            await db.query("SAVEPOINT alta_usuario");
+            await db.query("SAVE TRANSACTION alta_usuario");
             try {
               const { rows } = await db.query<UserRow>(
                 `INSERT INTO usuarios_proveedor
                    (proveedor_id, empleado_proveedor_id, nombre, usuario, password_hash, correo,
                     es_administrador, creado_por, actualizado_por)
-                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $8)
-                 RETURNING *`,
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $8);
+                 SELECT * FROM usuarios_proveedor WHERE id = SCOPE_IDENTITY()`,
                 [input.providerId, input.providerEmployeeId, name, username, passwordHash, email, input.isAdministrator, actorId],
               );
-              await db.query("RELEASE SAVEPOINT alta_usuario");
               const row = rows[0];
               if (!row) throw new Error("No se pudo crear el usuario");
               await append_audit_db(db, to_audit_actor(actor), "crear", "usuarios_proveedor", String(row.id), {
@@ -832,8 +850,8 @@ export function create_contractor_repositories_railway(): ContractorRepositories
               });
               return { user: map_user(row), temporaryPassword };
             } catch (error) {
-              await db.query("ROLLBACK TO SAVEPOINT alta_usuario");
-              if (get_pg_error(error).code !== pgUniqueViolation) throw error;
+              await db.query("ROLLBACK TRANSACTION alta_usuario").catch(() => undefined);
+              if (!is_unique_violation(error)) throw error;
             }
           }
           throw new ValidationError("No se pudo generar un usuario único; intenta de nuevo");
@@ -844,7 +862,7 @@ export function create_contractor_repositories_railway(): ContractorRepositories
           `SELECT empleado_proveedor_id FROM usuarios_proveedor
             WHERE proveedor_id = $1 AND empleado_proveedor_id IS NOT NULL
             GROUP BY empleado_proveedor_id
-           HAVING NOT bool_or(activo)`,
+           HAVING MAX(CAST(activo AS int)) = 0`,
           [providerId],
         );
         return rows.map((row) => row.empleado_proveedor_id);
@@ -852,7 +870,7 @@ export function create_contractor_repositories_railway(): ContractorRepositories
       async login(username, password) {
         return with_transaction(async (db) => {
           const { rows } = await db.query<UserRow>(
-            `SELECT * FROM usuarios_proveedor WHERE usuario = $1 FOR UPDATE`,
+            `SELECT * FROM usuarios_proveedor WITH (UPDLOCK, ROWLOCK) WHERE usuario = $1`,
             [username.trim().toLowerCase()],
           );
           const user = rows[0];
@@ -869,7 +887,7 @@ export function create_contractor_repositories_railway(): ContractorRepositories
             attempts += 1;
             const locked = attempts >= maxFailedAttempts;
             await db.query(
-              `UPDATE usuarios_proveedor SET intentos_fallidos = $2, bloqueado_hasta = $3 WHERE id = $1`,
+              `UPDATE usuarios_proveedor SET intentos_fallidos = $2, bloqueado_hasta = CAST($3 AS datetimeoffset(3)) WHERE id = $1`,
               [user.id, attempts, locked ? new Date(now.getTime() + lockoutMinutes * 60_000).toISOString() : null],
             );
             await append_audit_db(db, actor, "inicio_sesion_fallido", "usuarios_proveedor", String(user.id), {
@@ -895,7 +913,7 @@ export function create_contractor_repositories_railway(): ContractorRepositories
       async change_password(userId, currentPassword, newPassword) {
         await with_transaction(async (db) => {
           const { rows } = await db.query<UserRow>(
-            `SELECT * FROM usuarios_proveedor WHERE id = $1 AND activo FOR UPDATE`,
+            `SELECT * FROM usuarios_proveedor WITH (UPDLOCK, ROWLOCK) WHERE id = $1 AND activo = 1`,
             [userId],
           );
           const user = rows[0];
@@ -910,7 +928,7 @@ export function create_contractor_repositories_railway(): ContractorRepositories
 
           await db.query(
             `UPDATE usuarios_proveedor
-                SET password_hash = $2, debe_cambiar_password = false, actualizado_en = now(), actualizado_por = $3
+                SET password_hash = $2, debe_cambiar_password = 0, actualizado_en = SYSDATETIMEOFFSET(), actualizado_por = $3
               WHERE id = $1`,
             [userId, hash_secret(newPassword), `P-${userId}`],
           );
@@ -922,7 +940,7 @@ export function create_contractor_repositories_railway(): ContractorRepositories
       async reset_password(userId, actor) {
         return with_transaction(async (db) => {
           const { rows } = await db.query<{ proveedor_id: number }>(
-            `SELECT proveedor_id FROM usuarios_proveedor WHERE id = $1 FOR UPDATE`,
+            `SELECT proveedor_id FROM usuarios_proveedor WITH (UPDLOCK, ROWLOCK) WHERE id = $1`,
             [userId],
           );
           const user = rows[0];
@@ -932,8 +950,8 @@ export function create_contractor_repositories_railway(): ContractorRepositories
           const temporaryPassword = generate_temporary_password();
           await db.query(
             `UPDATE usuarios_proveedor
-                SET password_hash = $2, debe_cambiar_password = true, intentos_fallidos = 0,
-                    bloqueado_hasta = NULL, actualizado_en = now(), actualizado_por = $3
+                SET password_hash = $2, debe_cambiar_password = 1, intentos_fallidos = 0,
+                    bloqueado_hasta = NULL, actualizado_en = SYSDATETIMEOFFSET(), actualizado_por = $3
               WHERE id = $1`,
             [userId, hash_secret(temporaryPassword), get_signer_actor_id(actor)],
           );
@@ -944,7 +962,7 @@ export function create_contractor_repositories_railway(): ContractorRepositories
       async set_user_active(userId, active, reason, actor) {
         return with_transaction(async (db) => {
           const { rows } = await db.query<{ proveedor_id: number }>(
-            `SELECT proveedor_id FROM usuarios_proveedor WHERE id = $1 FOR UPDATE`,
+            `SELECT proveedor_id FROM usuarios_proveedor WITH (UPDLOCK, ROWLOCK) WHERE id = $1`,
             [userId],
           );
           const found = rows[0];
@@ -955,8 +973,9 @@ export function create_contractor_repositories_railway(): ContractorRepositories
             throw new ValidationError("No puedes desactivar tu propia cuenta");
           }
           const updated = await db.query<UserRow>(
-            `UPDATE usuarios_proveedor SET activo = $2, actualizado_en = now(), actualizado_por = $3
-              WHERE id = $1 RETURNING *`,
+            `UPDATE usuarios_proveedor SET activo = $2, actualizado_en = SYSDATETIMEOFFSET(), actualizado_por = $3
+              WHERE id = $1;
+             SELECT * FROM usuarios_proveedor WHERE id = $1`,
             [userId, active, get_signer_actor_id(actor)],
           );
           const row = updated.rows[0];
@@ -971,7 +990,7 @@ export function create_contractor_repositories_railway(): ContractorRepositories
       async set_user_employee(userId, providerEmployeeId, reason, actor) {
         return with_transaction(async (db) => {
           const { rows } = await db.query<{ proveedor_id: number }>(
-            `SELECT proveedor_id FROM usuarios_proveedor WHERE id = $1 FOR UPDATE`,
+            `SELECT proveedor_id FROM usuarios_proveedor WITH (UPDLOCK, ROWLOCK) WHERE id = $1`,
             [userId],
           );
           const found = rows[0];
@@ -980,16 +999,17 @@ export function create_contractor_repositories_railway(): ContractorRepositories
           const motive = require_text(reason, "El motivo");
           if (providerEmployeeId !== null) {
             const employee = await db.query(
-              `SELECT 1 FROM empleados_proveedor WHERE id = $1 AND proveedor_id = $2 AND activo`,
+              `SELECT 1 AS ok FROM empleados_proveedor WHERE id = $1 AND proveedor_id = $2 AND activo = 1`,
               [providerEmployeeId, found.proveedor_id],
             );
-            if (employee.rowCount === 0) {
+            if (employee.rows.length === 0) {
               throw new ValidationError("El colaborador no existe, está de baja o es de otro proveedor");
             }
           }
           const updated = await db.query<UserRow>(
-            `UPDATE usuarios_proveedor SET empleado_proveedor_id = $2, actualizado_en = now(), actualizado_por = $3
-              WHERE id = $1 RETURNING *`,
+            `UPDATE usuarios_proveedor SET empleado_proveedor_id = $2, actualizado_en = SYSDATETIMEOFFSET(), actualizado_por = $3
+              WHERE id = $1;
+             SELECT * FROM usuarios_proveedor WHERE id = $1`,
             [userId, providerEmployeeId, get_signer_actor_id(actor)],
           );
           const row = updated.rows[0];
@@ -1007,8 +1027,8 @@ export function create_contractor_repositories_railway(): ContractorRepositories
     providerEmployees: {
       async list_employees(providerId, options) {
         const { rows } = await get_db().query<EmployeeRow>(
-          `${employeeSelect} WHERE ep.proveedor_id = $1 AND (ep.activo OR $2::boolean)
-            GROUP BY ep.id ORDER BY ep.apellido_paterno, ep.primer_nombre`,
+          `${employeeSelect} WHERE ep.proveedor_id = $1 AND (ep.activo = 1 OR CAST($2 AS bit) = 1)
+            ORDER BY ep.apellido_paterno, ep.primer_nombre`,
           [providerId, options?.includeInactive === true],
         );
         return rows.map(map_employee);
@@ -1047,7 +1067,7 @@ export function create_contractor_repositories_railway(): ContractorRepositories
 
           await db.query(
             `UPDATE empleados_proveedor
-                SET activo = false, fecha_baja = hoy_mx(), actualizado_en = now(), actualizado_por = $2
+                SET activo = 0, fecha_baja = dbo.hoy_mx(), actualizado_en = SYSDATETIMEOFFSET(), actualizado_por = $2
               WHERE id = $1`,
             [employeeId, get_signer_actor_id(actor)],
           );
@@ -1067,22 +1087,27 @@ export function create_contractor_repositories_railway(): ContractorRepositories
           const actorId = get_signer_actor_id(actor);
 
           await db.query(
-            `UPDATE empleado_proveedor_trabajos SET retirado_en = now()
-              WHERE empleado_proveedor_id = $1 AND retirado_en IS NULL AND NOT (tipo_trabajo_codigo = ANY($2::text[]))`,
-            [employeeId, desired],
+            `UPDATE empleado_proveedor_trabajos SET retirado_en = SYSDATETIMEOFFSET()
+              WHERE empleado_proveedor_id = $1 AND retirado_en IS NULL${
+                desired.length > 0 ? ` AND tipo_trabajo_codigo NOT IN (${in_placeholders(2, desired.length)})` : ""
+              }`,
+            [employeeId, ...desired],
           );
           for (const workType of desired) {
             await db.query(
-              `INSERT INTO empleado_proveedor_trabajos (empleado_proveedor_id, tipo_trabajo_codigo, declarado_por)
-               VALUES ($1, $2, $3)
-               ON CONFLICT (empleado_proveedor_id, tipo_trabajo_codigo)
-               DO UPDATE SET retirado_en = NULL, declarado_en = now(), declarado_por = $3
-                 WHERE empleado_proveedor_trabajos.retirado_en IS NOT NULL`,
+              `UPDATE empleado_proveedor_trabajos
+                  SET retirado_en = NULL, declarado_en = SYSDATETIMEOFFSET(), declarado_por = $3
+                WHERE empleado_proveedor_id = $1 AND tipo_trabajo_codigo = $2 AND retirado_en IS NOT NULL;
+               IF @@ROWCOUNT = 0 AND NOT EXISTS (
+                    SELECT 1 FROM empleado_proveedor_trabajos WITH (UPDLOCK, HOLDLOCK)
+                     WHERE empleado_proveedor_id = $1 AND tipo_trabajo_codigo = $2)
+                 INSERT INTO empleado_proveedor_trabajos (empleado_proveedor_id, tipo_trabajo_codigo, declarado_por)
+                 VALUES ($1, $2, $3)`,
               [employeeId, workType, actorId],
             );
           }
           await db.query(
-            `UPDATE empleados_proveedor SET actualizado_en = now(), actualizado_por = $2 WHERE id = $1`,
+            `UPDATE empleados_proveedor SET actualizado_en = SYSDATETIMEOFFSET(), actualizado_por = $2 WHERE id = $1`,
             [employeeId, actorId],
           );
           await append_audit_db(db, to_audit_actor(actor), "actualizar", "empleado_proveedor_trabajos", String(employeeId), {
@@ -1132,8 +1157,8 @@ export function create_contractor_repositories_railway(): ContractorRepositories
           const { rows } = await db.query<PhotoRow>(
             `INSERT INTO fotos_colaborador
                (empleado_proveedor_id, nombre_archivo, tipo_mime, tamano_bytes, ruta_almacenamiento, sha256, subido_por)
-             VALUES ($1, $2, $3, $4, $5, $6, $7)
-             RETURNING *`,
+             VALUES ($1, $2, $3, $4, $5, $6, $7);
+             SELECT * FROM fotos_colaborador WHERE id = SCOPE_IDENTITY()`,
             [
               employeeId,
               require_text(input.fileName, "El nombre del archivo"),
@@ -1155,7 +1180,7 @@ export function create_contractor_repositories_railway(): ContractorRepositories
       },
       async get_current_photo(employeeId) {
         const { rows } = await get_db().query<PhotoRow>(
-          `SELECT * FROM fotos_colaborador WHERE empleado_proveedor_id = $1 ORDER BY id DESC LIMIT 1`,
+          `SELECT TOP (1) * FROM fotos_colaborador WHERE empleado_proveedor_id = $1 ORDER BY id DESC`,
           [employeeId],
         );
         const row = rows[0];
@@ -1167,15 +1192,16 @@ export function create_contractor_repositories_railway(): ContractorRepositories
           const employee = await get_employee_or_throw(db, employeeId);
           await authorize_provider_db(db, actor, employee.providerId);
           const found = await db.query<PhotoRow>(
-            `SELECT * FROM fotos_colaborador WHERE empleado_proveedor_id = $1 ORDER BY id DESC LIMIT 1 FOR UPDATE`,
+            `SELECT TOP (1) * FROM fotos_colaborador WITH (UPDLOCK, ROWLOCK) WHERE empleado_proveedor_id = $1 ORDER BY id DESC`,
             [employeeId],
           );
           const photo = found.rows[0];
           if (!photo || photo.ruta_almacenamiento === null) throw new ValidationError("El colaborador no tiene fotografía");
           const { rows } = await db.query<PhotoRow>(
             `UPDATE fotos_colaborador
-                SET ruta_almacenamiento = NULL, archivo_eliminado_en = now(), archivo_eliminado_por = $2
-              WHERE id = $1 RETURNING *`,
+                SET ruta_almacenamiento = NULL, archivo_eliminado_en = SYSDATETIMEOFFSET(), archivo_eliminado_por = $2
+              WHERE id = $1;
+             SELECT * FROM fotos_colaborador WHERE id = $1`,
             [photo.id, get_signer_actor_id(actor)],
           );
           const row = rows[0];
@@ -1193,7 +1219,7 @@ export function create_contractor_repositories_railway(): ContractorRepositories
     equipment: {
       async list_equipment(providerId, options) {
         const { rows } = await get_db().query<EquipmentRow>(
-          `SELECT * FROM equipos_proveedor WHERE proveedor_id = $1 AND (activo OR $2::boolean) ORDER BY id`,
+          `SELECT * FROM equipos_proveedor WHERE proveedor_id = $1 AND (activo = 1 OR CAST($2 AS bit) = 1) ORDER BY id`,
           [providerId, options?.includeInactive === true],
         );
         return rows.map(map_equipment);
@@ -1206,8 +1232,8 @@ export function create_contractor_repositories_railway(): ContractorRepositories
           const { rows } = await db.query<EquipmentRow>(
             `INSERT INTO equipos_proveedor
                (proveedor_id, tipo_equipo, descripcion, marca, modelo, numero_serie, placas, creado_por, actualizado_por)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $8)
-             RETURNING *`,
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $8);
+             SELECT * FROM equipos_proveedor WHERE id = SCOPE_IDENTITY()`,
             [
               providerId,
               equipmentType,
@@ -1230,7 +1256,7 @@ export function create_contractor_repositories_railway(): ContractorRepositories
       },
       async deactivate_equipment(equipmentId, reason, actor) {
         return with_transaction(async (db) => {
-          const found = await db.query<EquipmentRow>(`SELECT * FROM equipos_proveedor WHERE id = $1 FOR UPDATE`, [
+          const found = await db.query<EquipmentRow>(`SELECT * FROM equipos_proveedor WITH (UPDLOCK, ROWLOCK) WHERE id = $1`, [
             equipmentId,
           ]);
           const equipment = found.rows[0];
@@ -1240,8 +1266,9 @@ export function create_contractor_repositories_railway(): ContractorRepositories
           if (!equipment.activo) throw new ValidationError("El equipo ya está inactivo");
 
           const { rows } = await db.query<EquipmentRow>(
-            `UPDATE equipos_proveedor SET activo = false, actualizado_en = now(), actualizado_por = $2
-              WHERE id = $1 RETURNING *`,
+            `UPDATE equipos_proveedor SET activo = 0, actualizado_en = SYSDATETIMEOFFSET(), actualizado_por = $2
+              WHERE id = $1;
+             SELECT * FROM equipos_proveedor WHERE id = $1`,
             [equipmentId, get_signer_actor_id(actor)],
           );
           const row = rows[0];
@@ -1389,7 +1416,8 @@ export function create_contractor_repositories_railway(): ContractorRepositories
           if (!documentRow) {
             const created = await db.query<DocumentRow>(
               `INSERT INTO documentos_contratista (${ownerColumn}, tipo_documento_codigo, creado_por)
-               VALUES ($1, $2, $3) RETURNING *`,
+               VALUES ($1, $2, $3);
+               SELECT * FROM documentos_contratista WHERE id = SCOPE_IDENTITY()`,
               [ownerId, type.code, actorId],
             );
             documentRow = created.rows[0];
@@ -1397,15 +1425,15 @@ export function create_contractor_repositories_railway(): ContractorRepositories
           if (!documentRow) throw new Error("No se pudo crear el expediente del documento");
 
           // Bloqueo del expediente para que dos cargas simultáneas no repitan el número de versión.
-          await db.query(`SELECT 1 FROM documentos_contratista WHERE id = $1 FOR UPDATE`, [documentRow.id]);
+          await db.query(`SELECT 1 AS ok FROM documentos_contratista WITH (UPDLOCK, ROWLOCK) WHERE id = $1`, [documentRow.id]);
           const { rows } = await db.query<VersionRow>(
             `INSERT INTO versiones_documento
                (documento_id, numero_version, nombre_archivo, tipo_mime, tamano_bytes, ruta_almacenamiento,
                 sha256, fecha_emision, fecha_vencimiento, subido_por)
              VALUES ($1,
                      (SELECT COALESCE(max(numero_version), 0) + 1 FROM versiones_documento WHERE documento_id = $1),
-                     $2, $3, $4, $5, $6, $7, $8, $9)
-             RETURNING *`,
+                     $2, $3, $4, $5, $6, CAST($7 AS date), CAST($8 AS date), $9);
+             SELECT * FROM versiones_documento WHERE id = SCOPE_IDENTITY()`,
             [
               documentRow.id,
               fileName,
@@ -1434,8 +1462,8 @@ export function create_contractor_repositories_railway(): ContractorRepositories
           return await with_transaction(async (db) => {
             const found = await db.query<VersionRow & { tipo_documento_codigo: DocumentTypeCode }>(
               `SELECT v.*, d.tipo_documento_codigo
-                 FROM versiones_documento v JOIN documentos_contratista d ON d.id = v.documento_id
-                WHERE v.id = $1 FOR UPDATE OF v`,
+                 FROM versiones_documento v WITH (UPDLOCK, ROWLOCK) JOIN documentos_contratista d ON d.id = v.documento_id
+                WHERE v.id = $1`,
               [input.versionId],
             );
             const version = found.rows[0];
@@ -1445,7 +1473,7 @@ export function create_contractor_repositories_railway(): ContractorRepositories
 
             await require_permission_db(db, actorEmployeeNumber, type.reviewPermission);
             const latest = await db.query<{ id: string }>(
-              `SELECT id FROM versiones_documento WHERE documento_id = $1 ORDER BY numero_version DESC LIMIT 1`,
+              `SELECT TOP (1) id FROM versiones_documento WHERE documento_id = $1 ORDER BY numero_version DESC`,
               [version.documento_id],
             );
             if (latest.rows[0]?.id !== version.id) throw new ValidationError("Solo se revisa la versión más reciente");
@@ -1457,7 +1485,8 @@ export function create_contractor_repositories_railway(): ContractorRepositories
 
             const { rows } = await db.query<ReviewRow>(
               `INSERT INTO revisiones_documento (version_id, resultado, revisor_no_empleado, motivo)
-               VALUES ($1, $2, $3, $4) RETURNING *`,
+               VALUES ($1, $2, $3, $4);
+               SELECT * FROM revisiones_documento WHERE id = SCOPE_IDENTITY()`,
               [version.id, input.result, to_employee_int(actorEmployeeNumber), reason],
             );
             const row = rows[0];
@@ -1473,7 +1502,8 @@ export function create_contractor_repositories_railway(): ContractorRepositories
             return map_review(row);
           });
         } catch (error) {
-          if (get_pg_error(error).code === pgUniqueViolation) throw new ValidationError("Esta versión ya fue revisada");
+          // Restricción esperada: UNIQUE(version_id) en revisiones_documento.
+          if (is_unique_violation(error)) throw new ValidationError("Esta versión ya fue revisada");
           throw error;
         }
       },
@@ -1484,10 +1514,10 @@ export function create_contractor_repositories_railway(): ContractorRepositories
             const motive = require_text(reason, "El motivo");
             const found = await db.query<ReviewRow & { documento_id: string; tipo_documento_codigo: DocumentTypeCode }>(
               `SELECT r.*, v.documento_id, d.tipo_documento_codigo
-                 FROM revisiones_documento r
+                 FROM revisiones_documento r WITH (UPDLOCK, ROWLOCK)
                  JOIN versiones_documento v ON v.id = r.version_id
                  JOIN documentos_contratista d ON d.id = v.documento_id
-                WHERE r.version_id = $1 FOR UPDATE OF r`,
+                WHERE r.version_id = $1`,
               [versionId],
             );
             const review = found.rows[0];
@@ -1495,14 +1525,15 @@ export function create_contractor_repositories_railway(): ContractorRepositories
             if (review.resultado !== "APROBADO") throw new ValidationError("Solo se revoca un documento aprobado");
 
             const latest = await db.query<{ id: string }>(
-              `SELECT id FROM versiones_documento WHERE documento_id = $1 ORDER BY numero_version DESC LIMIT 1`,
+              `SELECT TOP (1) id FROM versiones_documento WHERE documento_id = $1 ORDER BY numero_version DESC`,
               [review.documento_id],
             );
             if (latest.rows[0]?.id !== versionId) throw new ValidationError("Solo se revoca la versión más reciente");
 
             const { rows } = await db.query<{ revocado_por: number; motivo: string; revocado_en: Date }>(
               `INSERT INTO revocaciones_revision (revision_id, revocado_por, motivo)
-               VALUES ($1, $2, $3) RETURNING revocado_por, motivo, revocado_en`,
+               VALUES ($1, $2, $3);
+               SELECT revocado_por, motivo, revocado_en FROM revocaciones_revision WHERE revision_id = $1`,
               [review.id, to_employee_int(actorEmployeeNumber), motive],
             );
             const revoked = rows[0];
@@ -1520,7 +1551,8 @@ export function create_contractor_repositories_railway(): ContractorRepositories
             });
           });
         } catch (error) {
-          if (get_pg_error(error).code === pgUniqueViolation) throw new ValidationError("Esta aprobación ya fue revocada");
+          // Restricción esperada: PRIMARY KEY(revision_id) en revocaciones_revision.
+          if (is_unique_violation(error)) throw new ValidationError("Esta aprobación ya fue revocada");
           throw error;
         }
       },
@@ -1542,8 +1574,8 @@ export function create_contractor_repositories_railway(): ContractorRepositories
                   d.tipo_documento_codigo, d.creado_en AS doc_creado_en, d.creado_por AS doc_creado_por,
                   COALESCE(ep.proveedor_id, eq.proveedor_id, d.proveedor_id) AS proveedor_id
              FROM documentos_contratista d
-             JOIN LATERAL (SELECT * FROM versiones_documento x WHERE x.documento_id = d.id
-                            ORDER BY x.numero_version DESC LIMIT 1) v ON true
+             CROSS APPLY (SELECT TOP (1) * FROM versiones_documento x WHERE x.documento_id = d.id
+                            ORDER BY x.numero_version DESC) v
              LEFT JOIN revisiones_documento r ON r.version_id = v.id
              LEFT JOIN empleados_proveedor ep ON ep.id = d.empleado_proveedor_id
              LEFT JOIN equipos_proveedor eq ON eq.id = d.equipo_proveedor_id
@@ -1582,11 +1614,11 @@ export function create_contractor_repositories_railway(): ContractorRepositories
         return with_transaction(async (db) => {
           const found = await db.query<VersionRow & { proveedor_id: number | null }>(
             `SELECT v.*, COALESCE(ep.proveedor_id, eq.proveedor_id, d.proveedor_id) AS proveedor_id
-               FROM versiones_documento v
+               FROM versiones_documento v WITH (UPDLOCK, ROWLOCK)
                JOIN documentos_contratista d ON d.id = v.documento_id
                LEFT JOIN empleados_proveedor ep ON ep.id = d.empleado_proveedor_id
                LEFT JOIN equipos_proveedor eq ON eq.id = d.equipo_proveedor_id
-              WHERE v.id = $1 FOR UPDATE OF v`,
+              WHERE v.id = $1`,
             [versionId],
           );
           const version = found.rows[0];
@@ -1596,8 +1628,9 @@ export function create_contractor_repositories_railway(): ContractorRepositories
 
           const { rows } = await db.query<VersionRow>(
             `UPDATE versiones_documento
-                SET ruta_almacenamiento = NULL, archivo_eliminado_en = now(), archivo_eliminado_por = $2
-              WHERE id = $1 RETURNING *`,
+                SET ruta_almacenamiento = NULL, archivo_eliminado_en = SYSDATETIMEOFFSET(), archivo_eliminado_por = $2
+              WHERE id = $1;
+             SELECT * FROM versiones_documento WHERE id = $1`,
             [versionId, get_signer_actor_id(actor)],
           );
           const row = rows[0];
@@ -1621,8 +1654,8 @@ export function create_contractor_repositories_railway(): ContractorRepositories
             if (!employee.active) throw new ValidationError("El colaborador está inactivo");
             const permitId = input.permitId ?? null;
             if (permitId) {
-              const permit = await db.query(`SELECT 1 FROM permisos_trabajo WHERE id = $1`, [permitId]);
-              if (permit.rowCount === 0) throw new NotFoundError("Permiso", permitId);
+              const permit = await db.query(`SELECT 1 AS ok FROM permisos_trabajo WHERE id = $1`, [permitId]);
+              if (permit.rows.length === 0) throw new NotFoundError("Permiso", permitId);
             }
 
             const semaphore = (await get_employee_semaphore_db(db, employee.id)) ?? "ROJO";
@@ -1635,8 +1668,8 @@ export function create_contractor_repositories_railway(): ContractorRepositories
               `INSERT INTO registros_ingreso
                  (empleado_proveedor_id, resultado, semaforo_al_ingresar, epp_completo, observaciones,
                   motivo_denegacion, permiso_id, registrado_por)
-               VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-               RETURNING *`,
+               VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
+               SELECT * FROM registros_ingreso WHERE id = SCOPE_IDENTITY()`,
               [
                 employee.id,
                 allowed ? "PERMITIDO" : "DENEGADO",
@@ -1659,7 +1692,8 @@ export function create_contractor_repositories_railway(): ContractorRepositories
             return map_entry(row);
           });
         } catch (error) {
-          if (get_pg_error(error).code === pgUniqueViolation) {
+          // Índice único filtrado esperado: uq_ingreso_abierto.
+          if (is_unique_violation(error)) {
             throw new ValidationError("El colaborador ya tiene un ingreso abierto (falta registrar su salida)");
           }
           throw error;
@@ -1668,14 +1702,15 @@ export function create_contractor_repositories_railway(): ContractorRepositories
       async register_exit(entryId, actorEmployeeNumber, options) {
         return with_transaction(async (db) => {
           await require_permission_db(db, actorEmployeeNumber, "contratistas:registrar_ingresos");
-          const found = await db.query<EntryRow>(`SELECT * FROM registros_ingreso WHERE id = $1 FOR UPDATE`, [entryId]);
+          const found = await db.query<EntryRow>(`SELECT * FROM registros_ingreso WITH (UPDLOCK, ROWLOCK) WHERE id = $1`, [entryId]);
           const entry = found.rows[0];
           if (!entry) throw new NotFoundError("Ingreso", entryId);
           if (entry.resultado !== "PERMITIDO") throw new ValidationError("Un ingreso denegado no tiene salida");
           if (entry.salida_en) throw new ValidationError("La salida ya fue registrada");
 
           const { rows } = await db.query<EntryRow>(
-            `UPDATE registros_ingreso SET salida_en = now(), salida_registrada_por = $2 WHERE id = $1 RETURNING *`,
+            `UPDATE registros_ingreso SET salida_en = SYSDATETIMEOFFSET(), salida_registrada_por = $2 WHERE id = $1;
+             SELECT * FROM registros_ingreso WHERE id = $1`,
             [entryId, to_employee_int(actorEmployeeNumber)],
           );
           const row = rows[0];
@@ -1690,20 +1725,21 @@ export function create_contractor_repositories_railway(): ContractorRepositories
       },
       async list_by_employee(providerEmployeeId, options) {
         const { rows } = await get_db().query<EntryRow>(
-          `SELECT * FROM registros_ingreso WHERE empleado_proveedor_id = $1 ORDER BY ingreso_en DESC LIMIT $2`,
+          `SELECT TOP ($2) * FROM registros_ingreso WHERE empleado_proveedor_id = $1 ORDER BY ingreso_en DESC`,
           [providerEmployeeId, options?.limit ?? 50],
         );
         return rows.map(map_entry);
       },
       async list_history(options) {
         const { rows } = await get_db().query<EntryRow>(
-          `SELECT r.* FROM registros_ingreso r
+          `SELECT TOP ($4) r.* FROM registros_ingreso r
              JOIN empleados_proveedor ep ON ep.id = r.empleado_proveedor_id
-            WHERE ($1::int IS NULL OR ep.proveedor_id = $1)
-              AND ($2::date IS NULL OR (r.ingreso_en AT TIME ZONE 'America/Mexico_City')::date >= $2::date)
-              AND ($3::date IS NULL OR (r.ingreso_en AT TIME ZONE 'America/Mexico_City')::date <= $3::date)
-            ORDER BY r.ingreso_en DESC
-            LIMIT $4`,
+            WHERE (CAST($1 AS int) IS NULL OR ep.proveedor_id = $1)
+              AND (CAST($2 AS date) IS NULL
+                   OR CAST(r.ingreso_en AT TIME ZONE 'Central Standard Time (Mexico)' AS date) >= CAST($2 AS date))
+              AND (CAST($3 AS date) IS NULL
+                   OR CAST(r.ingreso_en AT TIME ZONE 'Central Standard Time (Mexico)' AS date) <= CAST($3 AS date))
+            ORDER BY r.ingreso_en DESC`,
           [options?.providerId ?? null, options?.from ?? null, options?.to ?? null, options?.limit ?? 1000],
         );
         return rows.map(map_entry);
@@ -1713,7 +1749,7 @@ export function create_contractor_repositories_railway(): ContractorRepositories
           `SELECT r.* FROM registros_ingreso r
              JOIN empleados_proveedor ep ON ep.id = r.empleado_proveedor_id
             WHERE r.resultado = 'PERMITIDO' AND r.salida_en IS NULL
-              AND ($1::int IS NULL OR ep.proveedor_id = $1)
+              AND (CAST($1 AS int) IS NULL OR ep.proveedor_id = $1)
             ORDER BY r.ingreso_en`,
           [providerId ?? null],
         );
@@ -1735,7 +1771,7 @@ export function create_contractor_repositories_railway(): ContractorRepositories
                 activo: boolean;
                 nombre: string;
               }>(
-                `SELECT activo, concat_ws(' ', primer_nombre, segundo_nombre, apellido_paterno, apellido_materno) AS nombre
+                `SELECT activo, CONCAT_WS(' ', primer_nombre, segundo_nombre, apellido_paterno, apellido_materno) AS nombre
                    FROM empleados WHERE no_empleado = $1`,
                 [to_employee_int(input.participant.employeeNumber)],
               );
@@ -1760,8 +1796,8 @@ export function create_contractor_repositories_railway(): ContractorRepositories
               `INSERT INTO permiso_participantes
                  (permiso_id, funcion, posicion, participante_tipo, no_empleado, empleado_proveedor_id,
                   nombre_registrado, creado_por)
-               VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-               RETURNING *`,
+               VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
+               SELECT * FROM permiso_participantes WHERE id = SCOPE_IDENTITY()`,
               [
                 input.permitId,
                 role,
@@ -1783,14 +1819,14 @@ export function create_contractor_repositories_railway(): ContractorRepositories
             return map_participant(row);
           });
         } catch (error) {
-          if (get_pg_error(error).code === pgForeignKeyViolation) throw new NotFoundError("Permiso", input.permitId);
+          if (is_constraint_violation(error) && get_sql_error(error).message.includes("FOREIGN KEY")) throw new NotFoundError("Permiso", input.permitId);
           throw error;
         }
       },
       async remove_participant(participantId, actor) {
         return with_transaction(async (db) => {
           const found = await db.query<ParticipantRow>(
-            `SELECT * FROM permiso_participantes WHERE id = $1 FOR UPDATE`,
+            `SELECT * FROM permiso_participantes WITH (UPDLOCK, ROWLOCK) WHERE id = $1`,
             [participantId],
           );
           const participant = found.rows[0];
@@ -1800,7 +1836,8 @@ export function create_contractor_repositories_railway(): ContractorRepositories
           await authorize_permit_editor_db(db, actor, permit);
 
           const { rows } = await db.query<ParticipantRow>(
-            `UPDATE permiso_participantes SET retirado_en = now() WHERE id = $1 RETURNING *`,
+            `UPDATE permiso_participantes SET retirado_en = SYSDATETIMEOFFSET() WHERE id = $1;
+             SELECT * FROM permiso_participantes WHERE id = $1`,
             [participantId],
           );
           const row = rows[0];
@@ -1814,7 +1851,7 @@ export function create_contractor_repositories_railway(): ContractorRepositories
       async list_by_permit(permitId, options) {
         const { rows } = await get_db().query<ParticipantRow>(
           `SELECT * FROM permiso_participantes
-            WHERE permiso_id = $1 AND (retirado_en IS NULL OR $2::boolean)
+            WHERE permiso_id = $1 AND (retirado_en IS NULL OR CAST($2 AS bit) = 1)
             ORDER BY funcion, posicion, id`,
           [permitId, options?.includeRemoved === true],
         );

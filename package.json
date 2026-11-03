@@ -15,9 +15,9 @@
   },
   "dependencies": {
     "jsqr": "^1.4.0",
+    "mssql": "^12.7.13",
     "next": "^15.5.0",
     "pdf-lib": "^1.17.1",
-    "pg": "^8.23.1",
     "qrcode": "^1.5.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
@@ -25,8 +25,8 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.0",
     "@tailwindcss/postcss": "^4.1.0",
+    "@types/mssql": "^12.3.0",
     "@types/node": "^22.0.0",
-    "@types/pg": "^8.23.1",
     "@types/qrcode": "^1.5.5",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",

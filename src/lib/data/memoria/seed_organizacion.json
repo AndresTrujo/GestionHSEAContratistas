@@ -233,54 +233,6 @@
  ],
  "empleados": [
   {
-   "no_empleado": 205741,
-   "primer_nombre": "ADAN",
-   "segundo_nombre": null,
-   "apellido_paterno": "MEDINA",
-   "apellido_materno": "HERNANDEZ",
-   "genero": null,
-   "fecha_ingreso": "2026-09-23",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "INGENIERO EN ENTRENAMIENTO",
-   "linea_mando_id": 2,
-   "departamento_id": 15,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 201419
-  },
-  {
-   "no_empleado": 205744,
-   "primer_nombre": "LUIS",
-   "segundo_nombre": "DANIEL",
-   "apellido_paterno": "MAGANA",
-   "apellido_materno": "CASTELLANOS",
-   "genero": null,
-   "fecha_ingreso": "2026-09-24",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "INGENIERO EN ENTRENAMIENTO",
-   "linea_mando_id": 2,
-   "departamento_id": 15,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 201419
-  },
-  {
-   "no_empleado": 204119,
-   "primer_nombre": "VIRGINIA",
-   "segundo_nombre": null,
-   "apellido_paterno": "ANDRADE",
-   "apellido_materno": "HERNANDEZ",
-   "genero": "FEMENINO",
-   "fecha_ingreso": "2024-07-08",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "PROJECT MANAGER JR",
-   "linea_mando_id": 2,
-   "departamento_id": 15,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 201419
-  },
-  {
    "no_empleado": 202162,
    "primer_nombre": "ARTURO",
    "segundo_nombre": null,
@@ -496,8 +448,8 @@
    "apellido_materno": "GARCIA",
    "genero": "FEMENINO",
    "fecha_ingreso": "2016-04-04",
-   "fecha_baja": null,
-   "activo": true,
+   "fecha_baja": "2026-10-23",
+   "activo": false,
    "puesto": "PROJECT MANAGER",
    "linea_mando_id": 2,
    "departamento_id": 15,
@@ -553,6 +505,38 @@
    "jefe_no_empleado": 205603
   },
   {
+   "no_empleado": 205741,
+   "primer_nombre": "ADAN",
+   "segundo_nombre": null,
+   "apellido_paterno": "MEDINA",
+   "apellido_materno": "HERNANDEZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-09-23",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "INGENIERO EN ENTRENAMIENTO",
+   "linea_mando_id": 2,
+   "departamento_id": 15,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 205603
+  },
+  {
+   "no_empleado": 205744,
+   "primer_nombre": "LUIS",
+   "segundo_nombre": "DANIEL",
+   "apellido_paterno": "MAGANA",
+   "apellido_materno": "CASTELLANOS",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-09-24",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "INGENIERO EN ENTRENAMIENTO",
+   "linea_mando_id": 2,
+   "departamento_id": 15,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 205603
+  },
+  {
    "no_empleado": 202176,
    "primer_nombre": "JESUS",
    "segundo_nombre": "MANUEL",
@@ -563,6 +547,22 @@
    "fecha_baja": null,
    "activo": true,
    "puesto": "MECANICO ESPECIALISTA",
+   "linea_mando_id": 2,
+   "departamento_id": 15,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 205603
+  },
+  {
+   "no_empleado": 204119,
+   "primer_nombre": "VIRGINIA",
+   "segundo_nombre": null,
+   "apellido_paterno": "ANDRADE",
+   "apellido_materno": "HERNANDEZ",
+   "genero": "FEMENINO",
+   "fecha_ingreso": "2024-07-08",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "PROJECT MANAGER JR",
    "linea_mando_id": 2,
    "departamento_id": 15,
    "subdepartamento_id": null,
@@ -633,22 +633,6 @@
    "jefe_no_empleado": 205603
   },
   {
-   "no_empleado": 203313,
-   "primer_nombre": "MARTIN",
-   "segundo_nombre": null,
-   "apellido_paterno": "LADRON DE GUEVARA",
-   "apellido_materno": "HERRERA",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2022-10-07",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "MECANICO NIVEL II",
-   "linea_mando_id": 2,
-   "departamento_id": 15,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 205603
-  },
-  {
    "no_empleado": 200884,
    "primer_nombre": "ADRIAN",
    "segundo_nombre": null,
@@ -665,13 +649,45 @@
    "jefe_no_empleado": 205603
   },
   {
-   "no_empleado": 202566,
-   "primer_nombre": "LUIS",
-   "segundo_nombre": "DE JESUS",
-   "apellido_paterno": "PEREZ",
-   "apellido_materno": "LLANO",
+   "no_empleado": 203313,
+   "primer_nombre": "MARTIN",
+   "segundo_nombre": null,
+   "apellido_paterno": "LADRON DE GUEVARA",
+   "apellido_materno": "HERRERA",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2021-05-24",
+   "fecha_ingreso": "2022-10-07",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "MECANICO NIVEL II",
+   "linea_mando_id": 2,
+   "departamento_id": 15,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 205603
+  },
+  {
+   "no_empleado": 205509,
+   "primer_nombre": "ARTURO",
+   "segundo_nombre": null,
+   "apellido_paterno": "VIVANCO",
+   "apellido_materno": "GAMBOA",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-05-18",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "MECANICO NIVEL I",
+   "linea_mando_id": 2,
+   "departamento_id": 15,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 205603
+  },
+  {
+   "no_empleado": 204869,
+   "primer_nombre": "DANIEL",
+   "segundo_nombre": null,
+   "apellido_paterno": "HERRERA",
+   "apellido_materno": "MARISCAL",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2025-08-25",
    "fecha_baja": null,
    "activo": true,
    "puesto": "MECANICO NIVEL I",
@@ -745,29 +761,13 @@
    "jefe_no_empleado": 205603
   },
   {
-   "no_empleado": 205509,
-   "primer_nombre": "ARTURO",
-   "segundo_nombre": null,
-   "apellido_paterno": "VIVANCO",
-   "apellido_materno": "GAMBOA",
+   "no_empleado": 202566,
+   "primer_nombre": "LUIS",
+   "segundo_nombre": "DE JESUS",
+   "apellido_paterno": "PEREZ",
+   "apellido_materno": "LLANO",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2026-05-18",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "MECANICO NIVEL I",
-   "linea_mando_id": 2,
-   "departamento_id": 15,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 205603
-  },
-  {
-   "no_empleado": 204869,
-   "primer_nombre": "DANIEL",
-   "segundo_nombre": null,
-   "apellido_paterno": "HERRERA",
-   "apellido_materno": "MARISCAL",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2025-08-25",
+   "fecha_ingreso": "2021-05-24",
    "fecha_baja": null,
    "activo": true,
    "puesto": "MECANICO NIVEL I",
@@ -784,22 +784,6 @@
    "apellido_materno": "MORENO",
    "genero": "MASCULINO",
    "fecha_ingreso": "2021-05-24",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "MECANICO NIVEL III",
-   "linea_mando_id": 2,
-   "departamento_id": 15,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 205603
-  },
-  {
-   "no_empleado": 202520,
-   "primer_nombre": "JESUS",
-   "segundo_nombre": "MANUEL",
-   "apellido_paterno": "ACEVEDO",
-   "apellido_materno": "ENRIQUEZ",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2021-03-30",
    "fecha_baja": null,
    "activo": true,
    "puesto": "MECANICO NIVEL III",
@@ -832,6 +816,22 @@
    "apellido_materno": "SANCHEZ",
    "genero": "MASCULINO",
    "fecha_ingreso": "2025-08-19",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "MECANICO NIVEL III",
+   "linea_mando_id": 2,
+   "departamento_id": 15,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 205603
+  },
+  {
+   "no_empleado": 202520,
+   "primer_nombre": "JESUS",
+   "segundo_nombre": "MANUEL",
+   "apellido_paterno": "ACEVEDO",
+   "apellido_materno": "ENRIQUEZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2021-03-30",
    "fecha_baja": null,
    "activo": true,
    "puesto": "MECANICO NIVEL III",
@@ -926,7 +926,7 @@
    "segundo_nombre": "FERNANDA",
    "apellido_paterno": "GONZALEZ",
    "apellido_materno": "CARRANZA",
-   "genero": null,
+   "genero": "FEMENINO",
    "fecha_ingreso": "2026-09-14",
    "fecha_baja": null,
    "activo": true,
@@ -942,7 +942,7 @@
    "segundo_nombre": null,
    "apellido_paterno": "ARGUELLO",
    "apellido_materno": "MORA",
-   "genero": null,
+   "genero": "MASCULINO",
    "fecha_ingreso": "2026-09-14",
    "fecha_baja": null,
    "activo": true,
@@ -953,6 +953,54 @@
    "jefe_no_empleado": 203730
   },
   {
+   "no_empleado": 202234,
+   "primer_nombre": "JUAN",
+   "segundo_nombre": "DANIEL",
+   "apellido_paterno": "DOMINGUEZ",
+   "apellido_materno": "MONTOYA",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-09-03",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "COMPRADOR TECNICO",
+   "linea_mando_id": 3,
+   "departamento_id": 7,
+   "subdepartamento_id": 1,
+   "jefe_no_empleado": 203730
+  },
+  {
+   "no_empleado": 204053,
+   "primer_nombre": "ALEXIS",
+   "segundo_nombre": "AARON",
+   "apellido_paterno": "PERALTA",
+   "apellido_materno": "DELGADO",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2023-10-09",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "COMPRADOR TECNICO",
+   "linea_mando_id": 3,
+   "departamento_id": 7,
+   "subdepartamento_id": 1,
+   "jefe_no_empleado": 203730
+  },
+  {
+   "no_empleado": 205523,
+   "primer_nombre": "ELOY",
+   "segundo_nombre": null,
+   "apellido_paterno": "HIPOLITO",
+   "apellido_materno": "DOMINGUEZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-05-25",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "COMPRADOR TECNICO",
+   "linea_mando_id": 3,
+   "departamento_id": 7,
+   "subdepartamento_id": 1,
+   "jefe_no_empleado": 203730
+  },
+  {
    "no_empleado": 202503,
    "primer_nombre": "DANIELA",
    "segundo_nombre": null,
@@ -960,6 +1008,38 @@
    "apellido_materno": "MARIN",
    "genero": "FEMENINO",
    "fecha_ingreso": "2026-08-03",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "COMPRADOR TECNICO",
+   "linea_mando_id": 3,
+   "departamento_id": 7,
+   "subdepartamento_id": 1,
+   "jefe_no_empleado": 203730
+  },
+  {
+   "no_empleado": 205755,
+   "primer_nombre": "ABEL",
+   "segundo_nombre": null,
+   "apellido_paterno": "MOJICA",
+   "apellido_materno": "MARTINEZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-09-28",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "COMPRADOR TECNICO",
+   "linea_mando_id": 3,
+   "departamento_id": 7,
+   "subdepartamento_id": 1,
+   "jefe_no_empleado": 203730
+  },
+  {
+   "no_empleado": 205726,
+   "primer_nombre": "ANDRES",
+   "segundo_nombre": null,
+   "apellido_paterno": "MARTINEZ",
+   "apellido_materno": "MAJUL",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-09-14",
    "fecha_baja": null,
    "activo": true,
    "puesto": "COMPRADOR TECNICO",
@@ -985,48 +1065,16 @@
    "jefe_no_empleado": 203730
   },
   {
-   "no_empleado": 205755,
-   "primer_nombre": "ABEL",
+   "no_empleado": 204898,
+   "primer_nombre": "OMAR",
    "segundo_nombre": null,
-   "apellido_paterno": "MOJICA",
-   "apellido_materno": "MARTINEZ",
-   "genero": null,
-   "fecha_ingreso": "2026-09-28",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "COMPRADOR TECNICO",
-   "linea_mando_id": 3,
-   "departamento_id": 7,
-   "subdepartamento_id": 1,
-   "jefe_no_empleado": 203730
-  },
-  {
-   "no_empleado": 205726,
-   "primer_nombre": "ANDRES",
-   "segundo_nombre": null,
-   "apellido_paterno": "MARTINEZ",
-   "apellido_materno": "MAJUL",
-   "genero": null,
-   "fecha_ingreso": "2026-09-14",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "COMPRADOR TECNICO",
-   "linea_mando_id": 3,
-   "departamento_id": 7,
-   "subdepartamento_id": 1,
-   "jefe_no_empleado": 203730
-  },
-  {
-   "no_empleado": 205631,
-   "primer_nombre": "IVAN",
-   "segundo_nombre": null,
-   "apellido_paterno": "CARRILLO",
-   "apellido_materno": "ACOSTA",
+   "apellido_paterno": "ABURTO",
+   "apellido_materno": "CABRERA",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2026-08-10",
+   "fecha_ingreso": "2026-03-09",
    "fecha_baja": null,
    "activo": true,
-   "puesto": "LIDER DE COMPRAS",
+   "puesto": "COMPRADOR JR",
    "linea_mando_id": 3,
    "departamento_id": 7,
    "subdepartamento_id": 1,
@@ -1049,54 +1097,6 @@
    "jefe_no_empleado": 203828
   },
   {
-   "no_empleado": 202234,
-   "primer_nombre": "JUAN",
-   "segundo_nombre": "DANIEL",
-   "apellido_paterno": "DOMINGUEZ",
-   "apellido_materno": "MONTOYA",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2026-09-03",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "COMPRADOR TECNICO",
-   "linea_mando_id": 3,
-   "departamento_id": 7,
-   "subdepartamento_id": 1,
-   "jefe_no_empleado": 203828
-  },
-  {
-   "no_empleado": 204053,
-   "primer_nombre": "ALEXIS",
-   "segundo_nombre": "AARON",
-   "apellido_paterno": "PERALTA",
-   "apellido_materno": "DELGADO",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2023-10-09",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "COMPRADOR TECNICO",
-   "linea_mando_id": 3,
-   "departamento_id": 7,
-   "subdepartamento_id": 1,
-   "jefe_no_empleado": 203828
-  },
-  {
-   "no_empleado": 205523,
-   "primer_nombre": "ELOY",
-   "segundo_nombre": null,
-   "apellido_paterno": "HIPOLITO",
-   "apellido_materno": "DOMINGUEZ",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2026-05-25",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "COMPRADOR TECNICO",
-   "linea_mando_id": 3,
-   "departamento_id": 7,
-   "subdepartamento_id": 1,
-   "jefe_no_empleado": 203828
-  },
-  {
    "no_empleado": 204305,
    "primer_nombre": "JOSUE",
    "segundo_nombre": "ANTONIO",
@@ -1113,20 +1113,20 @@
    "jefe_no_empleado": 203828
   },
   {
-   "no_empleado": 204898,
-   "primer_nombre": "OMAR",
+   "no_empleado": 205631,
+   "primer_nombre": "IVAN",
    "segundo_nombre": null,
-   "apellido_paterno": "ABURTO",
-   "apellido_materno": "CABRERA",
+   "apellido_paterno": "CARRILLO",
+   "apellido_materno": "ACOSTA",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2026-03-09",
+   "fecha_ingreso": "2026-08-10",
    "fecha_baja": null,
    "activo": true,
-   "puesto": "COMPRADOR JR",
+   "puesto": "LIDER DE COMPRAS",
    "linea_mando_id": 3,
    "departamento_id": 7,
-   "subdepartamento_id": 3,
-   "jefe_no_empleado": 203828
+   "subdepartamento_id": 1,
+   "jefe_no_empleado": 204001
   },
   {
    "no_empleado": 203730,
@@ -1142,7 +1142,7 @@
    "linea_mando_id": 3,
    "departamento_id": 7,
    "subdepartamento_id": 1,
-   "jefe_no_empleado": 203828
+   "jefe_no_empleado": 205631
   },
   {
    "no_empleado": 202387,
@@ -1209,6 +1209,22 @@
    "jefe_no_empleado": 202491
   },
   {
+   "no_empleado": 204273,
+   "primer_nombre": "ANTHONY",
+   "segundo_nombre": "GAEL",
+   "apellido_paterno": "MENDIOLA",
+   "apellido_materno": "REYES",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2024-09-11",
+   "fecha_baja": "2026-09-25",
+   "activo": false,
+   "puesto": "AUXILIAR ADMINISTRATIVO",
+   "linea_mando_id": 3,
+   "departamento_id": 6,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 202491
+  },
+  {
    "no_empleado": 201996,
    "primer_nombre": "LIZETH",
    "segundo_nombre": "DEL CARMEN",
@@ -1241,31 +1257,15 @@
    "jefe_no_empleado": 202491
   },
   {
-   "no_empleado": 204273,
-   "primer_nombre": "ANTHONY",
-   "segundo_nombre": "GAEL",
-   "apellido_paterno": "MENDIOLA",
-   "apellido_materno": "REYES",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2024-09-11",
-   "fecha_baja": "2026-09-25",
-   "activo": false,
-   "puesto": "AUXILIAR ADMINISTRATIVO",
-   "linea_mando_id": 3,
-   "departamento_id": 6,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 202491
-  },
-  {
    "no_empleado": 205725,
    "primer_nombre": "DIEGO",
    "segundo_nombre": null,
    "apellido_paterno": "LOPEZ",
    "apellido_materno": "TRONCO",
-   "genero": null,
+   "genero": "MASCULINO",
    "fecha_ingreso": "2026-09-14",
    "fecha_baja": null,
-   "activo": false,
+   "activo": true,
    "puesto": "RESIDENTE",
    "linea_mando_id": 3,
    "departamento_id": 6,
@@ -1454,7 +1454,7 @@
    "segundo_nombre": "LIZET",
    "apellido_paterno": "DURAN",
    "apellido_materno": "CAPISTRAN",
-   "genero": null,
+   "genero": "FEMENINO",
    "fecha_ingreso": "2026-09-22",
    "fecha_baja": null,
    "activo": true,
@@ -1486,11 +1486,11 @@
    "segundo_nombre": null,
    "apellido_paterno": "CASTILLO",
    "apellido_materno": "CORRAL",
-   "genero": null,
+   "genero": "FEMENINO",
    "fecha_ingreso": "2026-09-28",
    "fecha_baja": null,
    "activo": true,
-   "puesto": "LIDER RESPONSABLE DE CAPITAL HUMANO Y ESR",
+   "puesto": "GERENTE DE CAPITAL HUMANO Y ESR",
    "linea_mando_id": 3,
    "departamento_id": 5,
    "subdepartamento_id": null,
@@ -1513,20 +1513,68 @@
    "jefe_no_empleado": 205750
   },
   {
-   "no_empleado": 204612,
+   "no_empleado": 200464,
    "primer_nombre": "JOSE",
-   "segundo_nombre": "RAMON",
-   "apellido_paterno": "OLVERA",
-   "apellido_materno": "PRADO",
+   "segundo_nombre": "ROBERTO",
+   "apellido_paterno": "HERNANDEZ",
+   "apellido_materno": "CRUZ",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2025-02-18",
+   "fecha_ingreso": "2021-11-05",
    "fecha_baja": null,
    "activo": true,
-   "puesto": "CHIEF CUSTOMER SERVICES OFFICER",
+   "puesto": "SUPERVISOR EN SITIO",
    "linea_mando_id": 2,
-   "departamento_id": 20,
+   "departamento_id": 12,
    "subdepartamento_id": null,
-   "jefe_no_empleado": 201453
+   "jefe_no_empleado": 201756
+  },
+  {
+   "no_empleado": 204394,
+   "primer_nombre": "EDWIN",
+   "segundo_nombre": "LUCIO",
+   "apellido_paterno": "MOLINA",
+   "apellido_materno": "HERNANDEZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2025-07-21",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "INGENIERO EN ENTRENAMIENTO",
+   "linea_mando_id": 2,
+   "departamento_id": 12,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 201756
+  },
+  {
+   "no_empleado": 204344,
+   "primer_nombre": "LAURA",
+   "segundo_nombre": "PENELOPE",
+   "apellido_paterno": "CASTILLO",
+   "apellido_materno": "REYES",
+   "genero": "FEMENINO",
+   "fecha_ingreso": "2024-07-29",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "PROJECT MANAGER",
+   "linea_mando_id": 2,
+   "departamento_id": 12,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 201756
+  },
+  {
+   "no_empleado": 200722,
+   "primer_nombre": "ELEUTERIO",
+   "segundo_nombre": null,
+   "apellido_paterno": "CASTRO",
+   "apellido_materno": "RAMIREZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2025-10-20",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "SUPERVISOR DE CAMPO",
+   "linea_mando_id": 2,
+   "departamento_id": 12,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 201756
   },
   {
    "no_empleado": 200562,
@@ -1545,20 +1593,52 @@
    "jefe_no_empleado": 203914
   },
   {
-   "no_empleado": 203795,
-   "primer_nombre": "DANIEL",
-   "segundo_nombre": "ALEJANDRO",
-   "apellido_paterno": "LARA",
-   "apellido_materno": "FERNANDEZ",
+   "no_empleado": 205678,
+   "primer_nombre": "LUIS",
+   "segundo_nombre": "JAVIER",
+   "apellido_paterno": "GUILLEN",
+   "apellido_materno": "SANCHEZ",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2023-04-19",
+   "fecha_ingreso": "2026-08-21",
    "fecha_baja": null,
    "activo": true,
-   "puesto": "AUXILIAR ADMINISTRATIVO",
+   "puesto": "RESIDENTE",
    "linea_mando_id": 2,
-   "departamento_id": 13,
+   "departamento_id": 12,
    "subdepartamento_id": null,
-   "jefe_no_empleado": 203914
+   "jefe_no_empleado": 204344
+  },
+  {
+   "no_empleado": 204751,
+   "primer_nombre": "JOSE",
+   "segundo_nombre": "JAFET",
+   "apellido_paterno": "CASTRO",
+   "apellido_materno": "LINALDI",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-02-16",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "INGENIERO EN ENTRENAMIENTO",
+   "linea_mando_id": 2,
+   "departamento_id": 12,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 204351
+  },
+  {
+   "no_empleado": 204612,
+   "primer_nombre": "JOSE",
+   "segundo_nombre": "RAMON",
+   "apellido_paterno": "OLVERA",
+   "apellido_materno": "PRADO",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2025-02-18",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "CHIEF CUSTOMER SERVICES OFFICER",
+   "linea_mando_id": 2,
+   "departamento_id": 20,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 201453
   },
   {
    "no_empleado": 204837,
@@ -1577,13 +1657,13 @@
    "jefe_no_empleado": 203914
   },
   {
-   "no_empleado": 202577,
-   "primer_nombre": "OCTAVIO",
-   "segundo_nombre": null,
-   "apellido_paterno": "USCANGA",
-   "apellido_materno": "GARCIA",
+   "no_empleado": 203795,
+   "primer_nombre": "DANIEL",
+   "segundo_nombre": "ALEJANDRO",
+   "apellido_paterno": "LARA",
+   "apellido_materno": "FERNANDEZ",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2021-06-02",
+   "fecha_ingreso": "2023-04-19",
    "fecha_baja": null,
    "activo": true,
    "puesto": "ANALISTA OPERATIVO",
@@ -1598,7 +1678,7 @@
    "segundo_nombre": "JOHANA",
    "apellido_paterno": "ESPINOZA",
    "apellido_materno": "PEREZ",
-   "genero": "MASCULINO",
+   "genero": "FEMENINO",
    "fecha_ingreso": "2026-02-16",
    "fecha_baja": null,
    "activo": true,
@@ -1641,6 +1721,22 @@
    "jefe_no_empleado": 203914
   },
   {
+   "no_empleado": 202577,
+   "primer_nombre": "OCTAVIO",
+   "segundo_nombre": null,
+   "apellido_paterno": "USCANGA",
+   "apellido_materno": "GARCIA",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2021-06-02",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "COMPRADOR TECNICO",
+   "linea_mando_id": 2,
+   "departamento_id": 13,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 203914
+  },
+  {
    "no_empleado": 202226,
    "primer_nombre": "LUCILA",
    "segundo_nombre": null,
@@ -1673,22 +1769,6 @@
    "jefe_no_empleado": 203914
   },
   {
-   "no_empleado": 203577,
-   "primer_nombre": "IVAN",
-   "segundo_nombre": null,
-   "apellido_paterno": "RENDON",
-   "apellido_materno": "MORAN",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2023-10-23",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "FIELD SERVICES I",
-   "linea_mando_id": 2,
-   "departamento_id": 13,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 203914
-  },
-  {
    "no_empleado": 203764,
    "primer_nombre": "FELIX",
    "segundo_nombre": "AGUSTIN",
@@ -1698,6 +1778,22 @@
    "fecha_ingreso": "2023-03-27",
    "fecha_baja": "2026-07-31",
    "activo": false,
+   "puesto": "FIELD SERVICES I",
+   "linea_mando_id": 2,
+   "departamento_id": 13,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 203914
+  },
+  {
+   "no_empleado": 203577,
+   "primer_nombre": "IVAN",
+   "segundo_nombre": null,
+   "apellido_paterno": "RENDON",
+   "apellido_materno": "MORAN",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2023-10-23",
+   "fecha_baja": null,
+   "activo": true,
    "puesto": "FIELD SERVICES I",
    "linea_mando_id": 2,
    "departamento_id": 13,
@@ -1758,7 +1854,7 @@
    "segundo_nombre": "ROBERTO",
    "apellido_paterno": "QUINTERO",
    "apellido_materno": "BORRERO",
-   "genero": null,
+   "genero": "MASCULINO",
    "fecha_ingreso": "2026-09-28",
    "fecha_baja": null,
    "activo": true,
@@ -1801,22 +1897,6 @@
    "jefe_no_empleado": 204612
   },
   {
-   "no_empleado": 202749,
-   "primer_nombre": "ARTURO",
-   "segundo_nombre": null,
-   "apellido_paterno": "TZITZIHUA",
-   "apellido_materno": "HERNANDEZ",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2022-03-07",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "LIDER TECNICO DE OPERACIONES",
-   "linea_mando_id": 2,
-   "departamento_id": 13,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 204612
-  },
-  {
    "no_empleado": 205559,
    "primer_nombre": "MARCOS",
    "segundo_nombre": "JOAQUIN",
@@ -1833,12 +1913,28 @@
    "jefe_no_empleado": 204612
   },
   {
+   "no_empleado": 202749,
+   "primer_nombre": "ARTURO",
+   "segundo_nombre": null,
+   "apellido_paterno": "TZITZIHUA",
+   "apellido_materno": "HERNANDEZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2022-03-07",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "LIDER TECNICO DE OPERACIONES",
+   "linea_mando_id": 2,
+   "departamento_id": 13,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 204612
+  },
+  {
    "no_empleado": 205754,
    "primer_nombre": "YONATHAN",
    "segundo_nombre": null,
    "apellido_paterno": "VLASQUEZ",
    "apellido_materno": "RODRIGUEZ",
-   "genero": null,
+   "genero": "MASCULINO",
    "fecha_ingreso": "2026-09-28",
    "fecha_baja": null,
    "activo": true,
@@ -1854,11 +1950,27 @@
    "segundo_nombre": "PAUL",
    "apellido_paterno": "VAZQUEZ",
    "apellido_materno": "LEON",
-   "genero": null,
+   "genero": "MASCULINO",
    "fecha_ingreso": "2026-09-07",
    "fecha_baja": null,
    "activo": true,
    "puesto": "SUPERVISOR DE ALMACEN",
+   "linea_mando_id": 3,
+   "departamento_id": 7,
+   "subdepartamento_id": 3,
+   "jefe_no_empleado": 203828
+  },
+  {
+   "no_empleado": 205728,
+   "primer_nombre": "ALICE",
+   "segundo_nombre": "PAOLA",
+   "apellido_paterno": "MARTINEZ",
+   "apellido_materno": "VERA",
+   "genero": "FEMENINO",
+   "fecha_ingreso": "2026-09-14",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "AUXILIAR DE ALMACEN",
    "linea_mando_id": 3,
    "departamento_id": 7,
    "subdepartamento_id": 3,
@@ -1872,22 +1984,6 @@
    "apellido_materno": "ZAMORA",
    "genero": "FEMENINO",
    "fecha_ingreso": "2026-08-05",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "AUXILIAR DE ALMACEN",
-   "linea_mando_id": 3,
-   "departamento_id": 7,
-   "subdepartamento_id": 3,
-   "jefe_no_empleado": 203828
-  },
-  {
-   "no_empleado": 205728,
-   "primer_nombre": "ALICE",
-   "segundo_nombre": "PAOLA",
-   "apellido_paterno": "MARTINEZ",
-   "apellido_materno": "VERA",
-   "genero": null,
-   "fecha_ingreso": "2026-09-14",
    "fecha_baja": null,
    "activo": true,
    "puesto": "AUXILIAR DE ALMACEN",
@@ -2089,22 +2185,6 @@
    "jefe_no_empleado": 204001
   },
   {
-   "no_empleado": 205226,
-   "primer_nombre": "ABIGAIL",
-   "segundo_nombre": null,
-   "apellido_paterno": "CASTRO",
-   "apellido_materno": "PIO",
-   "genero": "FEMENINO",
-   "fecha_ingreso": "2026-02-09",
-   "fecha_baja": "2026-08-23",
-   "activo": false,
-   "puesto": "RESIDENTE",
-   "linea_mando_id": 3,
-   "departamento_id": 7,
-   "subdepartamento_id": 3,
-   "jefe_no_empleado": 202745
-  },
-  {
    "no_empleado": 205245,
    "primer_nombre": "SANTIAGO",
    "segundo_nombre": null,
@@ -2126,9 +2206,25 @@
    "segundo_nombre": null,
    "apellido_paterno": "CASTILLO",
    "apellido_materno": "VAZQUEZ",
-   "genero": null,
+   "genero": "FEMENINO",
    "fecha_ingreso": "2026-09-10",
    "fecha_baja": null,
+   "activo": true,
+   "puesto": "RESIDENTE",
+   "linea_mando_id": 3,
+   "departamento_id": 7,
+   "subdepartamento_id": 3,
+   "jefe_no_empleado": 202745
+  },
+  {
+   "no_empleado": 205226,
+   "primer_nombre": "ABIGAIL",
+   "segundo_nombre": null,
+   "apellido_paterno": "CASTRO",
+   "apellido_materno": "PIO",
+   "genero": "FEMENINO",
+   "fecha_ingreso": "2026-02-09",
+   "fecha_baja": "2026-08-23",
    "activo": false,
    "puesto": "RESIDENTE",
    "linea_mando_id": 3,
@@ -2142,10 +2238,10 @@
    "segundo_nombre": "ALBERTO",
    "apellido_paterno": "ESCOBAR",
    "apellido_materno": "ANDRADE",
-   "genero": null,
+   "genero": "MASCULINO",
    "fecha_ingreso": "2026-09-23",
    "fecha_baja": null,
-   "activo": false,
+   "activo": true,
    "puesto": "RESIDENTE",
    "linea_mando_id": 3,
    "departamento_id": 7,
@@ -2241,7 +2337,7 @@
    "genero": "MASCULINO",
    "fecha_ingreso": "2026-06-01",
    "fecha_baja": null,
-   "activo": false,
+   "activo": true,
    "puesto": "RESIDENTE",
    "linea_mando_id": 6,
    "departamento_id": 9,
@@ -2366,7 +2462,7 @@
    "segundo_nombre": "JAVIER",
    "apellido_paterno": "AZAMAR",
    "apellido_materno": "LARA",
-   "genero": null,
+   "genero": "MASCULINO",
    "fecha_ingreso": "2026-09-14",
    "fecha_baja": null,
    "activo": true,
@@ -2425,54 +2521,6 @@
    "jefe_no_empleado": 201756
   },
   {
-   "no_empleado": 200464,
-   "primer_nombre": "JOSE",
-   "segundo_nombre": "ROBERTO",
-   "apellido_paterno": "HERNANDEZ",
-   "apellido_materno": "CRUZ",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2021-11-05",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "SUPERVISOR EN SITIO",
-   "linea_mando_id": 2,
-   "departamento_id": 12,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 201756
-  },
-  {
-   "no_empleado": 204394,
-   "primer_nombre": "EDWIN",
-   "segundo_nombre": "LUCIO",
-   "apellido_paterno": "MOLINA",
-   "apellido_materno": "HERNANDEZ",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2025-07-21",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "INGENIERO EN ENTRENAMIENTO",
-   "linea_mando_id": 2,
-   "departamento_id": 12,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 201756
-  },
-  {
-   "no_empleado": 204344,
-   "primer_nombre": "LAURA",
-   "segundo_nombre": "PENELOPE",
-   "apellido_paterno": "CASTILLO",
-   "apellido_materno": "REYES",
-   "genero": "FEMENINO",
-   "fecha_ingreso": "2024-07-29",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "PROJECT MANAGER",
-   "linea_mando_id": 2,
-   "departamento_id": 12,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 201756
-  },
-  {
    "no_empleado": 205560,
    "primer_nombre": "JOSE",
    "segundo_nombre": "DAVID",
@@ -2489,22 +2537,6 @@
    "jefe_no_empleado": 201756
   },
   {
-   "no_empleado": 200722,
-   "primer_nombre": "ELEUTERIO",
-   "segundo_nombre": null,
-   "apellido_paterno": "CASTRO",
-   "apellido_materno": "RAMIREZ",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2025-10-20",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "SUPERVISOR DE CAMPO",
-   "linea_mando_id": 2,
-   "departamento_id": 12,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 201756
-  },
-  {
    "no_empleado": 205650,
    "primer_nombre": "ALFREDO",
    "segundo_nombre": null,
@@ -2513,7 +2545,7 @@
    "genero": "MASCULINO",
    "fecha_ingreso": "2026-08-13",
    "fecha_baja": null,
-   "activo": false,
+   "activo": true,
    "puesto": "RESIDENTE",
    "linea_mando_id": 2,
    "departamento_id": 12,
@@ -2569,22 +2601,6 @@
    "jefe_no_empleado": 204344
   },
   {
-   "no_empleado": 205678,
-   "primer_nombre": "LUIS",
-   "segundo_nombre": "JAVIER",
-   "apellido_paterno": "GUILLEN",
-   "apellido_materno": "SANCHEZ",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2026-08-21",
-   "fecha_baja": null,
-   "activo": false,
-   "puesto": "RESIDENTE",
-   "linea_mando_id": 2,
-   "departamento_id": 12,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 204344
-  },
-  {
    "no_empleado": 204860,
    "primer_nombre": "NATALYA",
    "segundo_nombre": null,
@@ -2609,7 +2625,7 @@
    "genero": "FEMENINO",
    "fecha_ingreso": "2026-08-13",
    "fecha_baja": null,
-   "activo": false,
+   "activo": true,
    "puesto": "RESIDENTE",
    "linea_mando_id": 2,
    "departamento_id": 12,
@@ -2649,22 +2665,6 @@
    "jefe_no_empleado": 204351
   },
   {
-   "no_empleado": 204751,
-   "primer_nombre": "JOSE",
-   "segundo_nombre": "JAFET",
-   "apellido_paterno": "CASTRO",
-   "apellido_materno": "LINALDI",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2026-02-16",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "INGENIERO EN ENTRENAMIENTO",
-   "linea_mando_id": 2,
-   "departamento_id": 12,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 204351
-  },
-  {
    "no_empleado": 201756,
    "primer_nombre": "GERARDO",
    "segundo_nombre": "ULISES",
@@ -2679,6 +2679,22 @@
    "departamento_id": 12,
    "subdepartamento_id": null,
    "jefe_no_empleado": 204612
+  },
+  {
+   "no_empleado": 205790,
+   "primer_nombre": "FRANCISCO",
+   "segundo_nombre": "JAVIER",
+   "apellido_paterno": "BRAVO",
+   "apellido_materno": "HERNANDEZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-10-19",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "SUPERVISOR EN SITIO",
+   "linea_mando_id": 2,
+   "departamento_id": 12,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 205754
   },
   {
    "no_empleado": 201453,
@@ -2777,22 +2793,6 @@
    "jefe_no_empleado": 204001
   },
   {
-   "no_empleado": 205713,
-   "primer_nombre": "ADRIANA",
-   "segundo_nombre": "CAROLINA",
-   "apellido_paterno": "LOBATO",
-   "apellido_materno": "JESUS",
-   "genero": "FEMENINO",
-   "fecha_ingreso": "2026-09-07",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "SUPERVISOR HSE",
-   "linea_mando_id": 4,
-   "departamento_id": 17,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 204692
-  },
-  {
    "no_empleado": 205708,
    "primer_nombre": "JONATHAN",
    "segundo_nombre": "DAVID",
@@ -2825,13 +2825,13 @@
    "jefe_no_empleado": 202965
   },
   {
-   "no_empleado": 205563,
-   "primer_nombre": "YERALI",
-   "segundo_nombre": null,
-   "apellido_paterno": "BALCAZAR",
-   "apellido_materno": "ELVIRA",
+   "no_empleado": 205200,
+   "primer_nombre": "SUANY",
+   "segundo_nombre": "ESTEFANIA",
+   "apellido_paterno": "SOLIS",
+   "apellido_materno": "CORRO",
    "genero": "FEMENINO",
-   "fecha_ingreso": "2026-06-25",
+   "fecha_ingreso": "2026-08-24",
    "fecha_baja": null,
    "activo": true,
    "puesto": "INGENIERO EN ENTRENAMIENTO",
@@ -2841,13 +2841,13 @@
    "jefe_no_empleado": 202965
   },
   {
-   "no_empleado": 205200,
-   "primer_nombre": "SUANY",
-   "segundo_nombre": "ESTEFANIA",
-   "apellido_paterno": "SOLIS",
-   "apellido_materno": "CORRO",
+   "no_empleado": 205563,
+   "primer_nombre": "YERALI",
+   "segundo_nombre": null,
+   "apellido_paterno": "BALCAZAR",
+   "apellido_materno": "ELVIRA",
    "genero": "FEMENINO",
-   "fecha_ingreso": "2026-08-24",
+   "fecha_ingreso": "2026-06-25",
    "fecha_baja": null,
    "activo": true,
    "puesto": "INGENIERO EN ENTRENAMIENTO",
@@ -2990,10 +2990,10 @@
    "segundo_nombre": null,
    "apellido_paterno": "TRUJILLO",
    "apellido_materno": "SOSA",
-   "genero": null,
+   "genero": "MASCULINO",
    "fecha_ingreso": "2026-09-21",
    "fecha_baja": null,
-   "activo": false,
+   "activo": true,
    "puesto": "RESIDENTE",
    "linea_mando_id": 4,
    "departamento_id": 17,
@@ -3025,7 +3025,7 @@
    "genero": "MASCULINO",
    "fecha_ingreso": "2026-08-12",
    "fecha_baja": null,
-   "activo": false,
+   "activo": true,
    "puesto": "RESIDENTE",
    "linea_mando_id": 4,
    "departamento_id": 17,
@@ -3041,24 +3041,8 @@
    "genero": "MASCULINO",
    "fecha_ingreso": "2026-08-13",
    "fecha_baja": null,
-   "activo": false,
-   "puesto": "RESIDENTE",
-   "linea_mando_id": 4,
-   "departamento_id": 17,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 204692
-  },
-  {
-   "no_empleado": 205158,
-   "primer_nombre": "LUISA",
-   "segundo_nombre": "JOAIMI",
-   "apellido_paterno": "PEREZ",
-   "apellido_materno": "PEREZ",
-   "genero": "FEMENINO",
-   "fecha_ingreso": "2026-01-26",
-   "fecha_baja": null,
    "activo": true,
-   "puesto": "SUPERVISOR HSE",
+   "puesto": "RESIDENTE",
    "linea_mando_id": 4,
    "departamento_id": 17,
    "subdepartamento_id": null,
@@ -3072,6 +3056,22 @@
    "apellido_materno": "NAITE",
    "genero": "MASCULINO",
    "fecha_ingreso": "2024-10-28",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "SUPERVISOR HSE",
+   "linea_mando_id": 4,
+   "departamento_id": 17,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 204692
+  },
+  {
+   "no_empleado": 205158,
+   "primer_nombre": "LUISA",
+   "segundo_nombre": "JOAIMI",
+   "apellido_paterno": "PEREZ",
+   "apellido_materno": "PEREZ",
+   "genero": "FEMENINO",
+   "fecha_ingreso": "2026-01-26",
    "fecha_baja": null,
    "activo": true,
    "puesto": "SUPERVISOR HSE",
@@ -3169,7 +3169,7 @@
    "genero": "MASCULINO",
    "fecha_ingreso": "2026-08-12",
    "fecha_baja": null,
-   "activo": false,
+   "activo": true,
    "puesto": "RESIDENTE",
    "linea_mando_id": 4,
    "departamento_id": 17,
@@ -3241,22 +3241,6 @@
    "jefe_no_empleado": 204502
   },
   {
-   "no_empleado": 204897,
-   "primer_nombre": "DAVID",
-   "segundo_nombre": null,
-   "apellido_paterno": "PEREZ",
-   "apellido_materno": "GONZALEZ",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2025-09-01",
-   "fecha_baja": "2026-02-11",
-   "activo": false,
-   "puesto": "RESIDENTE",
-   "linea_mando_id": 4,
-   "departamento_id": 17,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 204502
-  },
-  {
    "no_empleado": 205223,
    "primer_nombre": "ERIC",
    "segundo_nombre": "JARET",
@@ -3265,6 +3249,22 @@
    "genero": "MASCULINO",
    "fecha_ingreso": "2026-02-09",
    "fecha_baja": "2026-06-15",
+   "activo": false,
+   "puesto": "RESIDENTE",
+   "linea_mando_id": 4,
+   "departamento_id": 17,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 204502
+  },
+  {
+   "no_empleado": 204897,
+   "primer_nombre": "DAVID",
+   "segundo_nombre": null,
+   "apellido_paterno": "PEREZ",
+   "apellido_materno": "GONZALEZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2025-09-01",
+   "fecha_baja": "2026-02-11",
    "activo": false,
    "puesto": "RESIDENTE",
    "linea_mando_id": 4,
@@ -3305,22 +3305,6 @@
    "jefe_no_empleado": 201757
   },
   {
-   "no_empleado": 204582,
-   "primer_nombre": "BRUNO",
-   "segundo_nombre": "IVAN",
-   "apellido_paterno": "GARCES",
-   "apellido_materno": "CANTU",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2025-07-07",
-   "fecha_baja": "2026-07-07",
-   "activo": false,
-   "puesto": "INGENIERO EN ENTRENAMIENTO",
-   "linea_mando_id": 2,
-   "departamento_id": 14,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 201757
-  },
-  {
    "no_empleado": 205198,
    "primer_nombre": "DEREK",
    "segundo_nombre": null,
@@ -3353,6 +3337,38 @@
    "jefe_no_empleado": 201757
   },
   {
+   "no_empleado": 205770,
+   "primer_nombre": "ANGEL",
+   "segundo_nombre": "PAUL",
+   "apellido_paterno": "MENDEZ",
+   "apellido_materno": "RAMIREZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-10-07",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "INGENIERO EN ENTRENAMIENTO",
+   "linea_mando_id": 2,
+   "departamento_id": 14,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 201757
+  },
+  {
+   "no_empleado": 204582,
+   "primer_nombre": "BRUNO",
+   "segundo_nombre": "IVAN",
+   "apellido_paterno": "GARCES",
+   "apellido_materno": "CANTU",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2025-07-07",
+   "fecha_baja": "2026-07-07",
+   "activo": false,
+   "puesto": "INGENIERO EN ENTRENAMIENTO",
+   "linea_mando_id": 2,
+   "departamento_id": 14,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 201757
+  },
+  {
    "no_empleado": 204618,
    "primer_nombre": "YARELI",
    "segundo_nombre": "ANILU",
@@ -3363,22 +3379,6 @@
    "fecha_baja": null,
    "activo": true,
    "puesto": "INGENIERO EN ENTRENAMIENTO",
-   "linea_mando_id": 2,
-   "departamento_id": 14,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 201757
-  },
-  {
-   "no_empleado": 202567,
-   "primer_nombre": "DANIEL",
-   "segundo_nombre": "DE JESUS",
-   "apellido_paterno": "TRONCO",
-   "apellido_materno": "ESPEJO",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2021-05-24",
-   "fecha_baja": "2026-06-21",
-   "activo": false,
-   "puesto": "INGENIERO DE SOFTWARE",
    "linea_mando_id": 2,
    "departamento_id": 14,
    "subdepartamento_id": null,
@@ -3417,6 +3417,22 @@
    "jefe_no_empleado": 201757
   },
   {
+   "no_empleado": 202567,
+   "primer_nombre": "DANIEL",
+   "segundo_nombre": "DE JESUS",
+   "apellido_paterno": "TRONCO",
+   "apellido_materno": "ESPEJO",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2021-05-24",
+   "fecha_baja": "2026-06-21",
+   "activo": false,
+   "puesto": "INGENIERO DE SOFTWARE",
+   "linea_mando_id": 2,
+   "departamento_id": 14,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 201757
+  },
+  {
    "no_empleado": 202690,
    "primer_nombre": "OSCAR",
    "segundo_nombre": "ALEJANDRO",
@@ -3424,8 +3440,8 @@
    "apellido_materno": "VENTURA",
    "genero": "MASCULINO",
    "fecha_ingreso": "2022-08-01",
-   "fecha_baja": null,
-   "activo": true,
+   "fecha_baja": "2026-10-05",
+   "activo": false,
    "puesto": "AUTOMATION & CONTROLS ENGINEER I",
    "linea_mando_id": 2,
    "departamento_id": 14,
@@ -3529,22 +3545,6 @@
    "jefe_no_empleado": 204351
   },
   {
-   "no_empleado": 205157,
-   "primer_nombre": "LUIS",
-   "segundo_nombre": null,
-   "apellido_paterno": "BLEA",
-   "apellido_materno": "LEDESMA",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2026-01-26",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "AYUDANTE GENERAL",
-   "linea_mando_id": 2,
-   "departamento_id": 12,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 204351
-  },
-  {
    "no_empleado": 205179,
    "primer_nombre": "ALEXANDER",
    "segundo_nombre": null,
@@ -3554,6 +3554,22 @@
    "fecha_ingreso": "2026-02-03",
    "fecha_baja": "2026-05-03",
    "activo": false,
+   "puesto": "AYUDANTE GENERAL",
+   "linea_mando_id": 2,
+   "departamento_id": 12,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 204351
+  },
+  {
+   "no_empleado": 205157,
+   "primer_nombre": "LUIS",
+   "segundo_nombre": null,
+   "apellido_paterno": "BLEA",
+   "apellido_materno": "LEDESMA",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-01-26",
+   "fecha_baja": null,
+   "activo": true,
    "puesto": "AYUDANTE GENERAL",
    "linea_mando_id": 2,
    "departamento_id": 12,
@@ -3689,6 +3705,38 @@
    "jefe_no_empleado": 204351
   },
   {
+   "no_empleado": 205742,
+   "primer_nombre": "JONATAN",
+   "segundo_nombre": "JAIR",
+   "apellido_paterno": "HERNANDEZ",
+   "apellido_materno": "GARCIA",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-09-23",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "AYUDANTE GENERAL",
+   "linea_mando_id": 2,
+   "departamento_id": 12,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 204351
+  },
+  {
+   "no_empleado": 205740,
+   "primer_nombre": "EDUARDO",
+   "segundo_nombre": null,
+   "apellido_paterno": "CRUZ",
+   "apellido_materno": "CASTILLO",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-09-22",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "AYUDANTE GENERAL",
+   "linea_mando_id": 2,
+   "departamento_id": 12,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 204351
+  },
+  {
    "no_empleado": 204040,
    "primer_nombre": "OSWALDO",
    "segundo_nombre": "CIRILO",
@@ -3753,22 +3801,6 @@
    "jefe_no_empleado": 204351
   },
   {
-   "no_empleado": 205551,
-   "primer_nombre": "KEVIN",
-   "segundo_nombre": null,
-   "apellido_paterno": "ESPEJO",
-   "apellido_materno": "QUERO",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2026-06-12",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "AYUDANTE GENERAL",
-   "linea_mando_id": 2,
-   "departamento_id": 12,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 204351
-  },
-  {
    "no_empleado": 204515,
    "primer_nombre": "CRUZ",
    "segundo_nombre": "ENRIQUE",
@@ -3801,38 +3833,6 @@
    "jefe_no_empleado": 204351
   },
   {
-   "no_empleado": 205742,
-   "primer_nombre": "JONATAN",
-   "segundo_nombre": "JAIR",
-   "apellido_paterno": "HERNANDEZ",
-   "apellido_materno": "GARCIA",
-   "genero": null,
-   "fecha_ingreso": "2026-09-23",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "AYUDANTE GENERAL",
-   "linea_mando_id": 2,
-   "departamento_id": 12,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 204351
-  },
-  {
-   "no_empleado": 205740,
-   "primer_nombre": "EDUARDO",
-   "segundo_nombre": null,
-   "apellido_paterno": "CRUZ",
-   "apellido_materno": "CASTILLO",
-   "genero": null,
-   "fecha_ingreso": "2026-09-22",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "AYUDANTE GENERAL",
-   "linea_mando_id": 2,
-   "departamento_id": 12,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 204351
-  },
-  {
    "no_empleado": 205576,
    "primer_nombre": "NATANAHEL",
    "segundo_nombre": null,
@@ -3840,6 +3840,22 @@
    "apellido_materno": "ALVAREZ",
    "genero": "MASCULINO",
    "fecha_ingreso": "2026-07-01",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "AYUDANTE GENERAL",
+   "linea_mando_id": 2,
+   "departamento_id": 12,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 204351
+  },
+  {
+   "no_empleado": 205551,
+   "primer_nombre": "KEVIN",
+   "segundo_nombre": null,
+   "apellido_paterno": "ESPEJO",
+   "apellido_materno": "QUERO",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-06-12",
    "fecha_baja": null,
    "activo": true,
    "puesto": "AYUDANTE GENERAL",
@@ -3881,13 +3897,13 @@
    "jefe_no_empleado": 204351
   },
   {
-   "no_empleado": 201676,
-   "primer_nombre": "JESUS",
-   "segundo_nombre": "JOSE",
-   "apellido_paterno": "ESPARZA",
-   "apellido_materno": "GONZALEZ",
+   "no_empleado": 205626,
+   "primer_nombre": "JUAN",
+   "segundo_nombre": null,
+   "apellido_paterno": "PEREZ",
+   "apellido_materno": "DE LA CRUZ",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2026-05-19",
+   "fecha_ingreso": "2026-08-05",
    "fecha_baja": null,
    "activo": true,
    "puesto": "ESPECIALISTA MECANICO",
@@ -3897,13 +3913,13 @@
    "jefe_no_empleado": 204351
   },
   {
-   "no_empleado": 205626,
-   "primer_nombre": "JUAN",
-   "segundo_nombre": null,
-   "apellido_paterno": "PEREZ",
-   "apellido_materno": "DE LA CRUZ",
+   "no_empleado": 201676,
+   "primer_nombre": "JESUS",
+   "segundo_nombre": "JOSE",
+   "apellido_paterno": "ESPARZA",
+   "apellido_materno": "GONZALEZ",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2026-08-05",
+   "fecha_ingreso": "2026-05-19",
    "fecha_baja": null,
    "activo": true,
    "puesto": "ESPECIALISTA MECANICO",
@@ -3927,6 +3943,38 @@
    "departamento_id": 12,
    "subdepartamento_id": null,
    "jefe_no_empleado": 204351
+  },
+  {
+   "no_empleado": 205783,
+   "primer_nombre": "DELMY",
+   "segundo_nombre": "ARIANNA",
+   "apellido_paterno": "RUIZ",
+   "apellido_materno": "ALVARADO",
+   "genero": "FEMENINO",
+   "fecha_ingreso": "2026-10-14",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "SIGNATARIO",
+   "linea_mando_id": 4,
+   "departamento_id": 17,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 204692
+  },
+  {
+   "no_empleado": 205816,
+   "primer_nombre": "EDER",
+   "segundo_nombre": null,
+   "apellido_paterno": "TEJEDA",
+   "apellido_materno": "LOPEZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-10-27",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "ESPECIALISTA EN CONTROL DE OBRA",
+   "linea_mando_id": 2,
+   "departamento_id": 13,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 204612
   },
   {
    "no_empleado": 205391,
@@ -3961,22 +4009,6 @@
    "jefe_no_empleado": 200464
   },
   {
-   "no_empleado": 205101,
-   "primer_nombre": "ESTEPHANY",
-   "segundo_nombre": "CONCEPCION",
-   "apellido_paterno": "GUTIERREZ",
-   "apellido_materno": "CASTELLANOS",
-   "genero": "FEMENINO",
-   "fecha_ingreso": "2025-12-24",
-   "fecha_baja": "2026-01-02",
-   "activo": false,
-   "puesto": "LOGISTICA",
-   "linea_mando_id": 2,
-   "departamento_id": 12,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 200464
-  },
-  {
    "no_empleado": 205113,
    "primer_nombre": "CARLOS",
    "segundo_nombre": "ALBERTO",
@@ -3986,6 +4018,22 @@
    "fecha_ingreso": "2026-01-09",
    "fecha_baja": null,
    "activo": true,
+   "puesto": "LOGISTICA",
+   "linea_mando_id": 2,
+   "departamento_id": 12,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 200464
+  },
+  {
+   "no_empleado": 205101,
+   "primer_nombre": "ESTEPHANY",
+   "segundo_nombre": "CONCEPCION",
+   "apellido_paterno": "GUTIERREZ",
+   "apellido_materno": "CASTELLANOS",
+   "genero": "FEMENINO",
+   "fecha_ingreso": "2025-12-24",
+   "fecha_baja": "2026-01-02",
+   "activo": false,
    "puesto": "LOGISTICA",
    "linea_mando_id": 2,
    "departamento_id": 12,
@@ -4041,12 +4089,28 @@
    "jefe_no_empleado": 204692
   },
   {
+   "no_empleado": 205764,
+   "primer_nombre": "VIANNEY",
+   "segundo_nombre": "KASSANDRA",
+   "apellido_paterno": "GOMEZ",
+   "apellido_materno": "GARCIA",
+   "genero": "FEMENINO",
+   "fecha_ingreso": "2026-10-05",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "SIGNATARIO",
+   "linea_mando_id": 4,
+   "departamento_id": 17,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 204692
+  },
+  {
    "no_empleado": 202194,
    "primer_nombre": "ALDO",
    "segundo_nombre": null,
    "apellido_paterno": "PEREZ",
    "apellido_materno": "RODRIGUEZ",
-   "genero": null,
+   "genero": "MASCULINO",
    "fecha_ingreso": "2026-08-26",
    "fecha_baja": null,
    "activo": true,
@@ -4062,7 +4126,7 @@
    "segundo_nombre": "HUGO",
    "apellido_paterno": "IBARRA",
    "apellido_materno": "LOERA",
-   "genero": null,
+   "genero": "MASCULINO",
    "fecha_ingreso": "2026-09-17",
    "fecha_baja": null,
    "activo": true,
@@ -4080,8 +4144,8 @@
    "apellido_materno": "PEREZ",
    "genero": "MASCULINO",
    "fecha_ingreso": "2026-08-14",
-   "fecha_baja": null,
-   "activo": true,
+   "fecha_baja": "2026-10-26",
+   "activo": false,
    "puesto": "SUPERVISOR EN SITIO",
    "linea_mando_id": 2,
    "departamento_id": 12,
@@ -4105,6 +4169,118 @@
    "jefe_no_empleado": 204692
   },
   {
+   "no_empleado": 205713,
+   "primer_nombre": "ADRIANA",
+   "segundo_nombre": "CAROLINA",
+   "apellido_paterno": "LOBATO",
+   "apellido_materno": "JESUS",
+   "genero": "FEMENINO",
+   "fecha_ingreso": "2026-09-07",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "SUPERVISOR HSE",
+   "linea_mando_id": 4,
+   "departamento_id": 17,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 204692
+  },
+  {
+   "no_empleado": 201154,
+   "primer_nombre": "ANTONIO",
+   "segundo_nombre": null,
+   "apellido_paterno": "CASTILLO",
+   "apellido_materno": "LARA",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-10-27",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "ESPECIALISTA ELECTRICO",
+   "linea_mando_id": 2,
+   "departamento_id": 12,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 205754
+  },
+  {
+   "no_empleado": 205811,
+   "primer_nombre": "ANGEL",
+   "segundo_nombre": "RAMON",
+   "apellido_paterno": "PRADOS",
+   "apellido_materno": "ALMEIDA",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-10-27",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "ESPECIALISTA ELECTRICO",
+   "linea_mando_id": 2,
+   "departamento_id": 12,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 205754
+  },
+  {
+   "no_empleado": 205812,
+   "primer_nombre": "LORENZO",
+   "segundo_nombre": "ANTONIO",
+   "apellido_paterno": "ESPONDA",
+   "apellido_materno": "SANCHEZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-10-27",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "ESPECIALISTA ELECTRICO",
+   "linea_mando_id": 2,
+   "departamento_id": 12,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 205754
+  },
+  {
+   "no_empleado": 205813,
+   "primer_nombre": "ISAAC",
+   "segundo_nombre": null,
+   "apellido_paterno": "PERALTA",
+   "apellido_materno": "GOMEZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-10-27",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "ESPECIALISTA ELECTRICO",
+   "linea_mando_id": 2,
+   "departamento_id": 12,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 205754
+  },
+  {
+   "no_empleado": 205815,
+   "primer_nombre": "MIGUEL",
+   "segundo_nombre": "ANGEL",
+   "apellido_paterno": "MACIAS",
+   "apellido_materno": "MOLINA",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-10-27",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "ESPECIALISTA ELECTRICO",
+   "linea_mando_id": 2,
+   "departamento_id": 12,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 205754
+  },
+  {
+   "no_empleado": 205819,
+   "primer_nombre": "BENITO",
+   "segundo_nombre": null,
+   "apellido_paterno": "GALMICHE",
+   "apellido_materno": "HERNANDEZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-10-30",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "SUPERVISOR DE SEGURIDAD",
+   "linea_mando_id": 4,
+   "departamento_id": 17,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 204692
+  },
+  {
    "no_empleado": 204746,
    "primer_nombre": "JAIR",
    "segundo_nombre": "EZEQUIEL",
@@ -4121,22 +4297,6 @@
    "jefe_no_empleado": 201756
   },
   {
-   "no_empleado": 200367,
-   "primer_nombre": "JUAN",
-   "segundo_nombre": "GABRIEL",
-   "apellido_paterno": "JIMENEZ",
-   "apellido_materno": "RODRIGUEZ",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2025-08-21",
-   "fecha_baja": "2025-09-08",
-   "activo": false,
-   "puesto": "ELECTRICO",
-   "linea_mando_id": 2,
-   "departamento_id": 12,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 201756
-  },
-  {
    "no_empleado": 204949,
    "primer_nombre": "JOSE",
    "segundo_nombre": "ANTONIO",
@@ -4145,22 +4305,6 @@
    "genero": "MASCULINO",
    "fecha_ingreso": "2025-09-29",
    "fecha_baja": "2025-10-13",
-   "activo": false,
-   "puesto": "ELECTRICO",
-   "linea_mando_id": 2,
-   "departamento_id": 12,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 201756
-  },
-  {
-   "no_empleado": 204776,
-   "primer_nombre": "DAVID",
-   "segundo_nombre": null,
-   "apellido_paterno": "GONZALEZ",
-   "apellido_materno": "MENDIOLA",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2025-07-30",
-   "fecha_baja": "2025-08-01",
    "activo": false,
    "puesto": "ELECTRICO",
    "linea_mando_id": 2,
@@ -4190,6 +4334,38 @@
    "segundo_nombre": null,
    "apellido_paterno": "GUERRERO",
    "apellido_materno": "GARCIA",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2025-07-30",
+   "fecha_baja": "2025-08-01",
+   "activo": false,
+   "puesto": "ELECTRICO",
+   "linea_mando_id": 2,
+   "departamento_id": 12,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 201756
+  },
+  {
+   "no_empleado": 200367,
+   "primer_nombre": "JUAN",
+   "segundo_nombre": "GABRIEL",
+   "apellido_paterno": "JIMENEZ",
+   "apellido_materno": "RODRIGUEZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2025-08-21",
+   "fecha_baja": "2025-09-08",
+   "activo": false,
+   "puesto": "ELECTRICO",
+   "linea_mando_id": 2,
+   "departamento_id": 12,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 201756
+  },
+  {
+   "no_empleado": 204776,
+   "primer_nombre": "DAVID",
+   "segundo_nombre": null,
+   "apellido_paterno": "GONZALEZ",
+   "apellido_materno": "MENDIOLA",
    "genero": "MASCULINO",
    "fecha_ingreso": "2025-07-30",
    "fecha_baja": "2025-08-01",
@@ -4345,6 +4521,22 @@
    "jefe_no_empleado": 201756
   },
   {
+   "no_empleado": 205808,
+   "primer_nombre": "JULIO",
+   "segundo_nombre": null,
+   "apellido_paterno": "TORRES",
+   "apellido_materno": "CRUZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-10-26",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "GERENTE DE MRO",
+   "linea_mando_id": 1,
+   "departamento_id": 16,
+   "subdepartamento_id": 4,
+   "jefe_no_empleado": 201453
+  },
+  {
    "no_empleado": 203702,
    "primer_nombre": "RODRIGO",
    "segundo_nombre": null,
@@ -4470,7 +4662,7 @@
    "linea_mando_id": 1,
    "departamento_id": 16,
    "subdepartamento_id": 4,
-   "jefe_no_empleado": 205458
+   "jefe_no_empleado": 205716
   },
   {
    "no_empleado": 203950,
@@ -4486,6 +4678,22 @@
    "linea_mando_id": 1,
    "departamento_id": 16,
    "subdepartamento_id": 8,
+   "jefe_no_empleado": 205716
+  },
+  {
+   "no_empleado": 205810,
+   "primer_nombre": "JESUS",
+   "segundo_nombre": null,
+   "apellido_paterno": "MANUEL",
+   "apellido_materno": "ROSAS",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-10-26",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "AUXILIAR DE CONTROL DE PRODUCCION",
+   "linea_mando_id": 1,
+   "departamento_id": 16,
+   "subdepartamento_id": 4,
    "jefe_no_empleado": 205716
   },
   {
@@ -4521,14 +4729,14 @@
    "jefe_no_empleado": 202245
   },
   {
-   "no_empleado": 204899,
-   "primer_nombre": "ROBERTO",
-   "segundo_nombre": "CARLOS",
-   "apellido_paterno": "RENTERIA",
-   "apellido_materno": "FLORES",
+   "no_empleado": 204863,
+   "primer_nombre": "JOSE",
+   "segundo_nombre": "BERNARDO",
+   "apellido_paterno": "GERON",
+   "apellido_materno": "ORDUNA",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2025-09-01",
-   "fecha_baja": "2026-02-25",
+   "fecha_ingreso": "2025-08-20",
+   "fecha_baja": "2026-02-12",
    "activo": false,
    "puesto": "RESIDENTE",
    "linea_mando_id": 5,
@@ -4537,14 +4745,14 @@
    "jefe_no_empleado": 203486
   },
   {
-   "no_empleado": 204865,
-   "primer_nombre": "JORGE",
-   "segundo_nombre": "ANTONIO",
-   "apellido_paterno": "CARVAJAL",
-   "apellido_materno": "MUNIZ",
+   "no_empleado": 204899,
+   "primer_nombre": "ROBERTO",
+   "segundo_nombre": "CARLOS",
+   "apellido_paterno": "RENTERIA",
+   "apellido_materno": "FLORES",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2025-08-20",
-   "fecha_baja": "2026-02-12",
+   "fecha_ingreso": "2025-09-01",
+   "fecha_baja": "2026-02-25",
    "activo": false,
    "puesto": "RESIDENTE",
    "linea_mando_id": 5,
@@ -4569,11 +4777,11 @@
    "jefe_no_empleado": 203486
   },
   {
-   "no_empleado": 204863,
-   "primer_nombre": "JOSE",
-   "segundo_nombre": "BERNARDO",
-   "apellido_paterno": "GERON",
-   "apellido_materno": "ORDUNA",
+   "no_empleado": 204865,
+   "primer_nombre": "JORGE",
+   "segundo_nombre": "ANTONIO",
+   "apellido_paterno": "CARVAJAL",
+   "apellido_materno": "MUNIZ",
    "genero": "MASCULINO",
    "fecha_ingreso": "2025-08-20",
    "fecha_baja": "2026-02-12",
@@ -4665,22 +4873,6 @@
    "jefe_no_empleado": 204001
   },
   {
-   "no_empleado": 204056,
-   "primer_nombre": "SAMANTHA",
-   "segundo_nombre": null,
-   "apellido_paterno": "HERNANDEZ",
-   "apellido_materno": "CAZADERO",
-   "genero": "FEMENINO",
-   "fecha_ingreso": "2025-03-31",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "INGENIERO DE CALIBRACION",
-   "linea_mando_id": 5,
-   "departamento_id": 11,
-   "subdepartamento_id": 10,
-   "jefe_no_empleado": 202745
-  },
-  {
    "no_empleado": 204835,
    "primer_nombre": "JUAN",
    "segundo_nombre": "DIEGO",
@@ -4742,6 +4934,22 @@
    "linea_mando_id": 5,
    "departamento_id": 11,
    "subdepartamento_id": 9,
+   "jefe_no_empleado": 203980
+  },
+  {
+   "no_empleado": 204056,
+   "primer_nombre": "SAMANTHA",
+   "segundo_nombre": null,
+   "apellido_paterno": "HERNANDEZ",
+   "apellido_materno": "CAZADERO",
+   "genero": "FEMENINO",
+   "fecha_ingreso": "2025-03-31",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "INGENIERO DE CALIBRACION",
+   "linea_mando_id": 5,
+   "departamento_id": 11,
+   "subdepartamento_id": 10,
    "jefe_no_empleado": 203980
   },
   {
@@ -4848,8 +5056,8 @@
    "apellido_materno": "LUNA",
    "genero": "MASCULINO",
    "fecha_ingreso": "2025-12-29",
-   "fecha_baja": null,
-   "activo": true,
+   "fecha_baja": "2026-10-29",
+   "activo": false,
    "puesto": "QUALITY CUSTOMER ENGINEER",
    "linea_mando_id": 5,
    "departamento_id": 11,
@@ -4857,20 +5065,36 @@
    "jefe_no_empleado": 204760
   },
   {
-   "no_empleado": 204693,
-   "primer_nombre": "PEDRO",
-   "segundo_nombre": "PABLO",
-   "apellido_paterno": "GUEVARA",
-   "apellido_materno": "PRIEGO",
+   "no_empleado": 205785,
+   "primer_nombre": "ANGEL",
+   "segundo_nombre": "DE JESUS",
+   "apellido_paterno": "ZAMUDIO",
+   "apellido_materno": "PRIETO",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2025-05-06",
+   "fecha_ingreso": "2026-10-15",
    "fecha_baja": null,
    "activo": true,
-   "puesto": "TECNICO OPERADOR CONVENCIONAL I",
-   "linea_mando_id": 1,
-   "departamento_id": 16,
-   "subdepartamento_id": 4,
-   "jefe_no_empleado": 205458
+   "puesto": "INSPECTOR DE CALIDAD",
+   "linea_mando_id": 5,
+   "departamento_id": 11,
+   "subdepartamento_id": 9,
+   "jefe_no_empleado": 205102
+  },
+  {
+   "no_empleado": 205784,
+   "primer_nombre": "MARTIN",
+   "segundo_nombre": null,
+   "apellido_paterno": "PEREZ",
+   "apellido_materno": "LOPEZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-10-15",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "INSPECTOR DE CALIDAD",
+   "linea_mando_id": 5,
+   "departamento_id": 11,
+   "subdepartamento_id": 9,
+   "jefe_no_empleado": 205102
   },
   {
    "no_empleado": 204302,
@@ -4889,20 +5113,20 @@
    "jefe_no_empleado": 204579
   },
   {
-   "no_empleado": 204560,
-   "primer_nombre": "CLAUDIA",
-   "segundo_nombre": "ANETTE",
-   "apellido_paterno": "LARA",
-   "apellido_materno": "ROSAS",
-   "genero": "FEMENINO",
-   "fecha_ingreso": "2025-07-07",
+   "no_empleado": 204693,
+   "primer_nombre": "PEDRO",
+   "segundo_nombre": "PABLO",
+   "apellido_paterno": "GUEVARA",
+   "apellido_materno": "PRIEGO",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2025-05-06",
    "fecha_baja": null,
    "activo": true,
-   "puesto": "INGENIERO EN ENTRENAMIENTO",
-   "linea_mando_id": 2,
-   "departamento_id": 15,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 201419
+   "puesto": "TECNICO OPERADOR CONVENCIONAL I",
+   "linea_mando_id": 1,
+   "departamento_id": 16,
+   "subdepartamento_id": 4,
+   "jefe_no_empleado": 205716
   },
   {
    "no_empleado": 202831,
@@ -4985,6 +5209,38 @@
    "jefe_no_empleado": 202179
   },
   {
+   "no_empleado": 205274,
+   "primer_nombre": "CAROLINA",
+   "segundo_nombre": null,
+   "apellido_paterno": "ORTIZ",
+   "apellido_materno": "VAZQUEZ",
+   "genero": "FEMENINO",
+   "fecha_ingreso": "2026-02-23",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "RESIDENTE",
+   "linea_mando_id": 2,
+   "departamento_id": 15,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 202179
+  },
+  {
+   "no_empleado": 205273,
+   "primer_nombre": "EDER",
+   "segundo_nombre": "JOEL",
+   "apellido_paterno": "MORALES",
+   "apellido_materno": "CORTES",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-02-23",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "RESIDENTE",
+   "linea_mando_id": 2,
+   "departamento_id": 15,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 202179
+  },
+  {
    "no_empleado": 204559,
    "primer_nombre": "RENATO",
    "segundo_nombre": "ISAI",
@@ -5001,61 +5257,13 @@
    "jefe_no_empleado": 202179
   },
   {
-   "no_empleado": 205273,
-   "primer_nombre": "EDER",
-   "segundo_nombre": "JOEL",
-   "apellido_paterno": "MORALES",
-   "apellido_materno": "CORTES",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2026-02-23",
-   "fecha_baja": null,
-   "activo": false,
-   "puesto": "RESIDENTE",
-   "linea_mando_id": 2,
-   "departamento_id": 15,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 202179
-  },
-  {
-   "no_empleado": 205274,
-   "primer_nombre": "CAROLINA",
+   "no_empleado": 205262,
+   "primer_nombre": "EDUARDO",
    "segundo_nombre": null,
-   "apellido_paterno": "ORTIZ",
-   "apellido_materno": "VAZQUEZ",
-   "genero": "FEMENINO",
-   "fecha_ingreso": "2026-02-23",
-   "fecha_baja": null,
-   "activo": false,
-   "puesto": "RESIDENTE",
-   "linea_mando_id": 2,
-   "departamento_id": 15,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 202179
-  },
-  {
-   "no_empleado": 204118,
-   "primer_nombre": "JESUS",
-   "segundo_nombre": "DANIEL",
-   "apellido_paterno": "LOZANO",
-   "apellido_materno": "RODRIGUEZ",
+   "apellido_paterno": "HERNANDEZ",
+   "apellido_materno": "CRUZ",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2024-07-08",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "AUXILIAR OPERATIVO",
-   "linea_mando_id": 2,
-   "departamento_id": 15,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 202179
-  },
-  {
-   "no_empleado": 204550,
-   "primer_nombre": "CIELO",
-   "segundo_nombre": "XIMENA",
-   "apellido_paterno": "OSORIO",
-   "apellido_materno": "PINTO",
-   "genero": "FEMENINO",
-   "fecha_ingreso": "2026-09-02",
+   "fecha_ingreso": "2026-02-20",
    "fecha_baja": null,
    "activo": true,
    "puesto": "INGENIERO EN ENTRENAMIENTO",
@@ -5065,13 +5273,13 @@
    "jefe_no_empleado": 202179
   },
   {
-   "no_empleado": 205262,
-   "primer_nombre": "EDUARDO",
+   "no_empleado": 205204,
+   "primer_nombre": "RICARDO",
    "segundo_nombre": null,
-   "apellido_paterno": "HERNANDEZ",
-   "apellido_materno": "CRUZ",
+   "apellido_paterno": "PEREZ",
+   "apellido_materno": "SANDOVAL",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2026-02-20",
+   "fecha_ingreso": "2026-09-10",
    "fecha_baja": null,
    "activo": true,
    "puesto": "INGENIERO EN ENTRENAMIENTO",
@@ -5097,13 +5305,13 @@
    "jefe_no_empleado": 202179
   },
   {
-   "no_empleado": 205204,
-   "primer_nombre": "RICARDO",
-   "segundo_nombre": null,
-   "apellido_paterno": "PEREZ",
-   "apellido_materno": "SANDOVAL",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2026-09-10",
+   "no_empleado": 204550,
+   "primer_nombre": "CIELO",
+   "segundo_nombre": "XIMENA",
+   "apellido_paterno": "OSORIO",
+   "apellido_materno": "PINTO",
+   "genero": "FEMENINO",
+   "fecha_ingreso": "2026-09-02",
    "fecha_baja": null,
    "activo": true,
    "puesto": "INGENIERO EN ENTRENAMIENTO",
@@ -5161,6 +5369,38 @@
    "jefe_no_empleado": 202944
   },
   {
+   "no_empleado": 204118,
+   "primer_nombre": "JESUS",
+   "segundo_nombre": "DANIEL",
+   "apellido_paterno": "LOZANO",
+   "apellido_materno": "RODRIGUEZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2024-07-08",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "AUXILIAR OPERATIVO",
+   "linea_mando_id": 2,
+   "departamento_id": 15,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 205603
+  },
+  {
+   "no_empleado": 204560,
+   "primer_nombre": "CLAUDIA",
+   "segundo_nombre": "ANETTE",
+   "apellido_paterno": "LARA",
+   "apellido_materno": "ROSAS",
+   "genero": "FEMENINO",
+   "fecha_ingreso": "2025-07-07",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "INGENIERO EN ENTRENAMIENTO",
+   "linea_mando_id": 2,
+   "departamento_id": 15,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 205603
+  },
+  {
    "no_empleado": 202179,
    "primer_nombre": "ERICK",
    "segundo_nombre": "AZAEL",
@@ -5174,7 +5414,7 @@
    "linea_mando_id": 2,
    "departamento_id": 15,
    "subdepartamento_id": null,
-   "jefe_no_empleado": 204612
+   "jefe_no_empleado": 205603
   },
   {
    "no_empleado": 205093,
@@ -5187,6 +5427,38 @@
    "fecha_baja": null,
    "activo": true,
    "puesto": "INGENIERO EN ENTRENAMIENTO",
+   "linea_mando_id": 1,
+   "departamento_id": 2,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 202438
+  },
+  {
+   "no_empleado": 205781,
+   "primer_nombre": "PEDRO",
+   "segundo_nombre": null,
+   "apellido_paterno": "VALENCIA",
+   "apellido_materno": "GUTIERREZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-10-12",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "INGENIERO DE APLICACIONES",
+   "linea_mando_id": 1,
+   "departamento_id": 2,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 202438
+  },
+  {
+   "no_empleado": 205780,
+   "primer_nombre": "CORNELIO",
+   "segundo_nombre": null,
+   "apellido_paterno": "VELAZQUEZ",
+   "apellido_materno": "BARRIOS",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-10-12",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "INGENIERO DE APLICACIONES",
    "linea_mando_id": 1,
    "departamento_id": 2,
    "subdepartamento_id": null,
@@ -5209,22 +5481,6 @@
    "jefe_no_empleado": 202438
   },
   {
-   "no_empleado": 204866,
-   "primer_nombre": "IAN",
-   "segundo_nombre": null,
-   "apellido_paterno": "MAZABA",
-   "apellido_materno": "RAMON",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2026-02-16",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "INGENIERO EN ENTRENAMIENTO",
-   "linea_mando_id": 1,
-   "departamento_id": 2,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 202944
-  },
-  {
    "no_empleado": 203782,
    "primer_nombre": "JAVIER",
    "segundo_nombre": null,
@@ -5235,6 +5491,22 @@
    "fecha_baja": null,
    "activo": true,
    "puesto": "INGENIERO DE APLICACIONES",
+   "linea_mando_id": 1,
+   "departamento_id": 2,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 202438
+  },
+  {
+   "no_empleado": 204866,
+   "primer_nombre": "IAN",
+   "segundo_nombre": null,
+   "apellido_paterno": "MAZABA",
+   "apellido_materno": "RAMON",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-02-16",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "INGENIERO EN ENTRENAMIENTO",
    "linea_mando_id": 1,
    "departamento_id": 2,
    "subdepartamento_id": null,
@@ -5545,22 +5817,6 @@
    "jefe_no_empleado": 205607
   },
   {
-   "no_empleado": 203044,
-   "primer_nombre": "ROBERTO",
-   "segundo_nombre": "DE JESUS",
-   "apellido_paterno": "ROMERO",
-   "apellido_materno": "CRUZ",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2023-01-16",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "LIDER EN DISENO",
-   "linea_mando_id": 1,
-   "departamento_id": 3,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 205607
-  },
-  {
    "no_empleado": 204268,
    "primer_nombre": "JOSE",
    "segundo_nombre": "MIGUEL",
@@ -5568,6 +5824,22 @@
    "apellido_materno": "ARREGUI",
    "genero": "MASCULINO",
    "fecha_ingreso": "2024-05-27",
+   "fecha_baja": "2026-10-23",
+   "activo": false,
+   "puesto": "LIDER EN DISENO",
+   "linea_mando_id": 1,
+   "departamento_id": 3,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 205607
+  },
+  {
+   "no_empleado": 203044,
+   "primer_nombre": "ROBERTO",
+   "segundo_nombre": "DE JESUS",
+   "apellido_paterno": "ROMERO",
+   "apellido_materno": "CRUZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2023-01-16",
    "fecha_baja": null,
    "activo": true,
    "puesto": "LIDER EN DISENO",
@@ -5625,22 +5897,6 @@
    "jefe_no_empleado": 202438
   },
   {
-   "no_empleado": 204838,
-   "primer_nombre": "JONATHAN",
-   "segundo_nombre": null,
-   "apellido_paterno": "VARGAS",
-   "apellido_materno": "LEON",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2025-08-11",
-   "fecha_baja": "2026-02-11",
-   "activo": false,
-   "puesto": "RESIDENTE",
-   "linea_mando_id": 1,
-   "departamento_id": 10,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 202438
-  },
-  {
    "no_empleado": 204829,
    "primer_nombre": "JOSE",
    "segundo_nombre": "MANUEL",
@@ -5689,6 +5945,22 @@
    "jefe_no_empleado": 202438
   },
   {
+   "no_empleado": 204838,
+   "primer_nombre": "JONATHAN",
+   "segundo_nombre": null,
+   "apellido_paterno": "VARGAS",
+   "apellido_materno": "LEON",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2025-08-11",
+   "fecha_baja": "2026-02-11",
+   "activo": false,
+   "puesto": "RESIDENTE",
+   "linea_mando_id": 1,
+   "departamento_id": 10,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 202438
+  },
+  {
    "no_empleado": 204689,
    "primer_nombre": "RICARDO",
    "segundo_nombre": null,
@@ -5721,22 +5993,6 @@
    "jefe_no_empleado": 202438
   },
   {
-   "no_empleado": 205363,
-   "primer_nombre": "OMAR",
-   "segundo_nombre": "ANTONIO",
-   "apellido_paterno": "GALVAN",
-   "apellido_materno": "CEBALLOS",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2026-03-17",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "INGENIERO EN ENTRENAMIENTO",
-   "linea_mando_id": 1,
-   "departamento_id": 10,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 202438
-  },
-  {
    "no_empleado": 204843,
    "primer_nombre": "JOSE",
    "segundo_nombre": "DANIEL",
@@ -5753,16 +6009,16 @@
    "jefe_no_empleado": 202438
   },
   {
-   "no_empleado": 202654,
-   "primer_nombre": "JOSE",
-   "segundo_nombre": "ALBERTO",
-   "apellido_paterno": "ROJAS",
-   "apellido_materno": "RODRIGUEZ",
+   "no_empleado": 205363,
+   "primer_nombre": "OMAR",
+   "segundo_nombre": "ANTONIO",
+   "apellido_paterno": "GALVAN",
+   "apellido_materno": "CEBALLOS",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2021-09-23",
+   "fecha_ingreso": "2026-03-17",
    "fecha_baja": null,
    "activo": true,
-   "puesto": "TECNICO ELECTRICO",
+   "puesto": "INGENIERO EN ENTRENAMIENTO",
    "linea_mando_id": 1,
    "departamento_id": 10,
    "subdepartamento_id": null,
@@ -5785,32 +6041,32 @@
    "jefe_no_empleado": 202438
   },
   {
-   "no_empleado": 205756,
-   "primer_nombre": "EMILIO",
-   "segundo_nombre": null,
-   "apellido_paterno": "CASTILLO",
-   "apellido_materno": "VIGORITO",
-   "genero": null,
-   "fecha_ingreso": "2026-09-28",
+   "no_empleado": 202654,
+   "primer_nombre": "JOSE",
+   "segundo_nombre": "ALBERTO",
+   "apellido_paterno": "ROJAS",
+   "apellido_materno": "RODRIGUEZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2021-09-23",
    "fecha_baja": null,
    "activo": true,
-   "puesto": "OPERADOR",
+   "puesto": "TECNICO ELECTRICO",
    "linea_mando_id": 1,
    "departamento_id": 10,
    "subdepartamento_id": null,
    "jefe_no_empleado": 202438
   },
   {
-   "no_empleado": 203698,
-   "primer_nombre": "MARIA",
-   "segundo_nombre": "ANTONIA",
-   "apellido_paterno": "SARMIENTO",
-   "apellido_materno": "HERNANDEZ",
-   "genero": "FEMENINO",
-   "fecha_ingreso": "2023-02-01",
+   "no_empleado": 205756,
+   "primer_nombre": "EMILIO",
+   "segundo_nombre": null,
+   "apellido_paterno": "CASTILLO",
+   "apellido_materno": "VIGORITO",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-09-28",
    "fecha_baja": null,
    "activo": true,
-   "puesto": "AUXILIAR DE LIMPIEZA",
+   "puesto": "OPERADOR",
    "linea_mando_id": 1,
    "departamento_id": 10,
    "subdepartamento_id": null,
@@ -5865,6 +6121,22 @@
    "jefe_no_empleado": 202438
   },
   {
+   "no_empleado": 203698,
+   "primer_nombre": "MARIA",
+   "segundo_nombre": "ANTONIA",
+   "apellido_paterno": "SARMIENTO",
+   "apellido_materno": "HERNANDEZ",
+   "genero": "FEMENINO",
+   "fecha_ingreso": "2023-02-01",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "AUXILIAR DE LIMPIEZA",
+   "linea_mando_id": 1,
+   "departamento_id": 10,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 202438
+  },
+  {
    "no_empleado": 204627,
    "primer_nombre": "MOISES",
    "segundo_nombre": null,
@@ -5897,22 +6169,6 @@
    "jefe_no_empleado": 202438
   },
   {
-   "no_empleado": 203599,
-   "primer_nombre": "JESUS",
-   "segundo_nombre": null,
-   "apellido_paterno": "SANTIAGO",
-   "apellido_materno": "AGUILERA",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2022-12-06",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "AUXILIAR DE MANTENIMIENTO",
-   "linea_mando_id": 1,
-   "departamento_id": 10,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 202438
-  },
-  {
    "no_empleado": 205324,
    "primer_nombre": "JAVIER",
    "segundo_nombre": null,
@@ -5936,6 +6192,22 @@
    "apellido_materno": "SANTIAGO",
    "genero": "MASCULINO",
    "fecha_ingreso": "2026-05-04",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "AUXILIAR DE MANTENIMIENTO",
+   "linea_mando_id": 1,
+   "departamento_id": 10,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 202438
+  },
+  {
+   "no_empleado": 203599,
+   "primer_nombre": "JESUS",
+   "segundo_nombre": null,
+   "apellido_paterno": "SANTIAGO",
+   "apellido_materno": "AGUILERA",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2022-12-06",
    "fecha_baja": null,
    "activo": true,
    "puesto": "AUXILIAR DE MANTENIMIENTO",
@@ -5993,13 +6265,13 @@
    "jefe_no_empleado": 201453
   },
   {
-   "no_empleado": 204803,
-   "primer_nombre": "GUILLERMO",
-   "segundo_nombre": "ANTONIO",
-   "apellido_paterno": "MOLINA",
-   "apellido_materno": "VELA",
+   "no_empleado": 204728,
+   "primer_nombre": "CARLOS",
+   "segundo_nombre": "GUSTAVO",
+   "apellido_paterno": "GARCIA",
+   "apellido_materno": "HERNANDEZ",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2025-07-15",
+   "fecha_ingreso": "2025-06-02",
    "fecha_baja": "2026-06-30",
    "activo": false,
    "puesto": "RESIDENTE",
@@ -6009,13 +6281,13 @@
    "jefe_no_empleado": 202436
   },
   {
-   "no_empleado": 204728,
-   "primer_nombre": "CARLOS",
-   "segundo_nombre": "GUSTAVO",
-   "apellido_paterno": "GARCIA",
-   "apellido_materno": "HERNANDEZ",
+   "no_empleado": 204803,
+   "primer_nombre": "GUILLERMO",
+   "segundo_nombre": "ANTONIO",
+   "apellido_paterno": "MOLINA",
+   "apellido_materno": "VELA",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2025-06-02",
+   "fecha_ingreso": "2025-07-15",
    "fecha_baja": "2026-06-30",
    "activo": false,
    "puesto": "RESIDENTE",
@@ -6046,7 +6318,7 @@
    "segundo_nombre": null,
    "apellido_paterno": "SANCHEZ",
    "apellido_materno": "SANCHEZ",
-   "genero": null,
+   "genero": "MASCULINO",
    "fecha_ingreso": "2026-09-09",
    "fecha_baja": null,
    "activo": true,
@@ -6062,7 +6334,7 @@
    "segundo_nombre": null,
    "apellido_paterno": "RODRIGUEZ",
    "apellido_materno": "LARA",
-   "genero": null,
+   "genero": "MASCULINO",
    "fecha_ingreso": "2026-09-09",
    "fecha_baja": null,
    "activo": true,
@@ -6105,11 +6377,11 @@
    "jefe_no_empleado": 202438
   },
   {
-   "no_empleado": 205497,
-   "primer_nombre": "RAUL",
+   "no_empleado": 205498,
+   "primer_nombre": "JORGE",
    "segundo_nombre": null,
-   "apellido_paterno": "PAZOS",
-   "apellido_materno": "MEZA",
+   "apellido_paterno": "ESCAMILLA",
+   "apellido_materno": "HERNANDEZ",
    "genero": "MASCULINO",
    "fecha_ingreso": "2026-05-11",
    "fecha_baja": null,
@@ -6121,11 +6393,11 @@
    "jefe_no_empleado": 202438
   },
   {
-   "no_empleado": 205498,
-   "primer_nombre": "JORGE",
+   "no_empleado": 205497,
+   "primer_nombre": "RAUL",
    "segundo_nombre": null,
-   "apellido_paterno": "ESCAMILLA",
-   "apellido_materno": "HERNANDEZ",
+   "apellido_paterno": "PAZOS",
+   "apellido_materno": "MEZA",
    "genero": "MASCULINO",
    "fecha_ingreso": "2026-05-11",
    "fecha_baja": null,
@@ -6160,8 +6432,8 @@
    "apellido_materno": "MORALES",
    "genero": "MASCULINO",
    "fecha_ingreso": "2026-04-20",
-   "fecha_baja": null,
-   "activo": true,
+   "fecha_baja": "2026-10-12",
+   "activo": false,
    "puesto": "SUPERVISOR DE CONVENCIONAL",
    "linea_mando_id": 1,
    "departamento_id": 2,
@@ -6215,102 +6487,6 @@
    "departamento_id": 2,
    "subdepartamento_id": null,
    "jefe_no_empleado": 202944
-  },
-  {
-   "no_empleado": 204082,
-   "primer_nombre": "JONATHAN",
-   "segundo_nombre": "DE JESUS",
-   "apellido_paterno": "URIBE",
-   "apellido_materno": "MENDOZA",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2024-07-08",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "TECNICO OPERADOR CONVENCIONAL I",
-   "linea_mando_id": 1,
-   "departamento_id": 16,
-   "subdepartamento_id": 4,
-   "jefe_no_empleado": 205458
-  },
-  {
-   "no_empleado": 202377,
-   "primer_nombre": "EDGAR",
-   "segundo_nombre": "FERNANDO",
-   "apellido_paterno": "ZAMORA",
-   "apellido_materno": "CORTEZ",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2020-06-29",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "TECNICO OPERADOR CNC II",
-   "linea_mando_id": 1,
-   "departamento_id": 2,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 205458
-  },
-  {
-   "no_empleado": 202502,
-   "primer_nombre": "LUIS",
-   "segundo_nombre": "EDUARDO",
-   "apellido_paterno": "CRUZ",
-   "apellido_materno": "TORRES",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2021-03-08",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "TECNICO OPERADOR CONVENCIONAL II",
-   "linea_mando_id": 1,
-   "departamento_id": 16,
-   "subdepartamento_id": 4,
-   "jefe_no_empleado": 205458
-  },
-  {
-   "no_empleado": 203719,
-   "primer_nombre": "CARLOS",
-   "segundo_nombre": "ALBERTO",
-   "apellido_paterno": "CAPETILLO",
-   "apellido_materno": "CASTANEDA",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2023-02-27",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "TECNICO OPERADOR CONVENCIONAL II",
-   "linea_mando_id": 1,
-   "departamento_id": 16,
-   "subdepartamento_id": 4,
-   "jefe_no_empleado": 205458
-  },
-  {
-   "no_empleado": 203277,
-   "primer_nombre": "ALEJANDRO",
-   "segundo_nombre": null,
-   "apellido_paterno": "TORRES",
-   "apellido_materno": "MARTINEZ",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2022-09-30",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "TECNICO OPERADOR CONVENCIONAL II",
-   "linea_mando_id": 1,
-   "departamento_id": 16,
-   "subdepartamento_id": 4,
-   "jefe_no_empleado": 205458
-  },
-  {
-   "no_empleado": 203617,
-   "primer_nombre": "LUIS",
-   "segundo_nombre": "ALBERTO",
-   "apellido_paterno": "MOLINA",
-   "apellido_materno": "HERNANDEZ",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2022-12-13",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "TECNICO OPERADOR CONVENCIONAL II",
-   "linea_mando_id": 1,
-   "departamento_id": 16,
-   "subdepartamento_id": 4,
-   "jefe_no_empleado": 205458
   },
   {
    "no_empleado": 204101,
@@ -6377,22 +6553,6 @@
    "jefe_no_empleado": 205288
   },
   {
-   "no_empleado": 205289,
-   "primer_nombre": "EDGAR",
-   "segundo_nombre": "ALEJANDRO",
-   "apellido_paterno": "MEXICANO",
-   "apellido_materno": "GARCIA",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2026-03-02",
-   "fecha_baja": "2026-09-11",
-   "activo": false,
-   "puesto": "SUPERVISOR DE MANUFACTURA",
-   "linea_mando_id": 1,
-   "departamento_id": 2,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 205288
-  },
-  {
    "no_empleado": 204808,
    "primer_nombre": "MARCOS",
    "segundo_nombre": null,
@@ -6409,20 +6569,20 @@
    "jefe_no_empleado": 205288
   },
   {
-   "no_empleado": 203717,
-   "primer_nombre": "FELIPE",
-   "segundo_nombre": "DE JESUS",
-   "apellido_paterno": "ARANGO",
-   "apellido_materno": "URBANO",
+   "no_empleado": 205289,
+   "primer_nombre": "EDGAR",
+   "segundo_nombre": "ALEJANDRO",
+   "apellido_paterno": "MEXICANO",
+   "apellido_materno": "GARCIA",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2023-02-20",
-   "fecha_baja": "2026-09-08",
+   "fecha_ingreso": "2026-03-02",
+   "fecha_baja": "2026-09-11",
    "activo": false,
-   "puesto": "TECNICO OPERADOR CNC II",
+   "puesto": "SUPERVISOR DE MANUFACTURA",
    "linea_mando_id": 1,
    "departamento_id": 2,
    "subdepartamento_id": null,
-   "jefe_no_empleado": 205289
+   "jefe_no_empleado": 205288
   },
   {
    "no_empleado": 205212,
@@ -6433,6 +6593,22 @@
    "genero": "MASCULINO",
    "fecha_ingreso": "2026-02-09",
    "fecha_baja": "2026-09-07",
+   "activo": false,
+   "puesto": "TECNICO OPERADOR CNC II",
+   "linea_mando_id": 1,
+   "departamento_id": 2,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 205289
+  },
+  {
+   "no_empleado": 203717,
+   "primer_nombre": "FELIPE",
+   "segundo_nombre": "DE JESUS",
+   "apellido_paterno": "ARANGO",
+   "apellido_materno": "URBANO",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2023-02-20",
+   "fecha_baja": "2026-09-08",
    "activo": false,
    "puesto": "TECNICO OPERADOR CNC II",
    "linea_mando_id": 1,
@@ -6457,36 +6633,116 @@
    "jefe_no_empleado": 205092
   },
   {
-   "no_empleado": 205424,
-   "primer_nombre": "NOE",
+   "no_empleado": 204082,
+   "primer_nombre": "JONATHAN",
    "segundo_nombre": "DE JESUS",
-   "apellido_paterno": "HERNANDEZ",
-   "apellido_materno": "BARRADAS",
+   "apellido_paterno": "URIBE",
+   "apellido_materno": "MENDOZA",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2026-04-07",
+   "fecha_ingreso": "2024-07-08",
    "fecha_baja": null,
    "activo": true,
-   "puesto": "TECNICO OPERADOR CNC",
+   "puesto": "TECNICO OPERADOR CONVENCIONAL I",
    "linea_mando_id": 1,
-   "departamento_id": 2,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 204808
+   "departamento_id": 16,
+   "subdepartamento_id": 4,
+   "jefe_no_empleado": 205716
   },
   {
-   "no_empleado": 205037,
-   "primer_nombre": "JOSUE",
-   "segundo_nombre": "ISMAEL",
-   "apellido_paterno": "HUESCA",
-   "apellido_materno": "AVALOS",
+   "no_empleado": 202377,
+   "primer_nombre": "EDGAR",
+   "segundo_nombre": "FERNANDO",
+   "apellido_paterno": "ZAMORA",
+   "apellido_materno": "CORTEZ",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2025-11-18",
+   "fecha_ingreso": "2020-06-29",
    "fecha_baja": null,
    "activo": true,
-   "puesto": "TECNICO OPERADOR CNC",
+   "puesto": "TECNICO OPERADOR CNC II",
    "linea_mando_id": 1,
    "departamento_id": 2,
    "subdepartamento_id": null,
-   "jefe_no_empleado": 204808
+   "jefe_no_empleado": 205716
+  },
+  {
+   "no_empleado": 203719,
+   "primer_nombre": "CARLOS",
+   "segundo_nombre": "ALBERTO",
+   "apellido_paterno": "CAPETILLO",
+   "apellido_materno": "CASTANEDA",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2023-02-27",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "TECNICO OPERADOR CONVENCIONAL II",
+   "linea_mando_id": 1,
+   "departamento_id": 16,
+   "subdepartamento_id": 4,
+   "jefe_no_empleado": 205716
+  },
+  {
+   "no_empleado": 202502,
+   "primer_nombre": "LUIS",
+   "segundo_nombre": "EDUARDO",
+   "apellido_paterno": "CRUZ",
+   "apellido_materno": "TORRES",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2021-03-08",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "TECNICO OPERADOR CONVENCIONAL II",
+   "linea_mando_id": 1,
+   "departamento_id": 16,
+   "subdepartamento_id": 4,
+   "jefe_no_empleado": 205716
+  },
+  {
+   "no_empleado": 203277,
+   "primer_nombre": "ALEJANDRO",
+   "segundo_nombre": null,
+   "apellido_paterno": "TORRES",
+   "apellido_materno": "MARTINEZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2022-09-30",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "TECNICO OPERADOR CONVENCIONAL II",
+   "linea_mando_id": 1,
+   "departamento_id": 16,
+   "subdepartamento_id": 4,
+   "jefe_no_empleado": 205716
+  },
+  {
+   "no_empleado": 203617,
+   "primer_nombre": "LUIS",
+   "segundo_nombre": "ALBERTO",
+   "apellido_paterno": "MOLINA",
+   "apellido_materno": "HERNANDEZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2022-12-13",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "TECNICO OPERADOR CONVENCIONAL II",
+   "linea_mando_id": 1,
+   "departamento_id": 16,
+   "subdepartamento_id": 4,
+   "jefe_no_empleado": 205716
+  },
+  {
+   "no_empleado": 205779,
+   "primer_nombre": "PEDRO",
+   "segundo_nombre": "DAVID",
+   "apellido_paterno": "LEYVA",
+   "apellido_materno": "GRANDA",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-10-12",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "ENCARGADO DE CONVENCIONAL",
+   "linea_mando_id": 1,
+   "departamento_id": 16,
+   "subdepartamento_id": 4,
+   "jefe_no_empleado": 205716
   },
   {
    "no_empleado": 205026,
@@ -6512,6 +6768,38 @@
    "apellido_materno": "VAZQUEZ",
    "genero": "MASCULINO",
    "fecha_ingreso": "2025-11-14",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "TECNICO OPERADOR CNC",
+   "linea_mando_id": 1,
+   "departamento_id": 2,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 204808
+  },
+  {
+   "no_empleado": 205424,
+   "primer_nombre": "NOE",
+   "segundo_nombre": "DE JESUS",
+   "apellido_paterno": "HERNANDEZ",
+   "apellido_materno": "BARRADAS",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-04-07",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "TECNICO OPERADOR CNC",
+   "linea_mando_id": 1,
+   "departamento_id": 2,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 204808
+  },
+  {
+   "no_empleado": 205037,
+   "primer_nombre": "JOSUE",
+   "segundo_nombre": "ISMAEL",
+   "apellido_paterno": "HUESCA",
+   "apellido_materno": "AVALOS",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2025-11-18",
    "fecha_baja": null,
    "activo": true,
    "puesto": "TECNICO OPERADOR CNC",
@@ -6553,22 +6841,6 @@
    "jefe_no_empleado": 204808
   },
   {
-   "no_empleado": 204261,
-   "primer_nombre": "RODRIGO",
-   "segundo_nombre": null,
-   "apellido_paterno": "OLIVA",
-   "apellido_materno": "CEBALLOS",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2024-05-20",
-   "fecha_baja": "2025-12-05",
-   "activo": false,
-   "puesto": "TECNICO OPERADOR CNC NIVEL I",
-   "linea_mando_id": 1,
-   "departamento_id": 2,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 204808
-  },
-  {
    "no_empleado": 204369,
    "primer_nombre": "MARIO",
    "segundo_nombre": "ALEJANDRO",
@@ -6577,6 +6849,22 @@
    "genero": "MASCULINO",
    "fecha_ingreso": "2024-08-19",
    "fecha_baja": "2025-11-28",
+   "activo": false,
+   "puesto": "TECNICO OPERADOR CNC NIVEL I",
+   "linea_mando_id": 1,
+   "departamento_id": 2,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 204808
+  },
+  {
+   "no_empleado": 204261,
+   "primer_nombre": "RODRIGO",
+   "segundo_nombre": null,
+   "apellido_paterno": "OLIVA",
+   "apellido_materno": "CEBALLOS",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2024-05-20",
+   "fecha_baja": "2025-12-05",
    "activo": false,
    "puesto": "TECNICO OPERADOR CNC NIVEL I",
    "linea_mando_id": 1,
@@ -6595,54 +6883,6 @@
    "fecha_baja": null,
    "activo": true,
    "puesto": "TECNICO OPERADOR CNC NIVEL I",
-   "linea_mando_id": 1,
-   "departamento_id": 2,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 204808
-  },
-  {
-   "no_empleado": 204075,
-   "primer_nombre": "CARLOS",
-   "segundo_nombre": "JAVIER",
-   "apellido_paterno": "LEZAMA",
-   "apellido_materno": "SARIO",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2023-11-13",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "TECNICO OPERADOR CNC II",
-   "linea_mando_id": 1,
-   "departamento_id": 2,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 204808
-  },
-  {
-   "no_empleado": 203845,
-   "primer_nombre": "FRANCISCO",
-   "segundo_nombre": "JAIR",
-   "apellido_paterno": "HERRERA",
-   "apellido_materno": "MARIA",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2023-05-22",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "TECNICO OPERADOR CNC II",
-   "linea_mando_id": 1,
-   "departamento_id": 2,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 204808
-  },
-  {
-   "no_empleado": 204223,
-   "primer_nombre": "JONATHAN",
-   "segundo_nombre": "DE JESUS",
-   "apellido_paterno": "IRALA",
-   "apellido_materno": "APARICIO",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2024-04-16",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "TECNICO OPERADOR CNC II",
    "linea_mando_id": 1,
    "departamento_id": 2,
    "subdepartamento_id": null,
@@ -6672,22 +6912,6 @@
    "apellido_materno": "HERNANDEZ",
    "genero": "MASCULINO",
    "fecha_ingreso": "2026-02-09",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "TECNICO OPERADOR CNC II",
-   "linea_mando_id": 1,
-   "departamento_id": 2,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 204808
-  },
-  {
-   "no_empleado": 205108,
-   "primer_nombre": "BRAULIO",
-   "segundo_nombre": "ERUBEY",
-   "apellido_paterno": "VERTIZ",
-   "apellido_materno": "BURELA",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2026-01-06",
    "fecha_baja": null,
    "activo": true,
    "puesto": "TECNICO OPERADOR CNC II",
@@ -6752,6 +6976,70 @@
    "apellido_materno": "ORTIZ",
    "genero": "MASCULINO",
    "fecha_ingreso": "2026-02-09",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "TECNICO OPERADOR CNC II",
+   "linea_mando_id": 1,
+   "departamento_id": 2,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 204808
+  },
+  {
+   "no_empleado": 204223,
+   "primer_nombre": "JONATHAN",
+   "segundo_nombre": "DE JESUS",
+   "apellido_paterno": "IRALA",
+   "apellido_materno": "APARICIO",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2024-04-16",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "TECNICO OPERADOR CNC II",
+   "linea_mando_id": 1,
+   "departamento_id": 2,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 204808
+  },
+  {
+   "no_empleado": 205108,
+   "primer_nombre": "BRAULIO",
+   "segundo_nombre": "ERUBEY",
+   "apellido_paterno": "VERTIZ",
+   "apellido_materno": "BURELA",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-01-06",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "TECNICO OPERADOR CNC II",
+   "linea_mando_id": 1,
+   "departamento_id": 2,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 204808
+  },
+  {
+   "no_empleado": 204075,
+   "primer_nombre": "CARLOS",
+   "segundo_nombre": "JAVIER",
+   "apellido_paterno": "LEZAMA",
+   "apellido_materno": "SARIO",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2023-11-13",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "TECNICO OPERADOR CNC II",
+   "linea_mando_id": 1,
+   "departamento_id": 2,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 204808
+  },
+  {
+   "no_empleado": 203845,
+   "primer_nombre": "FRANCISCO",
+   "segundo_nombre": "JAIR",
+   "apellido_paterno": "HERRERA",
+   "apellido_materno": "MARIA",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2023-05-22",
    "fecha_baja": null,
    "activo": true,
    "puesto": "TECNICO OPERADOR CNC II",
@@ -6873,6 +7161,54 @@
    "jefe_no_empleado": 205716
   },
   {
+   "no_empleado": 204307,
+   "primer_nombre": "RICARDO",
+   "segundo_nombre": null,
+   "apellido_paterno": "KAYSER",
+   "apellido_materno": "TIBURCIO",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2024-07-08",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "PROJECT DEVELOPMENT JR",
+   "linea_mando_id": 3,
+   "departamento_id": 18,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 202438
+  },
+  {
+   "no_empleado": 204308,
+   "primer_nombre": "CRISTO",
+   "segundo_nombre": "DELNER",
+   "apellido_paterno": "LEON",
+   "apellido_materno": "LEAL",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2024-07-08",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "PROJECT DEVELOPMENT JR",
+   "linea_mando_id": 3,
+   "departamento_id": 18,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 202438
+  },
+  {
+   "no_empleado": 205500,
+   "primer_nombre": "EDUARDO",
+   "segundo_nombre": null,
+   "apellido_paterno": "SANCHEZ",
+   "apellido_materno": "VELAZQUEZ",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2026-05-12",
+   "fecha_baja": null,
+   "activo": true,
+   "puesto": "INGENIERO EN ENTRENAMIENTO",
+   "linea_mando_id": 3,
+   "departamento_id": 18,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 202438
+  },
+  {
    "no_empleado": 204026,
    "primer_nombre": "YAMILET",
    "segundo_nombre": null,
@@ -6889,38 +7225,6 @@
    "jefe_no_empleado": 202438
   },
   {
-   "no_empleado": 204307,
-   "primer_nombre": "RICARDO",
-   "segundo_nombre": null,
-   "apellido_paterno": "KAYSER",
-   "apellido_materno": "TIBURCIO",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2024-07-08",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "PROJECT DEVELOPMENT JR",
-   "linea_mando_id": 3,
-   "departamento_id": 18,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 204026
-  },
-  {
-   "no_empleado": 204308,
-   "primer_nombre": "CRISTO",
-   "segundo_nombre": "DELNER",
-   "apellido_paterno": "LEON",
-   "apellido_materno": "LEAL",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2024-07-08",
-   "fecha_baja": null,
-   "activo": true,
-   "puesto": "PROJECT DEVELOPMENT JR",
-   "linea_mando_id": 3,
-   "departamento_id": 18,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 204026
-  },
-  {
    "no_empleado": 205061,
    "primer_nombre": "EDUARDO",
    "segundo_nombre": null,
@@ -6930,22 +7234,6 @@
    "fecha_ingreso": "2025-12-02",
    "fecha_baja": "2026-04-14",
    "activo": false,
-   "puesto": "INGENIERO EN ENTRENAMIENTO",
-   "linea_mando_id": 3,
-   "departamento_id": 18,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 204026
-  },
-  {
-   "no_empleado": 205500,
-   "primer_nombre": "EDUARDO",
-   "segundo_nombre": null,
-   "apellido_paterno": "SANCHEZ",
-   "apellido_materno": "VELAZQUEZ",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2026-05-12",
-   "fecha_baja": null,
-   "activo": true,
    "puesto": "INGENIERO EN ENTRENAMIENTO",
    "linea_mando_id": 3,
    "departamento_id": 18,
@@ -6985,13 +7273,13 @@
    "jefe_no_empleado": 203781
   },
   {
-   "no_empleado": 203678,
-   "primer_nombre": "JOSE",
-   "segundo_nombre": "FERNANDO",
-   "apellido_paterno": "RENDON",
-   "apellido_materno": "CASTANEDA",
+   "no_empleado": 204258,
+   "primer_nombre": "LUIS",
+   "segundo_nombre": "ANGEL",
+   "apellido_paterno": "SOLANO",
+   "apellido_materno": "CISNEROS",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2023-01-17",
+   "fecha_ingreso": "2024-05-20",
    "fecha_baja": null,
    "activo": true,
    "puesto": "TECNICO EN BLASTING Y RECUBRIMIENTO NIVEL 1",
@@ -7001,13 +7289,13 @@
    "jefe_no_empleado": 205716
   },
   {
-   "no_empleado": 204258,
-   "primer_nombre": "LUIS",
-   "segundo_nombre": "ANGEL",
-   "apellido_paterno": "SOLANO",
-   "apellido_materno": "CISNEROS",
+   "no_empleado": 203678,
+   "primer_nombre": "JOSE",
+   "segundo_nombre": "FERNANDO",
+   "apellido_paterno": "RENDON",
+   "apellido_materno": "CASTANEDA",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2024-05-20",
+   "fecha_ingreso": "2023-01-17",
    "fecha_baja": null,
    "activo": true,
    "puesto": "TECNICO EN BLASTING Y RECUBRIMIENTO NIVEL 1",
@@ -7305,22 +7593,6 @@
    "jefe_no_empleado": 201756
   },
   {
-   "no_empleado": 202152,
-   "primer_nombre": "GUSTAVO",
-   "segundo_nombre": "DE JESUS",
-   "apellido_paterno": "VALDIVIA",
-   "apellido_materno": "CONTRERAS",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2025-06-23",
-   "fecha_baja": "2025-10-12",
-   "activo": false,
-   "puesto": "OPERADOR DE TURBOMAQUINARIA",
-   "linea_mando_id": 2,
-   "departamento_id": 13,
-   "subdepartamento_id": null,
-   "jefe_no_empleado": 203914
-  },
-  {
    "no_empleado": 204761,
    "primer_nombre": "JOSE",
    "segundo_nombre": "FRANCISCO",
@@ -7329,6 +7601,22 @@
    "genero": "MASCULINO",
    "fecha_ingreso": "2025-06-19",
    "fecha_baja": "2025-10-06",
+   "activo": false,
+   "puesto": "OPERADOR DE TURBOMAQUINARIA",
+   "linea_mando_id": 2,
+   "departamento_id": 13,
+   "subdepartamento_id": null,
+   "jefe_no_empleado": 203914
+  },
+  {
+   "no_empleado": 202152,
+   "primer_nombre": "GUSTAVO",
+   "segundo_nombre": "DE JESUS",
+   "apellido_paterno": "VALDIVIA",
+   "apellido_materno": "CONTRERAS",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2025-06-23",
+   "fecha_baja": "2025-10-12",
    "activo": false,
    "puesto": "OPERADOR DE TURBOMAQUINARIA",
    "linea_mando_id": 2,
@@ -7385,13 +7673,13 @@
    "jefe_no_empleado": 200150
   },
   {
-   "no_empleado": 200617,
-   "primer_nombre": "JOSUE",
-   "segundo_nombre": null,
-   "apellido_paterno": "ACULTECO",
-   "apellido_materno": "TEPACH",
+   "no_empleado": 203484,
+   "primer_nombre": "JOSE",
+   "segundo_nombre": "ARTURO",
+   "apellido_paterno": "AVILA",
+   "apellido_materno": "GRAJALES",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2021-04-19",
+   "fecha_ingreso": "2025-10-20",
    "fecha_baja": null,
    "activo": true,
    "puesto": "SUPERVISOR DE CONTRATO",
@@ -7401,13 +7689,13 @@
    "jefe_no_empleado": 200150
   },
   {
-   "no_empleado": 203484,
-   "primer_nombre": "JOSE",
-   "segundo_nombre": "ARTURO",
-   "apellido_paterno": "AVILA",
-   "apellido_materno": "GRAJALES",
+   "no_empleado": 200617,
+   "primer_nombre": "JOSUE",
+   "segundo_nombre": null,
+   "apellido_paterno": "ACULTECO",
+   "apellido_materno": "TEPACH",
    "genero": "MASCULINO",
-   "fecha_ingreso": "2025-10-20",
+   "fecha_ingreso": "2021-04-19",
    "fecha_baja": null,
    "activo": true,
    "puesto": "SUPERVISOR DE CONTRATO",
@@ -7481,13 +7769,13 @@
    "jefe_no_empleado": 200617
   },
   {
-   "no_empleado": 202062,
-   "primer_nombre": "YAMIL",
-   "segundo_nombre": "BELEN",
-   "apellido_paterno": "ELVIRA",
-   "apellido_materno": "ANTONIO",
-   "genero": "FEMENINO",
-   "fecha_ingreso": "2019-04-15",
+   "no_empleado": 203544,
+   "primer_nombre": "MIGUEL",
+   "segundo_nombre": "ANGEL",
+   "apellido_paterno": "PELCASTRE",
+   "apellido_materno": "MORALES",
+   "genero": "MASCULINO",
+   "fecha_ingreso": "2022-11-22",
    "fecha_baja": null,
    "activo": true,
    "puesto": "ADMINISTRADOR DE CONTRATOS",
@@ -7497,13 +7785,13 @@
    "jefe_no_empleado": 200617
   },
   {
-   "no_empleado": 203544,
-   "primer_nombre": "MIGUEL",
-   "segundo_nombre": "ANGEL",
-   "apellido_paterno": "PELCASTRE",
-   "apellido_materno": "MORALES",
-   "genero": "MASCULINO",
-   "fecha_ingreso": "2022-11-22",
+   "no_empleado": 202062,
+   "primer_nombre": "YAMIL",
+   "segundo_nombre": "BELEN",
+   "apellido_paterno": "ELVIRA",
+   "apellido_materno": "ANTONIO",
+   "genero": "FEMENINO",
+   "fecha_ingreso": "2019-04-15",
    "fecha_baja": null,
    "activo": true,
    "puesto": "ADMINISTRADOR DE CONTRATOS",
@@ -8007,6 +8295,13 @@
    "linea_mando_id": 5,
    "departamento_id": 11,
    "subdepartamento_id": 9,
+   "origen": "Agregada desde app empleados"
+  },
+  {
+   "departamento_rh": "DEPARTAMENTO DE MRO",
+   "linea_mando_id": 1,
+   "departamento_id": 16,
+   "subdepartamento_id": 4,
    "origen": "Agregada desde app empleados"
   }
  ],
@@ -8858,7 +9153,7 @@
    "no_empleado": 200949,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -8866,7 +9161,7 @@
    "no_empleado": 202438,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -8874,7 +9169,7 @@
    "no_empleado": 202654,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -8882,7 +9177,7 @@
    "no_empleado": 203138,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -8890,7 +9185,7 @@
    "no_empleado": 203599,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -8914,7 +9209,7 @@
    "no_empleado": 204382,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -8922,7 +9217,7 @@
    "no_empleado": 204627,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -8930,7 +9225,7 @@
    "no_empleado": 204843,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -8938,7 +9233,7 @@
    "no_empleado": 205246,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -8946,7 +9241,7 @@
    "no_empleado": 205326,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -8954,7 +9249,7 @@
    "no_empleado": 205363,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -8962,7 +9257,7 @@
    "no_empleado": 205413,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -8970,7 +9265,7 @@
    "no_empleado": 202377,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -8986,7 +9281,7 @@
    "no_empleado": 204075,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -8994,7 +9289,7 @@
    "no_empleado": 204223,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9002,7 +9297,7 @@
    "no_empleado": 204312,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9010,7 +9305,7 @@
    "no_empleado": 204623,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9026,7 +9321,7 @@
    "no_empleado": 204808,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9034,7 +9329,7 @@
    "no_empleado": 205026,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9042,7 +9337,7 @@
    "no_empleado": 205027,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9058,7 +9353,7 @@
    "no_empleado": 205108,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9074,7 +9369,7 @@
    "no_empleado": 205210,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9082,7 +9377,7 @@
    "no_empleado": 205211,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9114,7 +9409,7 @@
    "no_empleado": 205215,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9122,7 +9417,7 @@
    "no_empleado": 205217,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9130,7 +9425,7 @@
    "no_empleado": 205288,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9146,7 +9441,7 @@
    "no_empleado": 205424,
    "id_curso": "CUR001",
    "fecha": "2026-05-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9378,7 +9673,7 @@
    "no_empleado": 202654,
    "id_curso": "CUR002",
    "fecha": "2026-05-27",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9386,7 +9681,7 @@
    "no_empleado": 205363,
    "id_curso": "CUR002",
    "fecha": "2026-05-27",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9394,7 +9689,7 @@
    "no_empleado": 205413,
    "id_curso": "CUR002",
    "fecha": "2026-05-27",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9402,7 +9697,7 @@
    "no_empleado": 202377,
    "id_curso": "CUR002",
    "fecha": "2026-05-27",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9418,7 +9713,7 @@
    "no_empleado": 204075,
    "id_curso": "CUR002",
    "fecha": "2026-05-27",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9458,7 +9753,7 @@
    "no_empleado": 204808,
    "id_curso": "CUR002",
    "fecha": "2026-05-27",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9490,7 +9785,7 @@
    "no_empleado": 205108,
    "id_curso": "CUR002",
    "fecha": "2026-05-27",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9502,19 +9797,11 @@
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
-   "id": 2476,
-   "no_empleado": 205210,
-   "id_curso": "CUR002",
-   "fecha": "2026-05-27",
-   "estado_id": 2,
-   "fuente": "Capacitacion_Master_v5.xlsx"
-  },
-  {
    "id": 2477,
    "no_empleado": 205211,
    "id_curso": "CUR002",
    "fecha": "2026-05-27",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9546,7 +9833,7 @@
    "no_empleado": 205215,
    "id_curso": "CUR002",
    "fecha": "2026-05-27",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9562,7 +9849,7 @@
    "no_empleado": 205288,
    "id_curso": "CUR002",
    "fecha": "2026-05-27",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9826,7 +10113,7 @@
    "no_empleado": 200949,
    "id_curso": "CUR004",
    "fecha": "2026-05-26",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9834,7 +10121,7 @@
    "no_empleado": 202438,
    "id_curso": "CUR004",
    "fecha": "2026-05-26",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9842,7 +10129,7 @@
    "no_empleado": 202654,
    "id_curso": "CUR004",
    "fecha": "2026-05-26",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9850,7 +10137,7 @@
    "no_empleado": 203138,
    "id_curso": "CUR004",
    "fecha": "2026-05-26",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9858,7 +10145,7 @@
    "no_empleado": 203599,
    "id_curso": "CUR004",
    "fecha": "2026-05-26",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9866,7 +10153,7 @@
    "no_empleado": 203698,
    "id_curso": "CUR004",
    "fecha": "2026-05-26",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9882,7 +10169,7 @@
    "no_empleado": 204382,
    "id_curso": "CUR004",
    "fecha": "2026-05-26",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9890,7 +10177,7 @@
    "no_empleado": 204627,
    "id_curso": "CUR004",
    "fecha": "2026-05-26",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9898,7 +10185,7 @@
    "no_empleado": 204843,
    "id_curso": "CUR004",
    "fecha": "2026-05-26",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9906,7 +10193,7 @@
    "no_empleado": 205246,
    "id_curso": "CUR004",
    "fecha": "2026-05-26",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9914,7 +10201,7 @@
    "no_empleado": 205363,
    "id_curso": "CUR004",
    "fecha": "2026-05-26",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9922,7 +10209,7 @@
    "no_empleado": 205413,
    "id_curso": "CUR004",
    "fecha": "2026-05-26",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9930,7 +10217,7 @@
    "no_empleado": 202377,
    "id_curso": "CUR004",
    "fecha": "2026-05-26",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9962,7 +10249,7 @@
    "no_empleado": 204312,
    "id_curso": "CUR004",
    "fecha": "2026-05-26",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -9994,7 +10281,7 @@
    "no_empleado": 205026,
    "id_curso": "CUR004",
    "fecha": "2026-05-26",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -10034,7 +10321,7 @@
    "no_empleado": 205210,
    "id_curso": "CUR004",
    "fecha": "2026-05-26",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -10042,7 +10329,7 @@
    "no_empleado": 205211,
    "id_curso": "CUR004",
    "fecha": "2026-05-26",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -10074,7 +10361,7 @@
    "no_empleado": 205215,
    "id_curso": "CUR004",
    "fecha": "2026-05-26",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -10090,7 +10377,7 @@
    "no_empleado": 205288,
    "id_curso": "CUR004",
    "fecha": "2026-05-26",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -10306,7 +10593,7 @@
    "no_empleado": 204134,
    "id_curso": "CUR003",
    "fecha": "2026-05-25",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -10314,7 +10601,7 @@
    "no_empleado": 202438,
    "id_curso": "CUR003",
    "fecha": "2026-05-25",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -10322,7 +10609,7 @@
    "no_empleado": 202654,
    "id_curso": "CUR003",
    "fecha": "2026-05-25",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -10330,7 +10617,7 @@
    "no_empleado": 205363,
    "id_curso": "CUR003",
    "fecha": "2026-05-25",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -10338,7 +10625,7 @@
    "no_empleado": 205413,
    "id_curso": "CUR003",
    "fecha": "2026-05-25",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -10346,7 +10633,7 @@
    "no_empleado": 202377,
    "id_curso": "CUR003",
    "fecha": "2026-05-25",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -10378,7 +10665,7 @@
    "no_empleado": 204312,
    "id_curso": "CUR003",
    "fecha": "2026-05-25",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -10402,7 +10689,7 @@
    "no_empleado": 204808,
    "id_curso": "CUR003",
    "fecha": "2026-05-25",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -10434,7 +10721,7 @@
    "no_empleado": 205108,
    "id_curso": "CUR003",
    "fecha": "2026-05-25",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -10450,7 +10737,7 @@
    "no_empleado": 205210,
    "id_curso": "CUR003",
    "fecha": "2026-05-25",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -10458,7 +10745,7 @@
    "no_empleado": 205211,
    "id_curso": "CUR003",
    "fecha": "2026-05-25",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -10490,7 +10777,7 @@
    "no_empleado": 205215,
    "id_curso": "CUR003",
    "fecha": "2026-05-25",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -10569,8 +10856,8 @@
    "id": 2376,
    "no_empleado": 204055,
    "id_curso": "CUR003",
-   "fecha": "2026-05-25",
-   "estado_id": 2,
+   "fecha": "2026-05-13",
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -10585,8 +10872,8 @@
    "id": 2378,
    "no_empleado": 204121,
    "id_curso": "CUR003",
-   "fecha": "2026-05-25",
-   "estado_id": 2,
+   "fecha": "2026-10-14",
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -10594,15 +10881,15 @@
    "no_empleado": 204211,
    "id_curso": "CUR003",
    "fecha": "2026-05-25",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
    "id": 2380,
    "no_empleado": 204237,
    "id_curso": "CUR003",
-   "fecha": "2026-05-25",
-   "estado_id": 2,
+   "fecha": "2026-05-13",
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -10614,19 +10901,11 @@
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
-   "id": 2382,
-   "no_empleado": 204396,
-   "id_curso": "CUR003",
-   "fecha": "2026-05-25",
-   "estado_id": 2,
-   "fuente": "Capacitacion_Master_v5.xlsx"
-  },
-  {
    "id": 2383,
    "no_empleado": 204488,
    "id_curso": "CUR003",
    "fecha": "2026-05-25",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -10950,22 +11229,6 @@
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
-   "id": 2655,
-   "no_empleado": 204237,
-   "id_curso": "CUR003",
-   "fecha": "2026-05-13",
-   "estado_id": 1,
-   "fuente": "Capacitacion_Master_v5.xlsx"
-  },
-  {
-   "id": 2340,
-   "no_empleado": 205093,
-   "id_curso": "CUR001",
-   "fecha": "2026-04-30",
-   "estado_id": 2,
-   "fuente": "Capacitacion_Master_v5.xlsx"
-  },
-  {
    "id": 2341,
    "no_empleado": 204861,
    "id_curso": "CUR001",
@@ -11146,7 +11409,7 @@
    "no_empleado": 204211,
    "id_curso": "CUR004",
    "fecha": "2026-04-28",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -13521,7 +13784,7 @@
    "id": 1911,
    "no_empleado": 204121,
    "id_curso": "CUR002",
-   "fecha": "2026-01-14",
+   "fecha": "2026-10-15",
    "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
@@ -19234,7 +19497,7 @@
    "no_empleado": 202438,
    "id_curso": "CUR006",
    "fecha": "2025-08-29",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -19386,7 +19649,7 @@
    "no_empleado": 204134,
    "id_curso": "CUR006",
    "fecha": "2025-08-26",
-   "estado_id": 2,
+   "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
   {
@@ -28952,8 +29215,8 @@
   {
    "id": 2955,
    "no_empleado": 202208,
-   "id_curso": "CUR005",
-   "fecha": "2026-05-14",
+   "id_curso": "CUR004",
+   "fecha": "2026-10-14",
    "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
   },
@@ -29112,14 +29375,6 @@
   {
    "id": 2975,
    "no_empleado": 205214,
-   "id_curso": "CUR005",
-   "fecha": "2026-02-13",
-   "estado_id": 1,
-   "fuente": "Capacitacion_Master_v5.xlsx"
-  },
-  {
-   "id": 2976,
-   "no_empleado": 205210,
    "id_curso": "CUR005",
    "fecha": "2026-02-13",
    "estado_id": 1,
@@ -30972,15 +31227,2873 @@
    "fecha": "2025-09-11",
    "estado_id": 1,
    "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3208,
+   "no_empleado": 205457,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-25",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3209,
+   "no_empleado": 204866,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-25",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3210,
+   "no_empleado": 204866,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-25",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3211,
+   "no_empleado": 204866,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-25",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3212,
+   "no_empleado": 204866,
+   "id_curso": "CUR004",
+   "fecha": "2026-09-25",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3213,
+   "no_empleado": 204866,
+   "id_curso": "CUR006",
+   "fecha": "2026-09-25",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3214,
+   "no_empleado": 204808,
+   "id_curso": "CUR005",
+   "fecha": "2026-09-25",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3215,
+   "no_empleado": 205093,
+   "id_curso": "CUR006",
+   "fecha": "2026-09-25",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3216,
+   "no_empleado": 205093,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-25",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3217,
+   "no_empleado": 205093,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-25",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3218,
+   "no_empleado": 200450,
+   "id_curso": "CUR006",
+   "fecha": "2026-09-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3219,
+   "no_empleado": 205198,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-01",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3220,
+   "no_empleado": 205560,
+   "id_curso": "CUR006",
+   "fecha": "2026-09-27",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3221,
+   "no_empleado": 204839,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3222,
+   "no_empleado": 203752,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3223,
+   "no_empleado": 205592,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3224,
+   "no_empleado": 200450,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3225,
+   "no_empleado": 205713,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3226,
+   "no_empleado": 205643,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3227,
+   "no_empleado": 205639,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3228,
+   "no_empleado": 205457,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3229,
+   "no_empleado": 205577,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3230,
+   "no_empleado": 205227,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3231,
+   "no_empleado": 205102,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3232,
+   "no_empleado": 202194,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3233,
+   "no_empleado": 205198,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3234,
+   "no_empleado": 205650,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3235,
+   "no_empleado": 204839,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3236,
+   "no_empleado": 203752,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3237,
+   "no_empleado": 205592,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3238,
+   "no_empleado": 204237,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3239,
+   "no_empleado": 200450,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3240,
+   "no_empleado": 205713,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3241,
+   "no_empleado": 205643,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3242,
+   "no_empleado": 205626,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3243,
+   "no_empleado": 205639,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3244,
+   "no_empleado": 205577,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3245,
+   "no_empleado": 205563,
+   "id_curso": "CUR002",
+   "fecha": "2024-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3246,
+   "no_empleado": 205650,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-30",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3247,
+   "no_empleado": 203752,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3248,
+   "no_empleado": 205592,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3249,
+   "no_empleado": 205643,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3250,
+   "no_empleado": 205626,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3251,
+   "no_empleado": 205639,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3252,
+   "no_empleado": 205577,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3253,
+   "no_empleado": 205563,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3254,
+   "no_empleado": 205650,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-30",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3255,
+   "no_empleado": 205563,
+   "id_curso": "CUR004",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3256,
+   "no_empleado": 205639,
+   "id_curso": "CUR004",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3257,
+   "no_empleado": 205643,
+   "id_curso": "CUR004",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3258,
+   "no_empleado": 205633,
+   "id_curso": "CUR004",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3259,
+   "no_empleado": 205198,
+   "id_curso": "CUR004",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3260,
+   "no_empleado": 205713,
+   "id_curso": "CUR004",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3261,
+   "no_empleado": 205626,
+   "id_curso": "CUR004",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3262,
+   "no_empleado": 202194,
+   "id_curso": "CUR004",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3263,
+   "no_empleado": 205577,
+   "id_curso": "CUR004",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3264,
+   "no_empleado": 203752,
+   "id_curso": "CUR004",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3265,
+   "no_empleado": 205227,
+   "id_curso": "CUR004",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3266,
+   "no_empleado": 205650,
+   "id_curso": "CUR004",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3267,
+   "no_empleado": 200450,
+   "id_curso": "CUR016",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3268,
+   "no_empleado": 205436,
+   "id_curso": "CUR017",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3269,
+   "no_empleado": 205436,
+   "id_curso": "CUR019",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3270,
+   "no_empleado": 200450,
+   "id_curso": "CUR051",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3271,
+   "no_empleado": 205436,
+   "id_curso": "CUR051",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3272,
+   "no_empleado": 200516,
+   "id_curso": "CUR007",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3273,
+   "no_empleado": 204933,
+   "id_curso": "CUR007",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3274,
+   "no_empleado": 204102,
+   "id_curso": "CUR007",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3275,
+   "no_empleado": 205436,
+   "id_curso": "CUR007",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3276,
+   "no_empleado": 205536,
+   "id_curso": "CUR007",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3277,
+   "no_empleado": 200516,
+   "id_curso": "CUR018",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3278,
+   "no_empleado": 204933,
+   "id_curso": "CUR018",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3279,
+   "no_empleado": 204102,
+   "id_curso": "CUR018",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3280,
+   "no_empleado": 204203,
+   "id_curso": "CUR018",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3281,
+   "no_empleado": 200652,
+   "id_curso": "CUR018",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3282,
+   "no_empleado": 205200,
+   "id_curso": "CUR018",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3283,
+   "no_empleado": 205436,
+   "id_curso": "CUR018",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3284,
+   "no_empleado": 205536,
+   "id_curso": "CUR018",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3285,
+   "no_empleado": 203698,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3286,
+   "no_empleado": 205246,
+   "id_curso": "CUR006",
+   "fecha": "2026-06-12",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3287,
+   "no_empleado": 204627,
+   "id_curso": "CUR006",
+   "fecha": "2026-06-12",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3288,
+   "no_empleado": 205490,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3289,
+   "no_empleado": 205490,
+   "id_curso": "CUR004",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3290,
+   "no_empleado": 205490,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3291,
+   "no_empleado": 205490,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3292,
+   "no_empleado": 205490,
+   "id_curso": "CUR005",
+   "fecha": "2026-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3293,
+   "no_empleado": 205102,
+   "id_curso": "CUR004",
+   "fecha": "2026-03-12",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3294,
+   "no_empleado": 205436,
+   "id_curso": "CUR004",
+   "fecha": "2026-07-20",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3295,
+   "no_empleado": 203428,
+   "id_curso": "CUR055",
+   "fecha": "2026-10-09",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3296,
+   "no_empleado": 202503,
+   "id_curso": "CUR055",
+   "fecha": "2026-10-09",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3297,
+   "no_empleado": 204102,
+   "id_curso": "CUR055",
+   "fecha": "2026-10-09",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3298,
+   "no_empleado": 204121,
+   "id_curso": "CUR055",
+   "fecha": "2026-10-09",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3299,
+   "no_empleado": 203950,
+   "id_curso": "CUR055",
+   "fecha": "2026-10-09",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3300,
+   "no_empleado": 205523,
+   "id_curso": "CUR055",
+   "fecha": "2026-10-09",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3301,
+   "no_empleado": 205613,
+   "id_curso": "CUR055",
+   "fecha": "2026-10-09",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3302,
+   "no_empleado": 204211,
+   "id_curso": "CUR055",
+   "fecha": "2026-10-09",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3303,
+   "no_empleado": 204898,
+   "id_curso": "CUR055",
+   "fecha": "2026-10-09",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3304,
+   "no_empleado": 200450,
+   "id_curso": "CUR055",
+   "fecha": "2026-10-09",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3305,
+   "no_empleado": 205727,
+   "id_curso": "CUR055",
+   "fecha": "2026-10-09",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3306,
+   "no_empleado": 205755,
+   "id_curso": "CUR055",
+   "fecha": "2026-10-09",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3307,
+   "no_empleado": 205726,
+   "id_curso": "CUR055",
+   "fecha": "2026-10-09",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3308,
+   "no_empleado": 204396,
+   "id_curso": "CUR055",
+   "fecha": "2026-10-09",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3309,
+   "no_empleado": 204303,
+   "id_curso": "CUR055",
+   "fecha": "2026-10-09",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3310,
+   "no_empleado": 205500,
+   "id_curso": "CUR055",
+   "fecha": "2026-10-09",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3311,
+   "no_empleado": 204237,
+   "id_curso": "CUR055",
+   "fecha": "2026-10-09",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3312,
+   "no_empleado": 203486,
+   "id_curso": "CUR055",
+   "fecha": "2026-10-09",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3313,
+   "no_empleado": 205246,
+   "id_curso": "CUR055",
+   "fecha": "2026-10-09",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3314,
+   "no_empleado": 205708,
+   "id_curso": "CUR055",
+   "fecha": "2026-10-09",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3315,
+   "no_empleado": 202234,
+   "id_curso": "CUR055",
+   "fecha": "2026-10-09",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3316,
+   "no_empleado": 205624,
+   "id_curso": "CUR027",
+   "fecha": "2026-10-08",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3317,
+   "no_empleado": 205425,
+   "id_curso": "CUR027",
+   "fecha": "2026-10-08",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3318,
+   "no_empleado": 205363,
+   "id_curso": "CUR027",
+   "fecha": "2026-10-08",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3319,
+   "no_empleado": 203599,
+   "id_curso": "CUR027",
+   "fecha": "2026-10-08",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3320,
+   "no_empleado": 205756,
+   "id_curso": "CUR027",
+   "fecha": "2026-10-08",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3321,
+   "no_empleado": 204432,
+   "id_curso": "CUR027",
+   "fecha": "2026-10-08",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3322,
+   "no_empleado": 205639,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3323,
+   "no_empleado": 200450,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3324,
+   "no_empleado": 205643,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3325,
+   "no_empleado": 205198,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3326,
+   "no_empleado": 205102,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3327,
+   "no_empleado": 205713,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3328,
+   "no_empleado": 205457,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3329,
+   "no_empleado": 204839,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3330,
+   "no_empleado": 202194,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3331,
+   "no_empleado": 205577,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3332,
+   "no_empleado": 205560,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3333,
+   "no_empleado": 203752,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3334,
+   "no_empleado": 205227,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3335,
+   "no_empleado": 205650,
+   "id_curso": "CUR001",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3336,
+   "no_empleado": 205498,
+   "id_curso": "CUR002",
+   "fecha": "2024-09-30",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3337,
+   "no_empleado": 205643,
+   "id_curso": "CUR004",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3338,
+   "no_empleado": 205633,
+   "id_curso": "CUR004",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3339,
+   "no_empleado": 205198,
+   "id_curso": "CUR004",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3340,
+   "no_empleado": 205713,
+   "id_curso": "CUR004",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3341,
+   "no_empleado": 202194,
+   "id_curso": "CUR004",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3342,
+   "no_empleado": 205577,
+   "id_curso": "CUR004",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3343,
+   "no_empleado": 203752,
+   "id_curso": "CUR004",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3344,
+   "no_empleado": 205227,
+   "id_curso": "CUR004",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3345,
+   "no_empleado": 205650,
+   "id_curso": "CUR004",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3346,
+   "no_empleado": 205213,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3347,
+   "no_empleado": 205639,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3348,
+   "no_empleado": 200450,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3349,
+   "no_empleado": 205643,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3351,
+   "no_empleado": 205678,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3352,
+   "no_empleado": 203845,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3353,
+   "no_empleado": 205037,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3354,
+   "no_empleado": 204396,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3355,
+   "no_empleado": 205198,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3356,
+   "no_empleado": 204075,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3357,
+   "no_empleado": 205713,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3358,
+   "no_empleado": 205457,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3359,
+   "no_empleado": 205458,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3360,
+   "no_empleado": 205027,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3361,
+   "no_empleado": 205584,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3362,
+   "no_empleado": 204839,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3363,
+   "no_empleado": 205497,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3364,
+   "no_empleado": 202194,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3365,
+   "no_empleado": 205577,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3366,
+   "no_empleado": 205560,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3367,
+   "no_empleado": 203752,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3368,
+   "no_empleado": 205227,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3369,
+   "no_empleado": 205210,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3370,
+   "no_empleado": 204055,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3371,
+   "no_empleado": 205650,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3372,
+   "no_empleado": 205559,
+   "id_curso": "CUR002",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3374,
+   "no_empleado": 205633,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3375,
+   "no_empleado": 205037,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3376,
+   "no_empleado": 204396,
+   "id_curso": "CUR003",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3377,
+   "no_empleado": 205198,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3378,
+   "no_empleado": 204075,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3379,
+   "no_empleado": 205457,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3380,
+   "no_empleado": 204136,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3381,
+   "no_empleado": 205027,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3382,
+   "no_empleado": 205026,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3383,
+   "no_empleado": 205584,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3384,
+   "no_empleado": 205577,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3385,
+   "no_empleado": 205560,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3386,
+   "no_empleado": 202965,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3388,
+   "no_empleado": 203752,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3389,
+   "no_empleado": 205227,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3391,
+   "no_empleado": 205650,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3392,
+   "no_empleado": 205559,
+   "id_curso": "CUR003",
+   "fecha": "2026-09-15",
+   "estado_id": 2,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3394,
+   "no_empleado": 205457,
+   "id_curso": "CUR005",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3395,
+   "no_empleado": 205716,
+   "id_curso": "CUR005",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3396,
+   "no_empleado": 205643,
+   "id_curso": "CUR005",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3397,
+   "no_empleado": 204082,
+   "id_curso": "CUR005",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3398,
+   "no_empleado": 203617,
+   "id_curso": "CUR005",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3399,
+   "no_empleado": 205742,
+   "id_curso": "CUR005",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3400,
+   "no_empleado": 205717,
+   "id_curso": "CUR005",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3401,
+   "no_empleado": 205613,
+   "id_curso": "CUR005",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3402,
+   "no_empleado": 205362,
+   "id_curso": "CUR005",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3403,
+   "no_empleado": 205508,
+   "id_curso": "CUR005",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3404,
+   "no_empleado": 205754,
+   "id_curso": "CUR005",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3405,
+   "no_empleado": 204394,
+   "id_curso": "CUR005",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3406,
+   "no_empleado": 205536,
+   "id_curso": "CUR005",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3407,
+   "no_empleado": 205723,
+   "id_curso": "CUR005",
+   "fecha": "2026-09-24",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3408,
+   "no_empleado": 205740,
+   "id_curso": "CUR005",
+   "fecha": "2026-09-24",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3409,
+   "no_empleado": 205727,
+   "id_curso": "CUR005",
+   "fecha": "2026-09-24",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3410,
+   "no_empleado": 205498,
+   "id_curso": "CUR006",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3411,
+   "no_empleado": 205217,
+   "id_curso": "CUR006",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3412,
+   "no_empleado": 205424,
+   "id_curso": "CUR006",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3413,
+   "no_empleado": 204364,
+   "id_curso": "CUR006",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3414,
+   "no_empleado": 204364,
+   "id_curso": "CUR004",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3415,
+   "no_empleado": 204223,
+   "id_curso": "CUR006",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3416,
+   "no_empleado": 204075,
+   "id_curso": "CUR006",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3417,
+   "no_empleado": 205457,
+   "id_curso": "CUR001",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3418,
+   "no_empleado": 205457,
+   "id_curso": "CUR004",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3419,
+   "no_empleado": 205457,
+   "id_curso": "CUR005",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3420,
+   "no_empleado": 204136,
+   "id_curso": "CUR006",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3421,
+   "no_empleado": 204136,
+   "id_curso": "CUR004",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3422,
+   "no_empleado": 204866,
+   "id_curso": "CUR001",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3423,
+   "no_empleado": 204866,
+   "id_curso": "CUR006",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3424,
+   "no_empleado": 204866,
+   "id_curso": "CUR004",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3425,
+   "no_empleado": 204866,
+   "id_curso": "CUR002",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3426,
+   "no_empleado": 204866,
+   "id_curso": "CUR003",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3427,
+   "no_empleado": 205027,
+   "id_curso": "CUR006",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3428,
+   "no_empleado": 205026,
+   "id_curso": "CUR006",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3429,
+   "no_empleado": 205211,
+   "id_curso": "CUR006",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3430,
+   "no_empleado": 204623,
+   "id_curso": "CUR006",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3431,
+   "no_empleado": 205497,
+   "id_curso": "CUR001",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3432,
+   "no_empleado": 205497,
+   "id_curso": "CUR004",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3433,
+   "no_empleado": 205497,
+   "id_curso": "CUR002",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3434,
+   "no_empleado": 205437,
+   "id_curso": "CUR001",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3435,
+   "no_empleado": 205437,
+   "id_curso": "CUR006",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3436,
+   "no_empleado": 205437,
+   "id_curso": "CUR004",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3437,
+   "no_empleado": 205437,
+   "id_curso": "CUR002",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3438,
+   "no_empleado": 205437,
+   "id_curso": "CUR003",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3439,
+   "no_empleado": 204808,
+   "id_curso": "CUR006",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3440,
+   "no_empleado": 204808,
+   "id_curso": "CUR005",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3441,
+   "no_empleado": 205093,
+   "id_curso": "CUR006",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3442,
+   "no_empleado": 205093,
+   "id_curso": "CUR002",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3443,
+   "no_empleado": 205093,
+   "id_curso": "CUR003",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3444,
+   "no_empleado": 205210,
+   "id_curso": "CUR006",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3445,
+   "no_empleado": 205288,
+   "id_curso": "CUR005",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3446,
+   "no_empleado": 205508,
+   "id_curso": "CUR001",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3447,
+   "no_empleado": 205108,
+   "id_curso": "CUR006",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3448,
+   "no_empleado": 202944,
+   "id_curso": "CUR006",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3449,
+   "no_empleado": 202944,
+   "id_curso": "CUR004",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3450,
+   "no_empleado": 202670,
+   "id_curso": "CUR002",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3451,
+   "no_empleado": 202670,
+   "id_curso": "CUR003",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3452,
+   "no_empleado": 204377,
+   "id_curso": "CUR002",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3453,
+   "no_empleado": 204377,
+   "id_curso": "CUR003",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3454,
+   "no_empleado": 203615,
+   "id_curso": "CUR004",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3455,
+   "no_empleado": 204102,
+   "id_curso": "CUR004",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3456,
+   "no_empleado": 202455,
+   "id_curso": "CUR018",
+   "fecha": "2026-10-17",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3457,
+   "no_empleado": 202455,
+   "id_curso": "CUR007",
+   "fecha": "2026-10-17",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3458,
+   "no_empleado": 202455,
+   "id_curso": "CUR023",
+   "fecha": "2026-10-17",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3459,
+   "no_empleado": 204552,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-19",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3460,
+   "no_empleado": 205563,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-19",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3461,
+   "no_empleado": 205563,
+   "id_curso": "CUR001",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3462,
+   "no_empleado": 202491,
+   "id_curso": "CUR003",
+   "fecha": "2026-05-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3463,
+   "no_empleado": 202455,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-19",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3464,
+   "no_empleado": 205200,
+   "id_curso": "CUR001",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3465,
+   "no_empleado": 205200,
+   "id_curso": "CUR003",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3466,
+   "no_empleado": 205200,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3467,
+   "no_empleado": 205200,
+   "id_curso": "CUR004",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3468,
+   "no_empleado": 204314,
+   "id_curso": "CUR003",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3469,
+   "no_empleado": 204314,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3470,
+   "no_empleado": 204396,
+   "id_curso": "CUR001",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3471,
+   "no_empleado": 202491,
+   "id_curso": "CUR002",
+   "fecha": "2026-08-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3472,
+   "no_empleado": 205500,
+   "id_curso": "CUR001",
+   "fecha": "2026-08-16",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3473,
+   "no_empleado": 205500,
+   "id_curso": "CUR002",
+   "fecha": "2026-08-17",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3474,
+   "no_empleado": 205500,
+   "id_curso": "CUR004",
+   "fecha": "2026-08-18",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3475,
+   "no_empleado": 205500,
+   "id_curso": "CUR003",
+   "fecha": "2026-08-19",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3476,
+   "no_empleado": 202179,
+   "id_curso": "CUR004",
+   "fecha": "2024-10-21",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3477,
+   "no_empleado": 204933,
+   "id_curso": "CUR001",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3478,
+   "no_empleado": 205631,
+   "id_curso": "CUR003",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3479,
+   "no_empleado": 205631,
+   "id_curso": "CUR004",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3480,
+   "no_empleado": 205631,
+   "id_curso": "CUR001",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3481,
+   "no_empleado": 205631,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3482,
+   "no_empleado": 205754,
+   "id_curso": "CUR001",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3483,
+   "no_empleado": 205754,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3484,
+   "no_empleado": 205754,
+   "id_curso": "CUR003",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3485,
+   "no_empleado": 205500,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-19",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3486,
+   "no_empleado": 204364,
+   "id_curso": "CUR003",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3487,
+   "no_empleado": 203845,
+   "id_curso": "CUR003",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3488,
+   "no_empleado": 205037,
+   "id_curso": "CUR003",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3570,
+   "no_empleado": 204223,
+   "id_curso": "CUR003",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3489,
+   "no_empleado": 205457,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-19",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3490,
+   "no_empleado": 203782,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-19",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3491,
+   "no_empleado": 205215,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-19",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3492,
+   "no_empleado": 205613,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-19",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3493,
+   "no_empleado": 205613,
+   "id_curso": "CUR004",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3494,
+   "no_empleado": 205613,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3495,
+   "no_empleado": 205613,
+   "id_curso": "CUR005",
+   "fecha": "2026-09-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3496,
+   "no_empleado": 205107,
+   "id_curso": "CUR001",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3497,
+   "no_empleado": 205107,
+   "id_curso": "CUR004",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3498,
+   "no_empleado": 205107,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3499,
+   "no_empleado": 205107,
+   "id_curso": "CUR003",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3500,
+   "no_empleado": 205288,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-19",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3501,
+   "no_empleado": 205508,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-19",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3502,
+   "no_empleado": 205508,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3503,
+   "no_empleado": 205508,
+   "id_curso": "CUR003",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3504,
+   "no_empleado": 205508,
+   "id_curso": "CUR005",
+   "fecha": "2026-09-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3505,
+   "no_empleado": 205726,
+   "id_curso": "CUR001",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3506,
+   "no_empleado": 205726,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3507,
+   "no_empleado": 205726,
+   "id_curso": "CUR003",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3508,
+   "no_empleado": 205726,
+   "id_curso": "CUR004",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3509,
+   "no_empleado": 205726,
+   "id_curso": "CUR005",
+   "fecha": "2026-09-28",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3510,
+   "no_empleado": 205726,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-19",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3511,
+   "no_empleado": 205247,
+   "id_curso": "CUR001",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3512,
+   "no_empleado": 205247,
+   "id_curso": "CUR004",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3513,
+   "no_empleado": 205247,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3514,
+   "no_empleado": 205247,
+   "id_curso": "CUR003",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3515,
+   "no_empleado": 205607,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-19",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3516,
+   "no_empleado": 205607,
+   "id_curso": "CUR001",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3517,
+   "no_empleado": 205607,
+   "id_curso": "CUR004",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3518,
+   "no_empleado": 205607,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3519,
+   "no_empleado": 205607,
+   "id_curso": "CUR003",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3520,
+   "no_empleado": 204396,
+   "id_curso": "CUR004",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3521,
+   "no_empleado": 204211,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3522,
+   "no_empleado": 204898,
+   "id_curso": "CUR001",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3523,
+   "no_empleado": 204898,
+   "id_curso": "CUR004",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3524,
+   "no_empleado": 204898,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3525,
+   "no_empleado": 204898,
+   "id_curso": "CUR003",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3526,
+   "no_empleado": 202566,
+   "id_curso": "CUR004",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3527,
+   "no_empleado": 205230,
+   "id_curso": "CUR004",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3528,
+   "no_empleado": 204118,
+   "id_curso": "CUR004",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3529,
+   "no_empleado": 205509,
+   "id_curso": "CUR004",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3530,
+   "no_empleado": 205741,
+   "id_curso": "CUR004",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3531,
+   "no_empleado": 205744,
+   "id_curso": "CUR004",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3532,
+   "no_empleado": 205675,
+   "id_curso": "CUR004",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3533,
+   "no_empleado": 202520,
+   "id_curso": "CUR004",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3534,
+   "no_empleado": 205230,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-20",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3535,
+   "no_empleado": 202566,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-20",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3536,
+   "no_empleado": 205509,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-20",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3537,
+   "no_empleado": 205675,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-20",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3538,
+   "no_empleado": 204869,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-20",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3539,
+   "no_empleado": 202208,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-20",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3540,
+   "no_empleado": 202623,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-20",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3541,
+   "no_empleado": 202281,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-20",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3542,
+   "no_empleado": 205741,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-20",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3543,
+   "no_empleado": 205744,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-20",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3544,
+   "no_empleado": 205230,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3545,
+   "no_empleado": 204869,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3546,
+   "no_empleado": 205675,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3547,
+   "no_empleado": 202208,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3548,
+   "no_empleado": 205509,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3549,
+   "no_empleado": 205741,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3550,
+   "no_empleado": 204611,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3551,
+   "no_empleado": 202584,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3552,
+   "no_empleado": 202520,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3553,
+   "no_empleado": 205744,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3554,
+   "no_empleado": 202208,
+   "id_curso": "CUR001",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3555,
+   "no_empleado": 205675,
+   "id_curso": "CUR001",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3556,
+   "no_empleado": 205509,
+   "id_curso": "CUR001",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3557,
+   "no_empleado": 204869,
+   "id_curso": "CUR001",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3558,
+   "no_empleado": 205741,
+   "id_curso": "CUR001",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3559,
+   "no_empleado": 205744,
+   "id_curso": "CUR001",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3560,
+   "no_empleado": 202208,
+   "id_curso": "CUR003",
+   "fecha": "2026-10-27",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3561,
+   "no_empleado": 205509,
+   "id_curso": "CUR003",
+   "fecha": "2026-10-27",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3562,
+   "no_empleado": 205744,
+   "id_curso": "CUR003",
+   "fecha": "2026-10-27",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3563,
+   "no_empleado": 205675,
+   "id_curso": "CUR003",
+   "fecha": "2026-10-27",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3564,
+   "no_empleado": 205741,
+   "id_curso": "CUR003",
+   "fecha": "2026-10-27",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3565,
+   "no_empleado": 202377,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3566,
+   "no_empleado": 205724,
+   "id_curso": "CUR006",
+   "fecha": "2026-10-15",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3567,
+   "no_empleado": 204120,
+   "id_curso": "CUR003",
+   "fecha": "2026-10-27",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3568,
+   "no_empleado": 204120,
+   "id_curso": "CUR004",
+   "fecha": "2026-10-14",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
+  },
+  {
+   "id": 3569,
+   "no_empleado": 204120,
+   "id_curso": "CUR002",
+   "fecha": "2026-10-20",
+   "estado_id": 1,
+   "fuente": "Capacitacion_Master_v5.xlsx"
   }
  ],
  "sugerencias_empleado_roles": [
-  {
-   "no_empleado": 205713,
-   "rol": "SUPERVISOR_HSEA",
-   "alcance": "GLOBAL",
-   "motivo": "Puesto: SUPERVISOR HSE"
-  },
   {
    "no_empleado": 204692,
    "rol": "SUPERVISOR_HSEA",
@@ -30988,13 +34101,13 @@
    "motivo": "Puesto: GERENTE HSE"
   },
   {
-   "no_empleado": 205158,
+   "no_empleado": 204490,
    "rol": "SUPERVISOR_HSEA",
    "alcance": "GLOBAL",
    "motivo": "Puesto: SUPERVISOR HSE"
   },
   {
-   "no_empleado": 204490,
+   "no_empleado": 205158,
    "rol": "SUPERVISOR_HSEA",
    "alcance": "GLOBAL",
    "motivo": "Puesto: SUPERVISOR HSE"
@@ -31007,6 +34120,12 @@
   },
   {
    "no_empleado": 203727,
+   "rol": "SUPERVISOR_HSEA",
+   "alcance": "GLOBAL",
+   "motivo": "Puesto: SUPERVISOR HSE"
+  },
+  {
+   "no_empleado": 205713,
    "rol": "SUPERVISOR_HSEA",
    "alcance": "GLOBAL",
    "motivo": "Puesto: SUPERVISOR HSE"

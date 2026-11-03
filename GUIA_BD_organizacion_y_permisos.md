@@ -8,10 +8,10 @@
 
 | Archivo | Para qué |
 |---|---|
-| `esquema.sql` | DDL PostgreSQL (Railway): organización, cargos de área, roles/permisos, capacitaciones, firmas, auditoría, vistas y funciones de autorización. Ya validado cargándolo con los datos de abajo. |
+| `esquema.sql` | DDL T-SQL (Azure SQL Server, lotes separados por GO): organización, cargos de área, roles/permisos, capacitaciones, firmas, auditoría, vistas y funciones de autorización. Portado desde PostgreSQL; aún no se ha ejecutado contra la BD real. |
 | `seed_organizacion.json` | Datos extraídos de `Capacitacion_Master_v5.xlsx`, ya normalizados. Contiene datos personales: no subirlo a un repo público. |
 
-Colócalos en: `src/lib/data/railway/esquema.sql` y `src/lib/data/memoria/seed_organizacion.json`.
+Colócalos en: `src/lib/data/azure/esquema.sql` y `src/lib/data/memoria/seed_organizacion.json`.
 
 ## 1. Alcance de esta fase
 
@@ -101,7 +101,7 @@ Cuando el área del permiso no tenga departamento, usar el de la solicitud; `sub
    - `signatures`: `sign_permit`, `list_by_permit`.
    Toda mutación recibe el actor y llama `audit.append(...)`.
 4. **Implementación en memoria** (`lib/data/memoria/`): cargar `seed_organizacion.json`; replicar las reglas de la sección 4 en TypeScript (la lógica de alcance de `tiene_permiso` ≡ GLOBAL / coincide con línea / departamento / subdepartamento).
-5. **Implementación Railway** (`lib/data/railway/`): usar `esquema.sql`; las consultas de autorización pueden apoyarse en `v_permisos_empleado`, `tiene_permiso()` y `cumple_cursos_rol()`. Script `scripts/cargar_seed.ts` que inserte el JSON en orden: líneas → departamentos → subdepartamentos → empleados (primero sin jefe, luego actualizar `jefe_no_empleado`) → cargos_area → reglas_departamentos_rh → cursos → capacitaciones. Las `sugerencias_empleado_roles` se cargan solo con confirmación explícita (otorgadas por 204692 / el administrador).
+5. **Implementación Azure SQL** (`lib/data/azure/`): usar `esquema.sql`; las consultas de autorización pueden apoyarse en `v_permisos_empleado`, `tiene_permiso()` y `cumple_cursos_rol()`. Script `scripts/cargar_seed.ts` que inserte el JSON en orden: líneas → departamentos → subdepartamentos → empleados (primero sin jefe, luego actualizar `jefe_no_empleado`) → cargos_area → reglas_departamentos_rh → cursos → capacitaciones. Las `sugerencias_empleado_roles` se cargan solo con confirmación explícita (otorgadas por 204692 / el administrador).
 6. **Auth** (`src/lib/auth`): al iniciar sesión validar que el `no_empleado` exista y esté activo; exponer en `get_session()` sus roles vigentes. Mantener el login provisional sin contraseña salvo que el usuario pida cambiarlo.
 7. **UI** (usar tokens de marca): pantallas de administración bajo `(app)/administracion/`: organización (líneas/departamentos y sus gerentes/encargados), empleados (búsqueda y ficha con jefe, cargos y roles), roles y asignaciones (con alcance y vigencia, motivo obligatorio), y vista "firmantes elegibles por área". Protegerlas con `roles:administrar` / `organizacion:administrar`.
 8. **Firebase** (si se elige `DATA_PROVIDER=firebase`): colecciones con los mismos nombres; `empleado_roles` y `cargos_area` como colecciones raíz con `noEmpleado` indexado; la lógica de alcance vive en el repositorio (no hay vistas). Dejar `get_repositories()` lanzando error hasta implementarlo.

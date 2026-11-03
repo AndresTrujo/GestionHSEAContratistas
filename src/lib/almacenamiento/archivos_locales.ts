@@ -2,7 +2,7 @@ import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, resolve, sep } from "node:path";
 import type { FileStorage } from "./almacenamiento";
 
-/** Guarda los archivos en una carpeta del disco (el Volume de Railway en producción). */
+/** Guarda los archivos en una carpeta del disco (un disco persistente en producción). */
 export class LocalFileStorage implements FileStorage {
   private readonly root: string;
 

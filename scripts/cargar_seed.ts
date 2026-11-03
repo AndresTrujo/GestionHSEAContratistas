@@ -1,11 +1,11 @@
 /**
- * Carga inicial de la BD de Railway (PostgreSQL) con la organización de seed_organizacion.json.
+ * Carga inicial de la BD de Azure SQL Server con la organización de seed_organizacion.json.
  *
  *   npm run db:cargar                      carga el seed (la BD debe tener ya el esquema)
- *   npm run db:cargar -- --esquema         aplica antes src/lib/data/railway/esquema.sql
+ *   npm run db:cargar -- --esquema         aplica antes src/lib/data/azure/esquema.sql
  *   npm run db:cargar -- --incluir-bajas   carga también empleados dados de baja (por omisión solo activos)
  *
- * Requiere DATABASE_URL (y DATABASE_SSL=true con la URL pública de Railway), en el entorno o en .env.local.
+ * Requiere AZURE_SQL_CONNECTION_STRING, en el entorno o en .env.local.
  * Orden: líneas -> departamentos -> subdepartamentos -> empleados (jefes en un segundo paso) ->
  * cargos_area -> reglas_departamentos_rh -> cursos -> capacitaciones -> administrador inicial.
  * Las sugerencias de roles del seed NO se cargan: los roles se asignan desde la app.
@@ -15,8 +15,9 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { firstAdminEmployeeNumber } from "../src/config/permisos";
 import type { SeedFile } from "../src/lib/data/memoria/almacen_organizacion";
-import { insert_audit_event } from "../src/lib/data/railway/auditoria_railway";
-import { close_pool, get_db, with_transaction, type Queryable } from "../src/lib/data/railway/conexion";
+import { insert_audit_event } from "../src/lib/data/azure/auditoria_azure";
+import { close_pool, get_db, with_transaction, type Queryable } from "../src/lib/data/azure/conexion";
+import { split_sql_batches } from "../src/lib/data/azure/lotes_sql";
 
 interface FullSeed extends SeedFile {
   reglas_departamentos_rh: {
@@ -42,16 +43,22 @@ interface FullSeed extends SeedFile {
   }[];
 }
 
-const maxQueryParams = 60_000;
+// SQL Server admite máximo 2,100 parámetros por consulta y 1,000 filas por VALUES.
+const maxQueryParams = 2_000;
+const maxRowsPerInsert = 1_000;
 
-/** Inserta por lotes con VALUES (los nombres de tabla y columnas son constantes del script). */
+/**
+ * Inserta por lotes con VALUES (los nombres de tabla y columnas son constantes del script).
+ * Con `identity`, la tabla tiene columna IDENTITY y los ids del seed se insertan tal cual.
+ */
 async function insert_rows(
   db: Queryable,
   table: string,
   columns: string[],
   rows: unknown[][],
+  identity = false,
 ): Promise<void> {
-  const batchSize = Math.max(1, Math.floor(maxQueryParams / columns.length));
+  const batchSize = Math.max(1, Math.min(maxRowsPerInsert, Math.floor(maxQueryParams / columns.length)));
   for (let start = 0; start < rows.length; start += batchSize) {
     const batch = rows.slice(start, start + batchSize);
     const placeholders = batch
@@ -60,7 +67,12 @@ async function insert_rows(
           `(${columns.map((__, colIndex) => `$${rowIndex * columns.length + colIndex + 1}`).join(", ")})`,
       )
       .join(", ");
-    await db.query(`INSERT INTO ${table} (${columns.join(", ")}) VALUES ${placeholders}`, batch.flat());
+    const insert = `INSERT INTO ${table} (${columns.join(", ")}) VALUES ${placeholders}`;
+    // IDENTITY_INSERT vale por sesión y ámbito: se activa y se apaga en la misma consulta.
+    await db.query(
+      identity ? `SET IDENTITY_INSERT ${table} ON; ${insert}; SET IDENTITY_INSERT ${table} OFF;` : insert,
+      batch.flat(),
+    );
   }
 }
 
@@ -73,9 +85,9 @@ function load_env_file(): void {
 }
 
 async function apply_schema(): Promise<void> {
-  const sql = readFileSync(join(process.cwd(), "src/lib/data/railway/esquema.sql"), "utf8");
-  // El esquema trae su propio BEGIN/COMMIT: va fuera de la transacción de la carga.
-  await get_db().query(sql);
+  const sql = readFileSync(join(process.cwd(), "src/lib/data/azure/esquema.sql"), "utf8");
+  // El esquema son varios lotes separados por GO: se ejecutan en orden, fuera de la transacción de la carga.
+  for (const batch of split_sql_batches(sql)) await get_db().query(batch);
   console.log("Esquema aplicado.");
 }
 
@@ -97,14 +109,13 @@ async function load_seed(includeTerminated: boolean): Promise<void> {
       ["id", "linea_mando_id", "nombre"],
       seed.departamentos.map((r) => [r.id, r.linea_mando_id, r.nombre]),
     );
+    // Con IDENTITY_INSERT, SQL Server ajusta solo el siguiente id al mayor insertado.
     await insert_rows(
       db,
       "subdepartamentos",
       ["id", "departamento_id", "nombre"],
       seed.subdepartamentos.map((r) => [r.id, r.departamento_id, r.nombre]),
-    );
-    await db.query(
-      `SELECT setval(pg_get_serial_sequence('subdepartamentos', 'id'), (SELECT max(id) FROM subdepartamentos))`,
+      true,
     );
 
     const employees = seed.empleados.filter((r) => includeTerminated || r.activo);
@@ -130,10 +141,10 @@ async function load_seed(includeTerminated: boolean): Promise<void> {
     );
     if (withManager.length > 0) {
       await db.query(
-        `UPDATE empleados e SET jefe_no_empleado = v.jefe
-           FROM unnest($1::int[], $2::int[]) AS v(numero, jefe)
-          WHERE e.no_empleado = v.numero`,
-        [withManager.map((r) => r.no_empleado), withManager.map((r) => r.jefe_no_empleado)],
+        `UPDATE e SET jefe_no_empleado = v.jefe
+           FROM empleados e
+           JOIN OPENJSON($1) WITH (numero int '$.numero', jefe int '$.jefe') v ON e.no_empleado = v.numero`,
+        [JSON.stringify(withManager.map((r) => ({ numero: r.no_empleado, jefe: r.jefe_no_empleado })))],
       );
     }
 
@@ -175,10 +186,11 @@ async function load_seed(includeTerminated: boolean): Promise<void> {
     const adminNumber = Number(firstAdminEmployeeNumber);
     let adminLoaded = false;
     if (loadedNumbers.has(adminNumber)) {
+      // empleado_roles tiene triggers: no admite OUTPUT sin INTO, así que el id se lee con SCOPE_IDENTITY().
       const { rows } = await db.query<{ id: string }>(
         `INSERT INTO empleado_roles (no_empleado, rol_id, alcance, otorgado_por, motivo, creado_por, actualizado_por)
-         SELECT $1, r.id, 'GLOBAL', $1, 'Administrador inicial', $1, $1 FROM roles r WHERE r.codigo = 'ADMIN_HSEA'
-         RETURNING id`,
+         SELECT $1, r.id, 'GLOBAL', $1, 'Administrador inicial', $1, $1 FROM roles r WHERE r.codigo = 'ADMIN_HSEA';
+         SELECT CAST(SCOPE_IDENTITY() AS varchar(20)) AS id WHERE SCOPE_IDENTITY() IS NOT NULL;`,
         [adminNumber],
       );
       const assignmentId = rows[0]?.id;

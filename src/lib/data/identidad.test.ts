@@ -6,7 +6,7 @@ describe("add_months_to_date", () => {
     expect(add_months_to_date("2026-10-05", 12)).toBe("2027-10-05");
   });
 
-  it("si el día no existe en el mes destino, usa el último (como PostgreSQL)", () => {
+  it("si el día no existe en el mes destino, usa el último (como SQL Server)", () => {
     expect(add_months_to_date("2026-01-31", 1)).toBe("2026-02-28");
     expect(add_months_to_date("2024-01-31", 1)).toBe("2024-02-29");
   });
