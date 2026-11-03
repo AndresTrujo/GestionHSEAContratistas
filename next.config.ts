@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Genera .next/standalone con server.js y solo las dependencias necesarias (despliegue en Azure).
+  output: "standalone",
   allowedDevOrigins: [
     "10.10.16.36",
     "10.10.*.*",
@@ -19,6 +21,7 @@ const nextConfig: NextConfig = {
         "10.10.16.36:3000",
         "*.devtunnels.ms",
         "*.*.devtunnels.ms",
+        "tfs-hsea-bnhqc9g4bbhmcdg5.eastus-01.azurewebsites.net",
       ],
     },
   },
