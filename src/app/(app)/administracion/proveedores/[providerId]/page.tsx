@@ -7,7 +7,7 @@ import { DisclosureCard } from "@/components/ui/DisclosureCard";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatusBadge, type BadgeTone } from "@/components/ui/StatusBadge";
 import { pinLength, requireSigningPin } from "@/config/seguridad";
-import { find_contractor_type } from "@/config/tipos_contratista";
+import { format_contractor_type } from "@/config/tipos_contratista";
 import type { ProviderStatus } from "@/domain/contratistas";
 import {
   activate_pin_action,
@@ -75,7 +75,7 @@ export default async function ProviderAdministrationPage({ params }: ProviderAdm
         subtitle={
           <>
             {provider.taxId} · {provider.contactEmail} ·{" "}
-            {provider.contractorTypes.map((code) => find_contractor_type(code)?.label ?? code).join(", ")}
+            {provider.contractorTypes.map((code) => format_contractor_type(code, provider.otherContractorType)).join(", ")}
           </>
         }
       />

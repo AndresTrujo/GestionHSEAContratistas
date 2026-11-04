@@ -1,3 +1,4 @@
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { notFound } from "next/navigation";
 import { primaryButtonClass, secondaryButtonClass } from "@/components/administracion/estilos";
 import { DetailCard } from "@/components/permisos/DetailCard";
@@ -182,12 +183,12 @@ export default async function HotWorkPermitDetailPage({
             canInspect ? (
               <form action={register_post_inspection} className="flex flex-wrap gap-3">
                 <input type="hidden" name="permitId" value={permit.id} />
-                <button name="result" value="yes" className={primaryButtonClass}>
+                <SubmitButton name="result" value="yes" className={primaryButtonClass}>
                   Sí (cierra el permiso)
-                </button>
-                <button name="result" value="no" className={secondaryButtonClass}>
+                </SubmitButton>
+                <SubmitButton name="result" value="no" className={secondaryButtonClass}>
                   No
-                </button>
+                </SubmitButton>
               </form>
             ) : (
               <p className="text-sm text-neutral-dark">Disponible cuando el permiso esté autorizado.</p>

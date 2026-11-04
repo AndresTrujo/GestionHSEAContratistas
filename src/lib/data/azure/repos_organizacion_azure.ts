@@ -61,6 +61,10 @@ function equals_nullable_int(column: string, placeholder: string): string {
   return `(${column} = CAST(${placeholder} AS int) OR (${column} IS NULL AND CAST(${placeholder} AS int) IS NULL))`;
 }
 
+/** Vigencia del caché de roles en memoria (por proceso). */
+const rolesCacheTtlMs = 60_000;
+let rolesCache: { roles: Role[]; expiresAt: number } | null = null;
+
 type OrganizationRepositories = Pick<
   DataRepositories,
   "employees" | "organization" | "access" | "credentials" | "signatures"
@@ -800,13 +804,19 @@ export function create_organization_repositories_azure(): OrganizationRepositori
 
     access: {
       async list_roles() {
+        // get_session la pide en cada petición y los roles solo cambian con el esquema o una migración (la app
+        // no los crea ni edita): se guardan en memoria. Con varias instancias, un cambio tarda como máximo el TTL.
+        const now = Date.now();
+        if (rolesCache && rolesCache.expiresAt > now) return [...rolesCache.roles];
         const { rows } = await get_db().query<RoleRow>(
           `SELECT r.*,
                   COALESCE((SELECT '[' + STRING_AGG('"' + STRING_ESCAPE(CAST(rp.permiso_codigo AS nvarchar(max)), 'json') + '"', ',') + ']'
                               FROM rol_permisos rp WHERE rp.rol_id = r.id), '[]') AS permisos
              FROM roles r ORDER BY r.id`,
         );
-        return rows.map(map_role);
+        const roles = rows.map(map_role);
+        rolesCache = { roles, expiresAt: now + rolesCacheTtlMs };
+        return [...roles];
       },
       async list_assignments_by_employee(employeeNumber, options) {
         const number = Number(employeeNumber);

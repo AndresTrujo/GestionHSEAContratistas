@@ -1,3 +1,4 @@
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { notFound } from "next/navigation";
 import { inputClass, labelClass, primaryButtonClass, tableClass, tdClass, thClass } from "@/components/administracion/estilos";
 import { DetailCard } from "@/components/permisos/DetailCard";
@@ -306,7 +307,7 @@ export default async function HeightsPermitDetailPage({
             ) : (
               <form action={close_heights_permit}>
                 <input type="hidden" name="permitId" value={permit.id} />
-                <button className={primaryButtonClass}>Cerrar permiso (trabajo terminado)</button>
+                <SubmitButton className={primaryButtonClass} pendingLabel="Cerrando…">Cerrar permiso (trabajo terminado)</SubmitButton>
               </form>
             )}
           </SectionCard>

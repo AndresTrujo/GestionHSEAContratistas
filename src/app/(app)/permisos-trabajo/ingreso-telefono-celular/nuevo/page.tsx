@@ -1,3 +1,4 @@
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { primaryButtonClass } from "@/components/administracion/estilos";
 import { ContractorPicker } from "@/components/permisos/ContractorPicker";
 import { FormAlert } from "@/components/permisos/FormAlert";
@@ -76,9 +77,9 @@ export default async function NewPhonePermitPage({ searchParams }: NewPhonePageP
           oficio.
         </p>
 
-        <button type="submit" className={`${primaryButtonClass} px-8`}>
+        <SubmitButton className={`${primaryButtonClass} px-8`} pendingLabel="Creando…">
           Crear oficio
-        </button>
+        </SubmitButton>
       </form>
     </>
   );

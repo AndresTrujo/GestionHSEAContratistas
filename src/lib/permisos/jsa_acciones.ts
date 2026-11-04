@@ -22,6 +22,7 @@ import { read_permit_area } from "./area";
 import { find_jsa_certification_issues, type CertificationIssue } from "./certificaciones_jsa";
 import { can_sign_participant, read_jsa_participants, register_jsa_participants } from "./ejecutantes";
 import { sign_step } from "./firma";
+import { resolve_requester_unit } from "./unidad_solicitante";
 
 const basePath = `/permisos-trabajo/${jsaSlug}`;
 const pngDataUrlPrefix = "data:image/png;base64,";
@@ -58,7 +59,8 @@ export async function create_jsa(formData: FormData): Promise<void> {
     time: read_text(formData, "time"),
     jobName: read_text(formData, "jobName"),
     location: read_text(formData, "location"),
-    company: read_text(formData, "company"),
+    // Lo elegido en el selector si es una opción permitida; si no, el de su perfil.
+    company: await resolve_requester_unit(formData, "company"),
   };
   if (Object.values(fields).some((value) => !value)) redirect(failure);
 

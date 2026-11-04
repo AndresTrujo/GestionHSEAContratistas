@@ -24,6 +24,8 @@ export interface Provider extends AuditMetadata {
   status: ProviderStatus;
   /** Giros del contratista; puede tener varios. */
   contractorTypes: ContractorTypeCode[];
+  /** Giro que el proveedor escribió con el tipo "OTRO"; null si no eligió ese tipo. */
+  otherContractorType: string | null;
 }
 
 /** Cuenta de acceso de proveedor. El hash de la contraseña nunca sale de la capa de datos. */
@@ -232,6 +234,8 @@ export interface RegisterProviderInput {
   contactEmail: string;
   phone: string | null;
   contractorTypes: ContractorTypeCode[];
+  /** Obligatorio si `contractorTypes` incluye "OTRO"; el repositorio lo limpia y pone la primera letra en mayúscula. */
+  otherContractorType?: string | null;
 }
 
 export interface CreateProviderUserInput {

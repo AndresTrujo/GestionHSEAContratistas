@@ -1,3 +1,4 @@
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { notFound } from "next/navigation";
 import {
   inputClass,
@@ -130,7 +131,7 @@ export default async function ConfinedPermitDetailPage({
 
       <DetailCard
         items={[
-          { label: "Compañía", value: String(permit.fields.company) },
+          { label: "Depto. / Compañía", value: String(permit.fields.company) },
           { label: "Fecha", value: String(permit.fields.date) },
           { label: "Área de trabajo", value: String(permit.fields.workArea) },
           { label: "Tarea a realizar", value: String(permit.fields.task) },
@@ -183,9 +184,9 @@ export default async function ConfinedPermitDetailPage({
                           <form action={record_confined_movement}>
                             <input type="hidden" name="permitId" value={permit.id} />
                             <input type="hidden" name="position" value={position} />
-                            <button name="kind" value="entry" className={secondaryButtonClass}>
+                            <SubmitButton name="kind" value="entry" className={secondaryButtonClass}>
                               Registrar entrada
-                            </button>
+                            </SubmitButton>
                           </form>
                         ) : (
                           "—"
@@ -198,9 +199,9 @@ export default async function ConfinedPermitDetailPage({
                           <form action={record_confined_movement}>
                             <input type="hidden" name="permitId" value={permit.id} />
                             <input type="hidden" name="position" value={position} />
-                            <button name="kind" value="exit" className={secondaryButtonClass}>
+                            <SubmitButton name="kind" value="exit" className={secondaryButtonClass}>
                               Registrar salida
-                            </button>
+                            </SubmitButton>
                           </form>
                         ) : (
                           "—"
@@ -274,7 +275,7 @@ export default async function ConfinedPermitDetailPage({
                   />
                 </div>
               ))}
-              <button className={primaryButtonClass}>Registrar lectura {readingCount + 1}</button>
+              <SubmitButton className={primaryButtonClass} pendingLabel="Registrando…">Registrar lectura {readingCount + 1}</SubmitButton>
             </form>
           )}
         </SectionCard>

@@ -1,6 +1,15 @@
 "use client";
 
-import { startTransition, useRef, useState, type FormEvent, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useRef,
+  useState,
+  useTransition,
+  type ButtonHTMLAttributes,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import { primaryButtonClass } from "@/components/administracion/estilos";
 import type { CertificationIssue } from "@/lib/permisos/certificaciones_jsa";
 
@@ -11,17 +20,47 @@ interface JsaFormProps {
   children: ReactNode;
 }
 
+/** El formulario está revisando certificaciones o creando el JSA: el botón de envío se bloquea. */
+const JsaBusyContext = createContext(false);
+
+interface JsaSubmitButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type"> {
+  /** Texto mientras el JSA se revisa y se crea. */
+  pendingLabel?: string;
+}
+
+/**
+ * Botón de envío del JSA. Equivale a SubmitButton, pero este formulario se envía con `onSubmit` (no con
+ * `action`, porque React 19 limpiaría los campos al terminar una acción), así que `useFormStatus` no lo ve y
+ * el estado de ocupado llega por contexto desde JsaForm.
+ */
+export function JsaSubmitButton({ pendingLabel, children, disabled, ...props }: JsaSubmitButtonProps) {
+  const busy = useContext(JsaBusyContext);
+  return (
+    <button {...props} type="submit" disabled={disabled || busy} aria-busy={busy}>
+      {busy && pendingLabel ? pendingLabel : children}
+    </button>
+  );
+}
+
 /**
  * Formulario del JSA. Antes de crearlo revisa que los colaboradores de contratista tengan las certificaciones que exige
  * el trabajo; si faltan, muestra un aviso en un modal SIN enviar ni limpiar el formulario, para que se corrija en el lugar.
+ * Mientras revisa y crea queda bloqueado (botón deshabilitado y candado contra Enter o doble clic): un segundo
+ * envío crearía un JSA duplicado.
  */
 export function JsaForm({ create_action, check_action, className, children }: JsaFormProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [issues, set_issues] = useState<CertificationIssue[]>([]);
   const [checking, set_checking] = useState(false);
+  const [creating, start_creating] = useTransition();
+  // El estado tarda un render en reflejarse; el candado es síncrono y frena un segundo envío inmediato.
+  const submittingRef = useRef(false);
+  const busy = checking || creating;
 
   async function handle_submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     const formData = new FormData(event.currentTarget);
     set_checking(true);
     try {
@@ -29,11 +68,21 @@ export function JsaForm({ create_action, check_action, className, children }: Js
       if (found.length > 0) {
         set_issues(found);
         dialogRef.current?.showModal();
+        submittingRef.current = false;
         return;
       }
-      startTransition(() => {
-        void create_action(formData);
+      // La creación redirige al terminar: el formulario sigue bloqueado hasta que cambie la página. Si falla,
+      // se libera para poder corregir y reintentar.
+      start_creating(async () => {
+        try {
+          await create_action(formData);
+        } finally {
+          submittingRef.current = false;
+        }
       });
+    } catch (error) {
+      submittingRef.current = false;
+      throw error;
     } finally {
       set_checking(false);
     }
@@ -41,9 +90,11 @@ export function JsaForm({ create_action, check_action, className, children }: Js
 
   return (
     <>
-      <form onSubmit={handle_submit} className={className} aria-busy={checking}>
-        {children}
-      </form>
+      <JsaBusyContext.Provider value={busy}>
+        <form onSubmit={handle_submit} className={className} aria-busy={busy}>
+          {children}
+        </form>
+      </JsaBusyContext.Provider>
 
       <dialog
         ref={dialogRef}

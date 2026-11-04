@@ -9,7 +9,13 @@ import {
 } from "@/config/documentos_contratista";
 import type { PermissionCode } from "@/config/permisos";
 import { lockoutMinutes, maxFailedAttempts } from "@/config/seguridad";
-import { find_contractor_type, type ContractorTypeCode } from "@/config/tipos_contratista";
+import {
+  find_contractor_type,
+  maxOtherContractorTypeLength,
+  normalize_other_contractor_type,
+  otherContractorTypeCode,
+  type ContractorTypeCode,
+} from "@/config/tipos_contratista";
 import type { ActorIdentity } from "@/domain/acceso";
 import type { ActorId, ActorType, AuditAction } from "@/domain/auditoria";
 import type {
@@ -402,6 +408,15 @@ export function create_contractor_repositories(
         if (types.some((code) => !find_contractor_type(code))) {
           throw new ValidationError("Tipo de contratista desconocido");
         }
+        const otherContractorType = types.includes(otherContractorTypeCode)
+          ? normalize_other_contractor_type(input.otherContractorType)
+          : "";
+        if (types.includes(otherContractorTypeCode) && !otherContractorType) {
+          throw new ValidationError("Escribe el giro de tu empresa");
+        }
+        if (otherContractorType.length > maxOtherContractorTypeLength) {
+          throw new ValidationError(`El giro no puede exceder ${maxOtherContractorTypeLength} caracteres`);
+        }
 
         const now = new Date().toISOString();
         const provider = {
@@ -413,6 +428,7 @@ export function create_contractor_repositories(
           phone: optional_text(input.phone),
           status: "PENDIENTE_VALIDACION" as const,
           contractorTypes: types,
+          otherContractorType: otherContractorType || null,
           createdAt: now,
           createdBy: "AUTOREGISTRO",
           updatedAt: now,
@@ -422,6 +438,7 @@ export function create_contractor_repositories(
         await append_audit({ type: "SISTEMA", id: "AUTOREGISTRO" }, "crear", "proveedores", String(provider.id), {
           taxId,
           contractorTypes: types.join(","),
+          otherContractorType: otherContractorType || null,
         });
         return provider;
       },

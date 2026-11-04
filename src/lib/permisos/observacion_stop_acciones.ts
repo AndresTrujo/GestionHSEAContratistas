@@ -16,6 +16,7 @@ import { employee_actor } from "./actor";
 import { read_permit_area } from "./area";
 import { resolve_provider_staff, resolve_tfs_employee } from "./ejecutantes";
 import { sign_step } from "./firma";
+import { resolve_requester_unit } from "./unidad_solicitante";
 
 const basePath = `/permisos-trabajo/${stopSlug}`;
 const pngDataUrlPrefix = "data:image/png;base64,";
@@ -38,7 +39,8 @@ export async function create_stop_observation(formData: FormData): Promise<void>
 
   const fields: WorkPermit["fields"] = {
     location: read_text(formData, "location"),
-    company: read_text(formData, "company"),
+    // Lo elegido en el selector si es una opción permitida; si no, el de su perfil.
+    company: await resolve_requester_unit(formData, "company"),
     date: read_text(formData, "date"),
     description: read_text(formData, "description"),
     actions: read_text(formData, "actions"),

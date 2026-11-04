@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { AdminForm } from "@/components/administracion/AdminForm";
 import { inputClass, labelClass } from "@/components/administracion/estilos";
-import { contractorTypes } from "@/config/tipos_contratista";
+import { ContractorTypeFields } from "@/components/contratistas/ContractorTypeFields";
 import { register_provider_action } from "@/lib/contratistas/acciones";
 
 /** Autorregistro de empresas contratistas (pública). Queda pendiente hasta que HSEA la valide. */
@@ -36,17 +36,7 @@ export default function ProviderRegistrationPage() {
             <label htmlFor="phone" className={labelClass}>Teléfono (opcional)</label>
             <input id="phone" name="phone" type="tel" className={inputClass} />
           </div>
-          <fieldset>
-            <legend className={labelClass}>Giro de la empresa (puedes elegir varios)</legend>
-            <div className="flex flex-wrap gap-4 text-sm">
-              {contractorTypes.map((type) => (
-                <label key={type.code} className="flex items-center gap-2">
-                  <input type="checkbox" name="contractorTypes" value={type.code} />
-                  {type.label}
-                </label>
-              ))}
-            </div>
-          </fieldset>
+          <ContractorTypeFields />
           {/* Señuelo para robots: las personas no lo ven ni lo llenan. */}
           <div className="hidden" aria-hidden="true">
             <label htmlFor="website">Sitio web</label>

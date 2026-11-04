@@ -343,6 +343,7 @@ CREATE TABLE dbo.proveedores (
   telefono                nvarchar(100) NULL,
   estatus                 nvarchar(30) NOT NULL DEFAULT N'PENDIENTE_VALIDACION'
                           CHECK (estatus IN (N'PENDIENTE_VALIDACION', N'ACTIVO', N'SUSPENDIDO')),
+  giro_otro               nvarchar(300) NULL,               -- giro escrito por el proveedor con el tipo 'OTRO'
   creado_en               datetimeoffset(3) NOT NULL DEFAULT SYSDATETIMEOFFSET(),
   creado_por              nvarchar(450) NULL,               -- 'AUTOREGISTRO' en el alta inicial
   actualizado_en          datetimeoffset(3) NOT NULL DEFAULT SYSDATETIMEOFFSET(),
@@ -1488,7 +1489,8 @@ INSERT INTO dbo.tipos_contratista (codigo, nombre) VALUES
   (N'MANTENIMIENTO',  N'Mantenimiento'),
   (N'REDES',          N'Redes'),
   (N'OBRA_CIVIL',     N'Obra civil'),
-  (N'INFRAESTRUCTURA',N'Infraestructura');
+  (N'INFRAESTRUCTURA',N'Infraestructura'),
+  (N'OTRO',           N'Otro');
 
 INSERT INTO dbo.tipos_trabajo (codigo, nombre, permit_type_slug) VALUES
   (N'CALIENTES',  N'Trabajos calientes',  N'trabajos-calientes'),

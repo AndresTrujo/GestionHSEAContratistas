@@ -1,4 +1,5 @@
 ﻿import Link from "next/link";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { login_employee_action, login_provider_action } from "@/lib/auth/acciones";
 import { format_wait } from "@/lib/auth/limite_intentos";
 
@@ -87,12 +88,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               autoComplete="current-password"
               className={inputClass}
             />
-            <button
-              type="submit"
-              className={submitClass}
-            >
+            <SubmitButton className={submitClass} pendingLabel="Entrando…">
               Entrar
-            </button>
+            </SubmitButton>
           </form>
         ) : (
           <form action={login_employee_action}>
@@ -108,12 +106,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               autoFocus
               className={inputClass}
             />
-            <button
-              type="submit"
-              className={submitClass}
-            >
+            <SubmitButton className={submitClass} pendingLabel="Entrando…">
               Entrar
-            </button>
+            </SubmitButton>
           </form>
         )}
 

@@ -1,7 +1,9 @@
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { inputClass, labelClass, primaryButtonClass } from "@/components/administracion/estilos";
 import { FormAlert } from "@/components/permisos/FormAlert";
 import { PermitAreaField } from "@/components/permisos/PermitAreaField";
 import { PermitField } from "@/components/permisos/PermitField";
+import { RequesterUnitField } from "@/components/permisos/RequesterUnitField";
 import { SectionCard } from "@/components/permisos/SectionCard";
 import { StopPeopleFields } from "@/components/permisos/StopPeopleFields";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
@@ -72,7 +74,7 @@ export default async function NewStopObservationPage({
             <PermitAreaField />
             <PermitField label="Fecha" name="date" type="date" defaultValue={today} />
             <PermitField label="Ubicación del acto / condición" name="location" />
-            <PermitField label="Compañía" name="company" />
+            <RequesterUnitField name="company" />
           </div>
         </SectionCard>
 
@@ -145,9 +147,9 @@ export default async function NewStopObservationPage({
           <textarea id="campo-actions" name="actions" required rows={5} className={inputClass} />
         </SectionCard>
 
-        <button type="submit" className={`${primaryButtonClass} px-8`}>
+        <SubmitButton className={`${primaryButtonClass} px-8`} pendingLabel="Creando…">
           Crear observación
-        </button>
+        </SubmitButton>
       </form>
     </>
   );

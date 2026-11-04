@@ -90,7 +90,7 @@ export default async function StopObservationDetailPage({
           ...(permit.fields.supervisorName ? [{ label: "Supervisor", value: String(permit.fields.supervisorName) }] : []),
           { label: "Fecha", value: String(permit.fields.date) },
           { label: "Ubicación del acto / condición", value: String(permit.fields.location) },
-          { label: "Compañía", value: String(permit.fields.company) },
+          { label: "Depto. / Compañía", value: String(permit.fields.company) },
         ]}
       />
 

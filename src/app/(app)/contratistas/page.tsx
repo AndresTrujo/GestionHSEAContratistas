@@ -12,7 +12,7 @@ import {
 } from "@/components/administracion/estilos";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { find_contractor_type } from "@/config/tipos_contratista";
+import { format_contractor_type } from "@/config/tipos_contratista";
 import type { Provider, ProviderStatus } from "@/domain/contratistas";
 import { get_session } from "@/lib/auth/sesion";
 import { get_repositories } from "@/lib/data/proveedor_datos";
@@ -209,7 +209,7 @@ export default async function ContractorsPage({ searchParams }: ContractorsPageP
                     </span>
                   </div>
                   <p className="mb-3 text-xs text-neutral-dark">
-                    {summary.provider.contractorTypes.map((code) => find_contractor_type(code)?.label ?? code).join(", ") || "Sin giro"}
+                    {summary.provider.contractorTypes.map((code) => format_contractor_type(code, summary.provider.otherContractorType)).join(", ") || "Sin giro"}
                   </p>
                   <div className="mb-3">
                     <SemaphoreBar summary={summary} />
@@ -249,7 +249,7 @@ export default async function ContractorsPage({ searchParams }: ContractorsPageP
                           <span className="flex flex-wrap gap-1">
                             {summary.provider.contractorTypes.map((code) => (
                               <span key={code} className="rounded-full bg-neutral-light/40 px-2 py-0.5 text-xs">
-                                {find_contractor_type(code)?.label ?? code}
+                                {format_contractor_type(code, summary.provider.otherContractorType)}
                               </span>
                             ))}
                           </span>

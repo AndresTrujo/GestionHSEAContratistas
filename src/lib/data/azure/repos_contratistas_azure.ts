@@ -9,7 +9,13 @@ import {
 } from "@/config/documentos_contratista";
 import type { PermissionCode } from "@/config/permisos";
 import { lockoutMinutes, maxFailedAttempts } from "@/config/seguridad";
-import { find_contractor_type, type ContractorTypeCode } from "@/config/tipos_contratista";
+import {
+  find_contractor_type,
+  maxOtherContractorTypeLength,
+  normalize_other_contractor_type,
+  otherContractorTypeCode,
+  type ContractorTypeCode,
+} from "@/config/tipos_contratista";
 import type { ActorIdentity } from "@/domain/acceso";
 import type { ActorType } from "@/domain/auditoria";
 import type {
@@ -119,6 +125,8 @@ interface ProviderRow extends ProviderAuditCols {
   correo_contacto: string;
   telefono: string | null;
   estatus: ProviderStatus;
+  /** Giro escrito con el tipo "OTRO"; null si no aplica. */
+  giro_otro: string | null;
   /** Códigos separados por coma (STRING_AGG); vacío si no hay. */
   tipos: string;
 }
@@ -265,6 +273,7 @@ function map_provider(row: ProviderRow): Provider {
     contractorTypes: split_codes(row.tipos).filter(
       (code): code is ContractorTypeCode => find_contractor_type(code) !== undefined,
     ),
+    otherContractorType: row.giro_otro,
     ...map_audit(row),
   };
 }
@@ -688,15 +697,31 @@ export function create_contractor_repositories_azure(): ContractorRepositories {
         if (types.some((code) => !find_contractor_type(code))) {
           throw new ValidationError("Tipo de contratista desconocido");
         }
+        const otherContractorType = types.includes(otherContractorTypeCode)
+          ? normalize_other_contractor_type(input.otherContractorType)
+          : "";
+        if (types.includes(otherContractorTypeCode) && !otherContractorType) {
+          throw new ValidationError("Escribe el giro de tu empresa");
+        }
+        if (otherContractorType.length > maxOtherContractorTypeLength) {
+          throw new ValidationError(`El giro no puede exceder ${maxOtherContractorTypeLength} caracteres`);
+        }
 
         try {
           return await with_transaction(async (db) => {
             const { rows } = await db.query<{ id: number }>(
               `INSERT INTO proveedores
-                 (razon_social, rfc, registro_patronal_imss, correo_contacto, telefono, creado_por, actualizado_por)
-               VALUES ($1, $2, $3, $4, $5, 'AUTOREGISTRO', 'AUTOREGISTRO');
+                 (razon_social, rfc, registro_patronal_imss, correo_contacto, telefono, giro_otro, creado_por, actualizado_por)
+               VALUES ($1, $2, $3, $4, $5, $6, 'AUTOREGISTRO', 'AUTOREGISTRO');
                SELECT CAST(SCOPE_IDENTITY() AS int) AS id`,
-              [name, taxId, optional_text(input.imssEmployerRegistration), contactEmail, optional_text(input.phone)],
+              [
+                name,
+                taxId,
+                optional_text(input.imssEmployerRegistration),
+                contactEmail,
+                optional_text(input.phone),
+                otherContractorType || null,
+              ],
             );
             const id = rows[0]?.id;
             if (id === undefined) throw new Error("No se pudo registrar el proveedor");
@@ -710,6 +735,7 @@ export function create_contractor_repositories_azure(): ContractorRepositories {
             await append_audit_db(db, { type: "SISTEMA", id: "AUTOREGISTRO" }, "crear", "proveedores", String(id), {
               taxId,
               contractorTypes: types.join(","),
+              otherContractorType: otherContractorType || null,
             });
             return await get_provider_or_throw(db, id);
           });

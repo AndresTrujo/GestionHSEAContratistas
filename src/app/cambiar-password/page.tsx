@@ -1,3 +1,4 @@
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { redirect } from "next/navigation";
 import { change_password_action, logout_action } from "@/lib/auth/acciones";
 import { minPasswordLength } from "@/lib/auth/secreto";
@@ -72,12 +73,9 @@ export default async function ChangePasswordPage({ searchParams }: ChangePasswor
             autoComplete="new-password"
             className={inputClass}
           />
-          <button
-            type="submit"
-            className="mt-2 w-full rounded bg-brand-green px-4 py-2 font-bold text-white hover:opacity-90"
-          >
+          <SubmitButton className="mt-2 w-full rounded bg-brand-green px-4 py-2 font-bold text-white hover:opacity-90" pendingLabel="Guardando…">
             Guardar contraseña
-          </button>
+          </SubmitButton>
         </form>
 
         <form action={logout_action} className="mt-4 text-center">

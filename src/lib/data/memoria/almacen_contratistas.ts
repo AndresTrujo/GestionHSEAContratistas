@@ -69,6 +69,7 @@ export function create_contractor_store(): ContractorStore {
       phone: null,
       status: "ACTIVO",
       contractorTypes: ["MANTENIMIENTO"],
+      otherContractorType: null,
       ...seedAudit,
     },
     {
@@ -80,6 +81,7 @@ export function create_contractor_store(): ContractorStore {
       phone: null,
       status: "ACTIVO",
       contractorTypes: ["REDES", "INFRAESTRUCTURA"],
+      otherContractorType: null,
       ...seedAudit,
     },
   ];

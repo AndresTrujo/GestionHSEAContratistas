@@ -408,6 +408,8 @@ export async function register_provider_action(_previous: ActionState, formData:
       contactEmail: read_text(formData, "contactEmail"),
       phone: read_optional(formData, "phone"),
       contractorTypes: types,
+      // El repositorio lo limpia (espacios) y pone la primera letra en mayúscula; es obligatorio con "Otro".
+      otherContractorType: read_optional(formData, "otherContractorType"),
     });
     return {
       ok: true,

@@ -1,8 +1,10 @@
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { inputClass, labelClass, primaryButtonClass } from "@/components/administracion/estilos";
 import { ExecutorFields } from "@/components/permisos/ExecutorFields";
 import { FormAlert } from "@/components/permisos/FormAlert";
 import { PermitAreaField } from "@/components/permisos/PermitAreaField";
 import { PermitField } from "@/components/permisos/PermitField";
+import { RequesterUnitField } from "@/components/permisos/RequesterUnitField";
 import { SectionCard } from "@/components/permisos/SectionCard";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -95,7 +97,7 @@ export default async function NewConfinedPermitPage({
         <SectionCard step={1} title="Datos generales" description="Quién solicita el permiso, dónde y qué se va a hacer.">
           <div className="grid gap-4 sm:grid-cols-2">
             <PermitAreaField />
-            <PermitField label="Compañía" name="company" />
+            <RequesterUnitField name="company" />
             <PermitField label="Fecha" name="date" type="date" defaultValue={today} />
             <PermitField label="Área de trabajo" name="workArea" />
             <PermitField label="Tarea a realizar" name="task" />
@@ -252,9 +254,9 @@ export default async function NewConfinedPermitPage({
           requerido. Las firmas se registran después de crear el permiso.
         </p>
 
-        <button type="submit" className={`${primaryButtonClass} px-8`}>
+        <SubmitButton className={`${primaryButtonClass} px-8`} pendingLabel="Creando…">
           Crear permiso
-        </button>
+        </SubmitButton>
       </form>
     </>
   );

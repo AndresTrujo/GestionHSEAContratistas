@@ -27,7 +27,7 @@ export default async function ConfinedPermitsPage({ searchParams }: PermitListPa
         { header: "Fecha", render: (permit) => String(permit.fields.date) },
         { header: "Espacio confinado", render: (permit) => `${String(permit.fields.spaceNumber)} · ${String(permit.fields.location)}` },
         { header: "Tipo", render: (permit) => `Tipo ${String(permit.fields.riskType)}` },
-        { header: "Compañía", render: (permit) => String(permit.fields.company) },
+        { header: "Depto. / Compañía", render: (permit) => String(permit.fields.company) },
       ]}
     />
   );

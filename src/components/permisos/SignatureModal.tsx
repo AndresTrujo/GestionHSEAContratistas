@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { useRef, useState } from "react";
 import type { PointerEvent, ReactNode } from "react";
 import { primaryButtonClass, secondaryButtonClass } from "@/components/administracion/estilos";
@@ -156,9 +157,9 @@ export function SignatureModal({
             <button type="button" onClick={() => dialogRef.current?.close()} className={secondaryButtonClass}>
               Cancelar
             </button>
-            <button type="submit" disabled={!hasStrokes} className={primaryButtonClass}>
+            <SubmitButton disabled={!hasStrokes} className={primaryButtonClass} pendingLabel="Firmando…">
               Confirmar firma
-            </button>
+            </SubmitButton>
           </div>
         </form>
       </dialog>

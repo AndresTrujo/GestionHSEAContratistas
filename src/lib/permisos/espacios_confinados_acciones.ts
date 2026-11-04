@@ -37,6 +37,7 @@ import {
 import { read_permit_area } from "./area";
 import { read_executors, register_executor_participants } from "./ejecutantes";
 import { sign_step } from "./firma";
+import { resolve_requester_unit } from "./unidad_solicitante";
 
 const basePath = `/permisos-trabajo/${confinedSlug}`;
 const pngDataUrlPrefix = "data:image/png;base64,";
@@ -99,7 +100,8 @@ export async function create_confined_permit(formData: FormData): Promise<void> 
   const failure = `${basePath}/nuevo?error=incomplete`;
 
   const fields: WorkPermit["fields"] = {
-    company: read_text(formData, "company"),
+    // Lo elegido en el selector si es una opción permitida; si no, el de su perfil.
+    company: await resolve_requester_unit(formData, "company"),
     date: read_text(formData, "date"),
     workArea: read_text(formData, "workArea"),
     task: read_text(formData, "task"),

@@ -1,10 +1,11 @@
 import { inputClass, labelClass, primaryButtonClass } from "@/components/administracion/estilos";
 import { FormAlert } from "@/components/permisos/FormAlert";
 import { JsaAnalysis } from "@/components/permisos/JsaAnalysis";
-import { JsaForm } from "@/components/permisos/JsaForm";
+import { JsaForm, JsaSubmitButton } from "@/components/permisos/JsaForm";
 import { ParticipantFields } from "@/components/permisos/ParticipantFields";
 import { PermitAreaField } from "@/components/permisos/PermitAreaField";
 import { PermitField } from "@/components/permisos/PermitField";
+import { RequesterUnitField } from "@/components/permisos/RequesterUnitField";
 import { SectionCard } from "@/components/permisos/SectionCard";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -114,7 +115,7 @@ export default async function NewJsaPage({ searchParams }: NewJsaPageProps) {
             <PermitAreaField />
             <PermitField label="Nombre del trabajo a ejecutar" name="jobName" />
             <PermitField label="Ubicación del área de trabajo" name="location" />
-            <PermitField label="Departamento / compañía" name="company" />
+            <RequesterUnitField name="company" />
             <PermitField label="Fecha" name="date" type="date" defaultValue={today} />
             <PermitField label="Hora" name="time" type="time" defaultValue={currentTime} />
           </div>
@@ -189,9 +190,9 @@ export default async function NewJsaPage({ searchParams }: NewJsaPageProps) {
           <ParticipantFields options={executorOptions} maxParticipants={jsaMaxParticipants} />
         </SectionCard>
 
-        <button type="submit" className={`${primaryButtonClass} px-8`}>
+        <JsaSubmitButton className={`${primaryButtonClass} px-8`} pendingLabel="Creando…">
           Crear JSA
-        </button>
+        </JsaSubmitButton>
       </JsaForm>
     </>
   );

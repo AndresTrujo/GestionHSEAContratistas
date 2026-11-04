@@ -82,11 +82,32 @@ export function parse_connection_string(connectionString: string): SqlConfig {
     },
     pool: {
       max: Number(process.env.DATABASE_POOL_MAX ?? 10),
-      min: 0,
+      // Una conexión siempre abierta: la primera petición tras un rato sin tráfico no paga TLS ni el token de Entra ID.
+      min: Number(process.env.DATABASE_POOL_MIN ?? 1),
       // Las conexiones se conservan entre navegaciones: reabrir TLS a Azure cuesta cientos de ms.
       idleTimeoutMillis: 5 * 60_000,
     },
   };
+}
+
+/**
+ * Aplana la cadena de errores de una conexión fallida. El driver envuelve la causa real (p. ej. la falla al
+ * obtener el token de Entra ID) en un AggregateError sin mensaje, que de otro modo se ve como "[AggregateError: ]".
+ */
+function describe_error_chain(error: unknown, depth = 0): string {
+  if (depth > 4 || typeof error !== "object" || error === null) return String(error);
+  const { name, message, code, originalError, errors } = error as {
+    name?: string;
+    message?: string;
+    code?: string;
+    originalError?: unknown;
+    errors?: unknown[];
+  };
+  const own = [name, code ? `(${code})` : "", message].filter(Boolean).join(" ");
+  const nested = [originalError, ...(Array.isArray(errors) ? errors : [])]
+    .filter((item) => item !== undefined)
+    .map((item) => describe_error_chain(item, depth + 1));
+  return nested.length > 0 ? `${own} -> [${nested.join(" | ")}]` : own;
 }
 
 function get_pool(): Promise<ConnectionPool> {
@@ -97,6 +118,7 @@ function get_pool(): Promise<ConnectionPool> {
     globalPool.azurePool = pool.connect().catch((error: unknown) => {
       // Un fallo de conexión no debe quedar en caché: el siguiente intento vuelve a conectar.
       globalPool.azurePool = undefined;
+      console.error(`[azure-sql] No se pudo conectar: ${describe_error_chain(error)}`);
       throw error;
     });
   }

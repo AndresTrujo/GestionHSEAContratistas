@@ -5,7 +5,7 @@ import { ProveedoresAccionDetalle } from "@/components/administracion/Proveedore
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatusBadge, type BadgeTone } from "@/components/ui/StatusBadge";
-import { find_contractor_type } from "@/config/tipos_contratista";
+import { format_contractor_type } from "@/config/tipos_contratista";
 import type { ProviderStatus } from "@/domain/contratistas";
 import { set_provider_status_action } from "@/lib/administracion/acciones";
 import { format_date } from "@/lib/administracion/etiquetas";
@@ -96,7 +96,7 @@ export default async function ProvidersAdministrationPage({ searchParams }: Prov
                   </p>
                   <p className="mt-1 text-sm">
                     <span className="font-bold text-brand-navy">Giro: </span>
-                    {provider.contractorTypes.map((code) => find_contractor_type(code)?.label ?? code).join(", ")}
+                    {provider.contractorTypes.map((code) => format_contractor_type(code, provider.otherContractorType)).join(", ")}
                   </p>
                 </div>
                 <StatusBadge tone={statusTones[provider.status]}>{statusLabels[provider.status]}</StatusBadge>
