@@ -5,6 +5,7 @@ import { DocumentPanel, type DocumentHistory } from "@/components/contratistas/D
 import { SemaphoreBadge } from "@/components/contratistas/SemaphoreBadge";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { DisclosureCard } from "@/components/ui/DisclosureCard";
+import { format_equipment_type } from "@/config/tipos_equipo";
 import { deactivate_equipment_action } from "@/lib/contratistas/acciones";
 import { can_manage_provider, require_provider_access } from "@/lib/auth/guardas";
 import { get_repositories } from "@/lib/data/proveedor_datos";
@@ -63,7 +64,7 @@ export default async function EquipmentDocumentsPage({ params }: EquipmentDocume
           { label: "Inicio", href: "/inicio" },
           ...(session.kind === "EMPLEADO" ? [{ label: "Control de contratistas", href: "/contratistas" }] : []),
           { label: "Equipos motorizados", href: `/contratistas/${providerId}/equipos` },
-          { label: equipment.equipmentType },
+          { label: format_equipment_type(equipment.equipmentType) },
         ]}
       />
 
@@ -77,7 +78,7 @@ export default async function EquipmentDocumentsPage({ params }: EquipmentDocume
               </span>
             )}
           </div>
-          <h1 className="text-4xl uppercase leading-tight">{equipment.equipmentType}</h1>
+          <h1 className="text-4xl uppercase leading-tight">{format_equipment_type(equipment.equipmentType)}</h1>
           {details && <p className="text-neutral-dark">{details}</p>}
           {identification && <p className="text-sm text-neutral-dark">{identification}</p>}
           {equipment.active && requirements.length > 0 && (

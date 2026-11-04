@@ -255,7 +255,7 @@ export async function add_equipment_action(_previous: ActionState, formData: For
       },
       actor,
     );
-    return "Equipo motorizado agregado. Sube sus cinco documentos para ponerlo en semáforo amarillo.";
+    return "Equipo motorizado agregado. Sube sus documentos para ponerlo en semáforo amarillo.";
   });
 }
 

@@ -1,4 +1,5 @@
 import type { PermissionCode } from "@/config/permisos";
+import type { EquipmentCategory } from "@/config/tipos_equipo";
 
 /** Trabajos específicos que exigen DC-3 (espejo de `tipos_trabajo` en esquema.sql). */
 export const workTypes = [
@@ -21,10 +22,13 @@ export type DocumentTypeCode =
   | "DC3_CALIENTES"
   | "DC3_ALTURAS"
   | "DC3_CONFINADOS"
-  | "CERT_CALIDAD"
-  | "PROG_MANTENIMIENTO"
+  | "CERT_OPERACION_SEGURA"
+  | "TARJETA_CIRCULACION"
   | "POLIZA_SEGURO"
   | "VERIF_VEHICULAR"
+  // Retirados (ya no se exigen); se conservan para mostrar los documentos que ya se habían subido.
+  | "CERT_CALIDAD"
+  | "PROG_MANTENIMIENTO"
   | "TENENCIA_VEHICULAR";
 
 export type DocumentSubjectKind = "EMPLEADO_PROVEEDOR" | "EQUIPO" | "PROVEEDOR";
@@ -40,6 +44,8 @@ export interface DocumentTypeDefinition {
   validityMonths: number | null;
   /** DC-3 de un trabajo específico; se exige solo si el colaborador lo declaró. */
   workTypeCode: WorkTypeCode | null;
+  /** Solo para equipos: categoría a la que se exige. Omitido = a todas (p. ej. el seguro). */
+  equipmentCategory?: EquipmentCategory;
   /** Permiso que debe tener quien revisa (el médico es distinto del de HSEA). */
   reviewPermission: PermissionCode;
 }
@@ -118,30 +124,36 @@ export const documentTypes: DocumentTypeDefinition[] = [
     workTypeCode: "CONFINADOS",
     reviewPermission: "contratistas:revisar_documentos",
   },
-  // Equipos motorizados: los cinco documentos son obligatorios para cada equipo.
+  // Equipos motorizados: los documentos obligatorios dependen de la categoría del tipo de equipo
+  // (ver `tipos_equipo.ts`). Equipos: certificado de operación segura y seguro. Unidades: tarjeta de
+  // circulación, seguro y verificación.
   {
-    code: "CERT_CALIDAD",
-    label: "Certificado de calidad",
+    code: "CERT_OPERACION_SEGURA",
+    label: "Certificado de operación segura (vigente)",
+    appliesTo: "EQUIPO",
+    category: "CERTIFICACION",
+    mandatory: true,
+    // Sin periodicidad fija: la vigencia sale de la fecha de vencimiento que se capture al subirlo.
+    validityMonths: null,
+    workTypeCode: null,
+    equipmentCategory: "EQUIPO",
+    reviewPermission: "contratistas:revisar_documentos",
+  },
+  {
+    code: "TARJETA_CIRCULACION",
+    label: "Tarjeta de circulación",
     appliesTo: "EQUIPO",
     category: "CERTIFICACION",
     mandatory: true,
     validityMonths: null,
     workTypeCode: null,
+    equipmentCategory: "UNIDAD",
     reviewPermission: "contratistas:revisar_documentos",
   },
   {
-    code: "PROG_MANTENIMIENTO",
-    label: "Programa de mantenimiento",
-    appliesTo: "EQUIPO",
-    category: "CERTIFICACION",
-    mandatory: true,
-    validityMonths: null,
-    workTypeCode: null,
-    reviewPermission: "contratistas:revisar_documentos",
-  },
-  {
+    // Para equipos y unidades.
     code: "POLIZA_SEGURO",
-    label: "Póliza de seguro",
+    label: "Seguro vigente",
     appliesTo: "EQUIPO",
     category: "CERTIFICACION",
     mandatory: true,
@@ -157,6 +169,28 @@ export const documentTypes: DocumentTypeDefinition[] = [
     mandatory: true,
     validityMonths: 6,
     workTypeCode: null,
+    equipmentCategory: "UNIDAD",
+    reviewPermission: "contratistas:revisar_documentos",
+  },
+  // Retirados (activo = 0 en BD): ya no se exigen, pero conservan su etiqueta para el historial.
+  {
+    code: "CERT_CALIDAD",
+    label: "Certificado de calidad",
+    appliesTo: "EQUIPO",
+    category: "CERTIFICACION",
+    mandatory: false,
+    validityMonths: null,
+    workTypeCode: null,
+    reviewPermission: "contratistas:revisar_documentos",
+  },
+  {
+    code: "PROG_MANTENIMIENTO",
+    label: "Programa de mantenimiento",
+    appliesTo: "EQUIPO",
+    category: "CERTIFICACION",
+    mandatory: false,
+    validityMonths: null,
+    workTypeCode: null,
     reviewPermission: "contratistas:revisar_documentos",
   },
   {
@@ -164,12 +198,22 @@ export const documentTypes: DocumentTypeDefinition[] = [
     label: "Tenencia vehicular",
     appliesTo: "EQUIPO",
     category: "CERTIFICACION",
-    mandatory: true,
+    mandatory: false,
     validityMonths: 12,
     workTypeCode: null,
     reviewPermission: "contratistas:revisar_documentos",
   },
 ];
+
+/** Documentos que se exigen a un equipo según la categoría de su tipo (`null`: tipo desconocido, solo los generales). */
+export function list_required_equipment_documents(category: EquipmentCategory | null): DocumentTypeDefinition[] {
+  return documentTypes.filter(
+    (type) =>
+      type.appliesTo === "EQUIPO" &&
+      type.mandatory &&
+      (type.equipmentCategory === undefined || type.equipmentCategory === category),
+  );
+}
 
 export function find_document_type(code: string): DocumentTypeDefinition | undefined {
   return documentTypes.find((type) => type.code === code);

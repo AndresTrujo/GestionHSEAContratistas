@@ -14,6 +14,7 @@ import { SemaphoreBadge } from "@/components/contratistas/SemaphoreBadge";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { DisclosureCard } from "@/components/ui/DisclosureCard";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { equipmentCategories, equipmentTypes, format_equipment_type } from "@/config/tipos_equipo";
 import type { Semaphore } from "@/domain/contratistas";
 import { add_equipment_action } from "@/lib/contratistas/acciones";
 import { can_manage_provider, require_provider_access } from "@/lib/auth/guardas";
@@ -129,7 +130,7 @@ export default async function ProviderEquipmentPage({ params, searchParams }: Pr
                 <li key={item.id} className="rounded-xl border border-neutral-light bg-white p-4 shadow-sm">
                   <div className="mb-2 flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="font-bold">{item.equipmentType}</p>
+                      <p className="font-bold">{format_equipment_type(item.equipmentType)}</p>
                       {details && <p className="text-sm text-neutral-dark">{details}</p>}
                     </div>
                     {item.active ? <SemaphoreBadge semaphore={semaphore} /> : <span className="text-xs text-red-700">Baja</span>}
@@ -161,7 +162,7 @@ export default async function ProviderEquipmentPage({ params, searchParams }: Pr
                   {visibleRows.map(({ item, semaphore, pending, details, identification }) => (
                     <tr key={item.id} className="hover:bg-neutral-light/10">
                       <td className={tdClass}>
-                        <span className="font-bold">{item.equipmentType}</span>
+                        <span className="font-bold">{format_equipment_type(item.equipmentType)}</span>
                         {details && <span className="block text-xs text-neutral-dark">{details}</span>}
                       </td>
                       <td className={tdClass}>{identification || <span className="text-neutral-dark">—</span>}</td>
@@ -190,14 +191,25 @@ export default async function ProviderEquipmentPage({ params, searchParams }: Pr
       </section>
 
       {canManage && (
-        <DisclosureCard title="Agregar equipo motorizado" description="Después de agregarlo, sube sus cinco documentos desde su ficha.">
+        <DisclosureCard title="Agregar equipo motorizado" description="Después de agregarlo, sube sus documentos desde su ficha. Equipos: certificado de operación segura y seguro vigente. Unidades: tarjeta de circulación, seguro vigente y verificación.">
           <AdminForm action={add_equipment_action} submitLabel="Agregar equipo" className="space-y-5">
             <input type="hidden" name="providerId" value={providerId} />
             <fieldset className="grid gap-3 sm:grid-cols-2">
               <legend className="mb-2 text-sm font-bold uppercase tracking-wide text-neutral-dark">Equipo</legend>
               <div>
-                <label htmlFor="equipmentType" className={labelClass}>Tipo (p. ej. grúa, montacargas)</label>
-                <input id="equipmentType" name="equipmentType" required className={inputClass} />
+                <label htmlFor="equipmentType" className={labelClass}>Tipo de equipo</label>
+                <select id="equipmentType" name="equipmentType" required defaultValue="" className={inputClass}>
+                  <option value="" disabled>Elige un tipo</option>
+                  {equipmentCategories.map((category) => (
+                    <optgroup key={category.code} label={category.label}>
+                      {equipmentTypes
+                        .filter((type) => type.category === category.code)
+                        .map((type) => (
+                          <option key={type.code} value={type.code}>{type.label}</option>
+                        ))}
+                    </optgroup>
+                  ))}
+                </select>
               </div>
               <div>
                 <label htmlFor="description" className={labelClass}>Descripción (opcional)</label>

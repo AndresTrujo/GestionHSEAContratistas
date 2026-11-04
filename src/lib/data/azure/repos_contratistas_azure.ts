@@ -2,6 +2,7 @@ import {
   allowedDocumentMimeTypes,
   find_document_type,
   is_work_type_code,
+  list_required_equipment_documents,
   maxDocumentFileBytes,
   type DocumentTypeDefinition,
   type DocumentTypeCode,
@@ -9,6 +10,7 @@ import {
 } from "@/config/documentos_contratista";
 import type { PermissionCode } from "@/config/permisos";
 import { lockoutMinutes, maxFailedAttempts } from "@/config/seguridad";
+import { find_equipment_type } from "@/config/tipos_equipo";
 import {
   find_contractor_type,
   maxOtherContractorTypeLength,
@@ -555,16 +557,34 @@ async function list_requirements_db(db: Queryable, subject: DocumentSubject): Pr
     );
     return rows.map(map_requirement);
   }
-  const isProvider = subject.kind === "PROVEEDOR";
+  if (subject.kind === "EQUIPO") {
+    // Los documentos de un equipo dependen de la categoría de su tipo (Equipos / Unidades); un tipo que ya no
+    // está en el catálogo (registros anteriores) solo exige los generales (categoria_equipo NULL).
+    const { rows } = await db.query<RequirementRow>(
+      `SELECT td.codigo AS tipo_documento_codigo, COALESCE(de.estado, 'FALTANTE') AS estado,
+              de.vigente_hasta, de.documento_id, de.version_id
+         FROM equipos_proveedor e
+         LEFT JOIN tipos_equipo te ON te.codigo = e.tipo_equipo
+         JOIN tipos_documento td
+           ON td.aplica_a = 'EQUIPO' AND td.activo = 1 AND td.obligatorio = 1
+          AND (td.categoria_equipo IS NULL OR td.categoria_equipo = te.categoria)
+         LEFT JOIN v_documentos_estado de
+           ON de.equipo_proveedor_id = e.id AND de.tipo_documento_codigo = td.codigo
+        WHERE e.id = $1
+        ORDER BY td.codigo`,
+      [subject.equipmentId],
+    );
+    return rows.map(map_requirement);
+  }
   const { rows } = await db.query<RequirementRow>(
     `SELECT td.codigo AS tipo_documento_codigo, COALESCE(de.estado, 'FALTANTE') AS estado,
             de.vigente_hasta, de.documento_id, de.version_id
        FROM tipos_documento td
        LEFT JOIN v_documentos_estado de
-         ON ${isProvider ? "de.proveedor_id" : "de.equipo_proveedor_id"} = $1 AND de.tipo_documento_codigo = td.codigo
-      WHERE td.aplica_a = '${isProvider ? "PROVEEDOR" : "EQUIPO"}' AND td.activo = 1 AND td.obligatorio = 1
+         ON de.proveedor_id = $1 AND de.tipo_documento_codigo = td.codigo
+      WHERE td.aplica_a = 'PROVEEDOR' AND td.activo = 1 AND td.obligatorio = 1
       ORDER BY td.codigo`,
-    [subject.kind === "PROVEEDOR" ? subject.providerId : subject.equipmentId],
+    [subject.providerId],
   );
   return rows.map(map_requirement);
 }
@@ -604,7 +624,13 @@ async function is_type_required_db(
   subject: DocumentSubject,
   type: DocumentTypeDefinition,
 ): Promise<boolean> {
-  if (subject.kind === "EQUIPO") return type.appliesTo === "EQUIPO" && type.mandatory;
+  if (subject.kind === "EQUIPO") {
+    const { rows } = await db.query<{ tipo_equipo: string }>(`SELECT tipo_equipo FROM equipos_proveedor WHERE id = $1`, [
+      subject.equipmentId,
+    ]);
+    const category = find_equipment_type(rows[0]?.tipo_equipo ?? "")?.category ?? null;
+    return list_required_equipment_documents(category).some((item) => item.code === type.code);
+  }
   if (subject.kind === "PROVEEDOR") return type.appliesTo === "PROVEEDOR" && type.mandatory;
   if (type.mandatory) return type.appliesTo === "EMPLEADO_PROVEEDOR";
   if (!type.workTypeCode) return false;
@@ -1251,6 +1277,7 @@ export function create_contractor_repositories_azure(): ContractorRepositories {
       },
       async add_equipment(providerId, input, actor) {
         const equipmentType = require_text(input.equipmentType, "El tipo de equipo").toUpperCase();
+        if (!find_equipment_type(equipmentType)) throw new ValidationError("Elige un tipo de equipo de la lista");
         return with_transaction(async (db) => {
           await authorize_provider_db(db, actor, providerId);
           const actorId = get_signer_actor_id(actor);

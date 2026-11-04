@@ -3,12 +3,14 @@ import {
   documentTypes,
   find_document_type,
   is_work_type_code,
+  list_required_equipment_documents,
   maxDocumentFileBytes,
   type DocumentTypeDefinition,
   type WorkTypeCode,
 } from "@/config/documentos_contratista";
 import type { PermissionCode } from "@/config/permisos";
 import { lockoutMinutes, maxFailedAttempts } from "@/config/seguridad";
+import { find_equipment_type } from "@/config/tipos_equipo";
 import {
   find_contractor_type,
   maxOtherContractorTypeLength,
@@ -140,7 +142,11 @@ function find_latest_version(store: ContractorStore, documentId: string): Docume
 /** Tipos que el sujeto debe cumplir: los obligatorios + el DC-3 de los trabajos declarados. */
 function list_required_types(store: ContractorStore, subject: DocumentSubject): DocumentTypeDefinition[] {
   if (subject.kind === "EQUIPO") {
-    return documentTypes.filter((type) => type.appliesTo === "EQUIPO" && type.mandatory);
+    // Los documentos dependen de la categoría del tipo (Equipos / Unidades); un tipo fuera del catálogo solo
+    // exige los generales.
+    const equipment = store.equipment.find((e) => e.id === subject.equipmentId);
+    const category = find_equipment_type(equipment?.equipmentType ?? "")?.category ?? null;
+    return list_required_equipment_documents(category);
   }
   if (subject.kind === "PROVEEDOR") {
     return documentTypes.filter((type) => type.appliesTo === "PROVEEDOR" && type.mandatory);
@@ -792,12 +798,14 @@ export function create_contractor_repositories(
       },
       async add_equipment(providerId, input, actor) {
         await authorize_provider(actor, providerId);
+        const equipmentType = require_text(input.equipmentType, "El tipo de equipo").toUpperCase();
+        if (!find_equipment_type(equipmentType)) throw new ValidationError("Elige un tipo de equipo de la lista");
         const now = new Date().toISOString();
         const actorId = get_signer_actor_id(actor);
         const equipment = {
           id: store.nextId.equipment++,
           providerId,
-          equipmentType: require_text(input.equipmentType, "El tipo de equipo").toUpperCase(),
+          equipmentType,
           description: optional_text(input.description),
           brand: optional_text(input.brand),
           model: optional_text(input.model),

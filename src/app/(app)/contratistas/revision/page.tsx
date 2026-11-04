@@ -3,6 +3,7 @@ import { cardClass, inputClass, labelClass } from "@/components/administracion/e
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { find_document_type } from "@/config/documentos_contratista";
+import { format_equipment_type } from "@/config/tipos_equipo";
 import type { DocumentSubject } from "@/domain/contratistas";
 import { review_document_action } from "@/lib/contratistas/acciones";
 import { format_date } from "@/lib/administracion/etiquetas";
@@ -46,7 +47,7 @@ export default async function DocumentReviewPage() {
         const equipment = (await repositories.equipment.list_equipment(item.providerId, { includeInactive: true })).find(
           (candidate) => candidate.id === subject.equipmentId,
         );
-        return [key, equipment ? `Equipo motorizado: ${equipment.equipmentType}` : key] as const;
+        return [key, equipment ? `Equipo motorizado: ${format_equipment_type(equipment.equipmentType)}` : key] as const;
       }),
     ),
   ]);

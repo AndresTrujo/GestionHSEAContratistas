@@ -409,6 +409,16 @@ CREATE TABLE dbo.empleado_proveedor_trabajos (
   PRIMARY KEY (empleado_proveedor_id, tipo_trabajo_codigo)
 );
 
+-- Tipos de equipo motorizado (catálogo). La categoría decide qué documentos se exigen: Equipos (certificado de
+-- operación segura + seguro) y Unidades (tarjeta de circulación + seguro + verificación).
+-- equipos_proveedor.tipo_equipo guarda el código; sin FK porque puede haber registros anteriores con texto libre.
+CREATE TABLE dbo.tipos_equipo (
+  codigo                  nvarchar(450) NOT NULL PRIMARY KEY,
+  nombre                  nvarchar(450) NOT NULL,
+  categoria               nvarchar(10) NOT NULL CHECK (categoria IN (N'EQUIPO', N'UNIDAD')),
+  activo                  bit NOT NULL DEFAULT 1
+);
+
 CREATE TABLE dbo.equipos_proveedor (
   id                      int IDENTITY(1,1) NOT NULL PRIMARY KEY,
   proveedor_id            int NOT NULL REFERENCES dbo.proveedores(id),
@@ -472,7 +482,10 @@ CREATE TABLE dbo.tipos_documento (
   tipo_trabajo_codigo     nvarchar(450) NULL REFERENCES dbo.tipos_trabajo(codigo),
   permiso_revision        nvarchar(450) NOT NULL REFERENCES dbo.permisos(codigo),
   activo                  bit NOT NULL DEFAULT 1,
-  CHECK (tipo_trabajo_codigo IS NULL OR (aplica_a = N'EMPLEADO' AND obligatorio = 0))
+  -- Solo para documentos de equipo: categoría de tipos_equipo a la que se exige; NULL = a todas (p. ej. el seguro).
+  categoria_equipo        nvarchar(10) NULL CHECK (categoria_equipo IN (N'EQUIPO', N'UNIDAD')),
+  CHECK (tipo_trabajo_codigo IS NULL OR (aplica_a = N'EMPLEADO' AND obligatorio = 0)),
+  CHECK (categoria_equipo IS NULL OR aplica_a = N'EQUIPO')
 );
 
 -- Un "expediente" por sujeto y tipo de documento; las versiones cuelgan de él.
@@ -970,7 +983,11 @@ CREATE VIEW dbo.v_semaforo_equipo_proveedor AS
               ELSE N'AMARILLO' END AS semaforo
     FROM dbo.equipos_proveedor e
     JOIN dbo.proveedores p ON p.id = e.proveedor_id
+    LEFT JOIN dbo.tipos_equipo te ON te.codigo = e.tipo_equipo
+    -- Documentos exigidos según la categoría del tipo (Equipos / Unidades); los generales (categoria_equipo NULL)
+    -- aplican a todos, incluidos los registros anteriores cuyo tipo ya no está en el catálogo.
     JOIN dbo.tipos_documento td ON td.aplica_a = N'EQUIPO' AND td.activo = 1 AND td.obligatorio = 1
+     AND (td.categoria_equipo IS NULL OR td.categoria_equipo = te.categoria)
     LEFT JOIN dbo.v_documentos_estado de
       ON de.equipo_proveedor_id = e.id AND de.tipo_documento_codigo = td.codigo
    WHERE e.activo = 1
@@ -1506,11 +1523,29 @@ INSERT INTO dbo.tipos_documento
   (N'INDUCCION',      N'Curso de inducción (vigencia 2 años)',   N'EMPLEADO', N'CAPACITACION',  1, 24,   NULL, N'contratistas:revisar_documentos'),
   (N'DC3_CALIENTES',  N'DC-3 trabajos calientes',                N'EMPLEADO', N'CERTIFICACION', 0, NULL, N'CALIENTES',  N'contratistas:revisar_documentos'),
   (N'DC3_ALTURAS',    N'DC-3 trabajos en alturas',               N'EMPLEADO', N'CERTIFICACION', 0, NULL, N'ALTURAS',    N'contratistas:revisar_documentos'),
-  (N'DC3_CONFINADOS', N'DC-3 espacios confinados',               N'EMPLEADO', N'CERTIFICACION', 0, NULL, N'CONFINADOS', N'contratistas:revisar_documentos'),
-  -- Equipos motorizados: cinco documentos obligatorios por equipo.
-  (N'CERT_CALIDAD',       N'Certificado de calidad',     N'EQUIPO', N'CERTIFICACION', 1, NULL, NULL, N'contratistas:revisar_documentos'),
-  (N'PROG_MANTENIMIENTO', N'Programa de mantenimiento',  N'EQUIPO', N'CERTIFICACION', 1, NULL, NULL, N'contratistas:revisar_documentos'),
-  (N'POLIZA_SEGURO',      N'Póliza de seguro',           N'EQUIPO', N'CERTIFICACION', 1, 12,   NULL, N'contratistas:revisar_documentos'),
-  (N'VERIF_VEHICULAR',    N'Verificación vehicular',     N'EQUIPO', N'CERTIFICACION', 1, 6,    NULL, N'contratistas:revisar_documentos'),
-  (N'TENENCIA_VEHICULAR', N'Tenencia vehicular',         N'EQUIPO', N'CERTIFICACION', 1, 12,   NULL, N'contratistas:revisar_documentos');
+  (N'DC3_CONFINADOS', N'DC-3 espacios confinados',               N'EMPLEADO', N'CERTIFICACION', 0, NULL, N'CONFINADOS', N'contratistas:revisar_documentos');
+GO
+
+-- Equipos motorizados: los documentos obligatorios dependen de la categoría del tipo de equipo.
+--   Equipos (EQUIPO): certificado de operación segura + seguro.
+--   Unidades (UNIDAD): tarjeta de circulación + seguro + verificación.
+-- Sin vigencia_meses el certificado de operación segura y la tarjeta: la vigencia sale de la fecha de vencimiento
+-- que se capture al subirlos. Seguro y verificación vencen por tiempo desde su emisión.
+INSERT INTO dbo.tipos_documento
+  (codigo, nombre, aplica_a, categoria, obligatorio, vigencia_meses, tipo_trabajo_codigo, permiso_revision, categoria_equipo) VALUES
+  (N'CERT_OPERACION_SEGURA', N'Certificado de operación segura (vigente)', N'EQUIPO', N'CERTIFICACION', 1, NULL, NULL, N'contratistas:revisar_documentos', N'EQUIPO'),
+  (N'TARJETA_CIRCULACION',   N'Tarjeta de circulación',                    N'EQUIPO', N'CERTIFICACION', 1, NULL, NULL, N'contratistas:revisar_documentos', N'UNIDAD'),
+  (N'POLIZA_SEGURO',         N'Seguro vigente',                            N'EQUIPO', N'CERTIFICACION', 1, 12,   NULL, N'contratistas:revisar_documentos', NULL),
+  (N'VERIF_VEHICULAR',       N'Verificación vehicular',                    N'EQUIPO', N'CERTIFICACION', 1, 6,    NULL, N'contratistas:revisar_documentos', N'UNIDAD');
+GO
+
+INSERT INTO dbo.tipos_equipo (codigo, nombre, categoria) VALUES
+  (N'GRUA',                    N'Grúa',                    N'EQUIPO'),
+  (N'MONTACARGAS',             N'Montacargas',             N'EQUIPO'),
+  (N'PLATAFORMA_AUTOELEVABLE', N'Plataforma autoelevable', N'EQUIPO'),
+  (N'VEHICULO_PICKUP',         N'Vehículo (Pickup)',       N'UNIDAD'),
+  (N'VEHICULO_SEDAN',          N'Vehículo (Sedán)',        N'UNIDAD'),
+  (N'CAMION',                  N'Camión',                  N'UNIDAD'),
+  (N'CAMION_DE_CARGA',         N'Camión de carga',         N'UNIDAD'),
+  (N'CAMIONETA_3_TONS',        N'Camioneta de 3 Tons',     N'UNIDAD');
 GO
