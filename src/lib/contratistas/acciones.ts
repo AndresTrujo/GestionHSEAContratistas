@@ -122,10 +122,9 @@ function assert_can_register_employees(session: Session, providerId: number): vo
 }
 
 export async function add_provider_employee_action(_previous: ActionState, formData: FormData): Promise<ActionState> {
-  return run_action([], async (session, actor) => {
-    const providerId = read_id(formData, "providerId");
+  const providerId = read_id(formData, "providerId");
+  return run_action([`/contratistas/${providerId}/personal`], async (session, actor) => {
     assert_can_register_employees(session, providerId);
-    revalidatePath(`/contratistas/${providerId}/personal`);
     const employee = await get_repositories().providerEmployees.add_employee(
       providerId,
       {
@@ -149,10 +148,9 @@ export async function add_provider_employee_action(_previous: ActionState, formD
 }
 
 export async function import_provider_employees_action(_previous: ActionState, formData: FormData): Promise<ActionState> {
-  return run_action([], async (session, actor) => {
-    const providerId = read_id(formData, "providerId");
+  const providerId = read_id(formData, "providerId");
+  return run_action([`/contratistas/${providerId}/personal`], async (session, actor) => {
     assert_can_register_employees(session, providerId);
-    revalidatePath(`/contratistas/${providerId}/personal`);
     const file = formData.get("file");
     if (!(file instanceof File) || file.size === 0) throw new ValidationError("Selecciona el archivo CSV");
     if (file.size > 1024 * 1024) throw new ValidationError("El archivo CSV excede 1 MB");
@@ -185,9 +183,8 @@ export async function import_provider_employees_action(_previous: ActionState, f
 }
 
 export async function deactivate_provider_employee_action(_previous: ActionState, formData: FormData): Promise<ActionState> {
-  return run_action([], async (_session, actor) => {
-    const providerId = read_id(formData, "providerId");
-    revalidatePath(`/contratistas/${providerId}/personal`);
+  const providerId = read_id(formData, "providerId");
+  return run_action([`/contratistas/${providerId}/personal`], async (_session, actor) => {
     await get_repositories().providerEmployees.deactivate_employee(read_id(formData, "employeeId"), read_text(formData, "reason"), actor);
     return "Colaborador dado de baja.";
   });
@@ -198,14 +195,14 @@ export async function deactivate_provider_employee_action(_previous: ActionState
  * Además del administrador del proveedor y del personal TFS, el propio colaborador puede subir la suya.
  */
 export async function upload_employee_photo_action(_previous: ActionState, formData: FormData): Promise<ActionState> {
+  const returnPath = read_text(formData, "returnPath");
   return run_action(
-    [],
+    returnPath ? [returnPath] : [],
     async (session, actor) => {
       const employeeId = read_id(formData, "employeeId");
       if (session.kind === "USUARIO_PROVEEDOR" && !session.isAdministrator && session.providerEmployeeId !== employeeId) {
         throw new AccessDeniedError("ser el propio colaborador o el administrador del proveedor");
       }
-      revalidatePath(read_text(formData, "returnPath"));
       const file = formData.get("file");
       if (!(file instanceof File)) throw new ValidationError("Selecciona una fotografía");
       await upload_employee_photo(employeeId, file, actor);
@@ -216,18 +213,17 @@ export async function upload_employee_photo_action(_previous: ActionState, formD
 }
 
 export async function delete_employee_photo_action(_previous: ActionState, formData: FormData): Promise<ActionState> {
-  return run_action([], async (_session, actor) => {
-    revalidatePath(read_text(formData, "returnPath"));
+  const returnPath = read_text(formData, "returnPath");
+  return run_action(returnPath ? [returnPath] : [], async (_session, actor) => {
     await delete_employee_photo(read_id(formData, "employeeId"), read_text(formData, "reason"), actor);
     return "Fotografía eliminada. Sin fotografía no se genera la pantalla de acceso.";
   });
 }
 
 export async function set_work_types_action(_previous: ActionState, formData: FormData): Promise<ActionState> {
-  return run_action([], async (_session, actor) => {
-    const providerId = read_id(formData, "providerId");
-    const employeeId = read_id(formData, "employeeId");
-    revalidatePath(`/contratistas/${providerId}/personal/${employeeId}/documentos`);
+  const providerId = read_id(formData, "providerId");
+  const employeeId = read_id(formData, "employeeId");
+  return run_action([`/contratistas/${providerId}/personal/${employeeId}/documentos`], async (_session, actor) => {
     const workTypes: WorkTypeCode[] = formData
       .getAll("workTypes")
       .filter((value): value is string => typeof value === "string")
@@ -240,9 +236,8 @@ export async function set_work_types_action(_previous: ActionState, formData: Fo
 /* ---- Equipos ---- */
 
 export async function add_equipment_action(_previous: ActionState, formData: FormData): Promise<ActionState> {
-  return run_action([], async (_session, actor) => {
-    const providerId = read_id(formData, "providerId");
-    revalidatePath(`/contratistas/${providerId}/equipos`);
+  const providerId = read_id(formData, "providerId");
+  return run_action([`/contratistas/${providerId}/equipos`], async (_session, actor) => {
     await get_repositories().equipment.add_equipment(
       providerId,
       {
@@ -260,9 +255,8 @@ export async function add_equipment_action(_previous: ActionState, formData: For
 }
 
 export async function deactivate_equipment_action(_previous: ActionState, formData: FormData): Promise<ActionState> {
-  return run_action([], async (_session, actor) => {
-    const providerId = read_id(formData, "providerId");
-    revalidatePath(`/contratistas/${providerId}/equipos`);
+  const providerId = read_id(formData, "providerId");
+  return run_action([`/contratistas/${providerId}/equipos`], async (_session, actor) => {
     await get_repositories().equipment.deactivate_equipment(read_id(formData, "equipmentId"), read_text(formData, "reason"), actor);
     return "Equipo motorizado dado de baja.";
   });
@@ -317,8 +311,8 @@ export async function review_document_action(_previous: ActionState, formData: F
 
 /** Elimina a mano el archivo de una versión (administrador del proveedor o `contratistas:gestionar`); el registro se conserva. */
 export async function delete_document_file_action(_previous: ActionState, formData: FormData): Promise<ActionState> {
-  return run_action([], async (_session, actor) => {
-    revalidatePath(read_text(formData, "returnPath"));
+  const returnPath = read_text(formData, "returnPath");
+  return run_action(returnPath ? [returnPath] : [], async (_session, actor) => {
     await delete_document_file(read_text(formData, "versionId"), read_text(formData, "reason"), actor);
     return "Archivo eliminado. Se conserva el registro del documento para trazabilidad.";
   });
