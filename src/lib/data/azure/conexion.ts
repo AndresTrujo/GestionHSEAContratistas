@@ -9,7 +9,10 @@ export interface Queryable {
   query<T>(text: string, params?: unknown[]): Promise<{ rows: T[]; rowCount: number }>;
 }
 
-const globalPool = globalThis as typeof globalThis & { azurePool?: Promise<ConnectionPool> };
+/** Umbral (ms) a partir del cual se registra una consulta o transacción como lenta. */
+const slowQueryMs = Number(process.env.DATABASE_SLOW_QUERY_MS ?? 3000);
+
+const globalPool =globalThis as typeof globalThis & { azurePool?: Promise<ConnectionPool> };
 
 /**
  * Autenticación de la cadena: usuario y contraseña de SQL (por omisión) o Microsoft Entra ID mediante
@@ -153,9 +156,18 @@ async function run_query<T>(
   text: string,
   params?: unknown[],
 ): Promise<{ rows: T[]; rowCount: number }> {
+  const startedAt = Date.now();
   const request = await make_request();
+  const acquiredMs = Date.now() - startedAt;
   bind_params(request, params);
   const result = await request.query<T>(text.replace(/\$(\d+)/g, "@p$1"));
+  // Diagnóstico de cuelgues: separa "esperó una conexión del pool" de "la consulta tardó" (bloqueos, red).
+  const totalMs = Date.now() - startedAt;
+  if (totalMs >= slowQueryMs) {
+    console.warn(
+      `[azure-sql] consulta lenta: ${totalMs} ms (${acquiredMs} ms esperando conexión) :: ${text.replace(/\s+/g, " ").trim().slice(0, 120)}`,
+    );
+  }
   const recordsets = result.recordsets as IRecordSet<T>[];
   // Si la consulta devuelve varios conjuntos (p. ej. INSERT seguido de SELECT), el resultado es el último.
   const last = Array.isArray(recordsets) && recordsets.length > 0 ? recordsets[recordsets.length - 1] : undefined;
@@ -176,8 +188,10 @@ export function get_db(): Queryable {
  * confirman o se revierten juntos. Si `work` lanza, se hace ROLLBACK.
  */
 export async function with_transaction<T>(work: (db: Queryable) => Promise<T>): Promise<T> {
+  const startedAt = Date.now();
   const transaction = new sql.Transaction(await get_pool());
   await transaction.begin();
+  const beganMs = Date.now() - startedAt;
   try {
     const result = await work({
       query<R>(text: string, params?: unknown[]) {
@@ -185,8 +199,13 @@ export async function with_transaction<T>(work: (db: Queryable) => Promise<T>): 
       },
     });
     await transaction.commit();
+    const totalMs = Date.now() - startedAt;
+    if (totalMs >= slowQueryMs) {
+      console.warn(`[azure-sql] transacción lenta: ${totalMs} ms (${beganMs} ms en abrirla)`);
+    }
     return result;
   } catch (error) {
+    console.warn(`[azure-sql] transacción revertida tras ${Date.now() - startedAt} ms: ${describe_error_chain(error)}`);
     await transaction.rollback().catch(() => undefined);
     throw error;
   }
