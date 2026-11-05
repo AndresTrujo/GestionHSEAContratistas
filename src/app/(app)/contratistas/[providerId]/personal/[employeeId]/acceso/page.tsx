@@ -4,7 +4,8 @@ import QRCode from "qrcode";
 import { cardClass } from "@/components/administracion/estilos";
 import { SemaphoreBadge } from "@/components/contratistas/SemaphoreBadge";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
-import { create_access_token } from "@/lib/acceso/token_acceso";
+import { build_access_url, create_access_token } from "@/lib/acceso/token_acceso";
+import { get_app_base_url } from "@/lib/acceso/url_base";
 import { can_manage_provider, require_provider_access } from "@/lib/auth/guardas";
 import { get_repositories } from "@/lib/data/proveedor_datos";
 
@@ -38,7 +39,12 @@ export default async function EmployeeAccessPage({ params }: AccessPageProps) {
     .join(" ");
   const canGenerate = employee.active && semaphore === "VERDE" && photo !== null;
   const qrImage = canGenerate
-    ? await QRCode.toDataURL(create_access_token(employeeId), { errorCorrectionLevel: "M", margin: 2, width: 320 })
+    ? // El QR lleva una URL: la cámara nativa del teléfono abre /acceso/qr y el escáner de la app extrae el token.
+      await QRCode.toDataURL(build_access_url(await get_app_base_url(), create_access_token(employeeId)), {
+        errorCorrectionLevel: "M",
+        margin: 2,
+        width: 320,
+      })
     : null;
 
   const missing = [

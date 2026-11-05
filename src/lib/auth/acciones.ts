@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { safe_next_path, with_next } from "./destino";
 import { get_client_address } from "./ip_cliente";
 import { clear_login_failures, get_lockout_seconds, record_login_failure } from "./limite_intentos";
 import { minPasswordLength } from "./secreto";
@@ -33,13 +34,14 @@ async function start_session(identity: SessionIdentity): Promise<void> {
  * pero ya se valida que exista y esté activo. La identidad queda en una cookie firmada.
  */
 export async function login_employee_action(formData: FormData): Promise<void> {
+  const nextPath = safe_next_path(formData.get("next"));
   const employeeNumber = read_text(formData, "employeeNumber");
-  if (!employeeNumber) redirect("/login?error=required");
+  if (!employeeNumber) redirect(with_next("/login?error=required", nextPath));
 
   // Sin contraseña, el freno es por IP: cada número inválido o inactivo cuenta como intento fallido.
   const throttleKeys = [`empleado-ip:${await get_client_address()}`];
   const waitSeconds = get_lockout_seconds(throttleKeys);
-  if (waitSeconds > 0) redirect(`/login?error=throttled&espera=${waitSeconds}`);
+  if (waitSeconds > 0) redirect(with_next(`/login?error=throttled&espera=${waitSeconds}`, nextPath));
 
   const repositories = get_repositories();
   const employee = /^\d{1,9}$/.test(employeeNumber) ? await repositories.employees.find_by_number(employeeNumber) : null;
@@ -49,9 +51,9 @@ export async function login_employee_action(formData: FormData): Promise<void> {
       await log_server_event("WARN", "login", "Inicio de sesión de empleado bloqueado por intentos fallidos", {
         context: { clave: throttleKeys[0] ?? null, bloqueoSegundos: lockSeconds },
       });
-      redirect(`/login?error=throttled&espera=${lockSeconds}`);
+      redirect(with_next(`/login?error=throttled&espera=${lockSeconds}`, nextPath));
     }
-    redirect("/login?error=invalid_employee");
+    redirect(with_next("/login?error=invalid_employee", nextPath));
   }
 
   clear_login_failures(throttleKeys);
@@ -65,20 +67,21 @@ export async function login_employee_action(formData: FormData): Promise<void> {
     occurredAt: new Date().toISOString(),
     details: {},
   });
-  redirect("/inicio");
+  redirect(nextPath ?? "/inicio");
 }
 
 /** Login de proveedores: usuario de 8 caracteres + contraseña. El repositorio cuenta los intentos y bloquea. */
 export async function login_provider_action(formData: FormData): Promise<void> {
+  const nextPath = safe_next_path(formData.get("next"));
   const username = read_text(formData, "username");
   const rawPassword = formData.get("password");
   const password = typeof rawPassword === "string" ? rawPassword : "";
-  if (!username || !password) redirect("/login?tipo=proveedor&error=required");
+  if (!username || !password) redirect(with_next("/login?tipo=proveedor&error=required", nextPath));
 
   // El freno cuenta por usuario (protege la cuenta) y por IP (frena el barrido de varios usuarios).
   const throttleKeys = [`proveedor-usuario:${username.toLowerCase()}`, `proveedor-ip:${await get_client_address()}`];
   const waitSeconds = get_lockout_seconds(throttleKeys);
-  if (waitSeconds > 0) redirect(`/login?tipo=proveedor&error=throttled&espera=${waitSeconds}`);
+  if (waitSeconds > 0) redirect(with_next(`/login?tipo=proveedor&error=throttled&espera=${waitSeconds}`, nextPath));
 
   const result = await get_repositories().providerUsers.login(username, password);
   if (!result.ok) {
@@ -88,7 +91,7 @@ export async function login_provider_action(formData: FormData): Promise<void> {
         await log_server_event("WARN", "login", "Inicio de sesión de proveedor bloqueado por intentos fallidos", {
           context: { usuario: username.toLowerCase(), bloqueoSegundos: lockSeconds },
         });
-        redirect(`/login?tipo=proveedor&error=throttled&espera=${lockSeconds}`);
+        redirect(with_next(`/login?tipo=proveedor&error=throttled&espera=${lockSeconds}`, nextPath));
       }
     }
     const errorByReason = {
@@ -97,12 +100,12 @@ export async function login_provider_action(formData: FormData): Promise<void> {
       USUARIO_INACTIVO: "inactive",
       PROVEEDOR_SUSPENDIDO: "suspended",
     } as const;
-    redirect(`/login?tipo=proveedor&error=${errorByReason[result.reason]}`);
+    redirect(with_next(`/login?tipo=proveedor&error=${errorByReason[result.reason]}`, nextPath));
   }
 
   clear_login_failures(throttleKeys);
   await start_session({ kind: "USUARIO_PROVEEDOR", id: String(result.user.id) });
-  redirect(result.user.mustChangePassword ? "/cambiar-password" : "/inicio");
+  redirect(result.user.mustChangePassword ? "/cambiar-password" : (nextPath ?? "/inicio"));
 }
 
 /** Cambio de contraseña del usuario de proveedor en sesión (obligatorio tras recibir una temporal). */

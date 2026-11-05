@@ -1,10 +1,11 @@
 ﻿import Link from "next/link";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { login_employee_action, login_provider_action } from "@/lib/auth/acciones";
+import { safe_next_path, with_next } from "@/lib/auth/destino";
 import { format_wait } from "@/lib/auth/limite_intentos";
 
 interface LoginPageProps {
-  searchParams: Promise<{ error?: string; tipo?: string; espera?: string }>;
+  searchParams: Promise<{ error?: string; tipo?: string; espera?: string; next?: string }>;
 }
 
 const errorMessages: Record<string, string> = {
@@ -23,7 +24,8 @@ const submitClass =
   "mt-2 inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-brand-green px-4 py-2 font-bold text-white shadow-sm transition hover:brightness-95";
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
-  const { error, tipo, espera } = await searchParams;
+  const { error, tipo, espera, next } = await searchParams;
+  const nextPath = safe_next_path(next);
   const isProvider = tipo === "proveedor";
   const waitSeconds = Number(espera);
   const errorMessage =
@@ -49,10 +51,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         </h1>
 
         <nav aria-label="Tipo de acceso" className="mb-6 flex gap-1 rounded-lg bg-neutral-light/40 p-1">
-          <Link href="/login" aria-current={!isProvider ? "page" : undefined} className={get_tab_class(!isProvider)}>
+          <Link href={with_next("/login", nextPath)} aria-current={!isProvider ? "page" : undefined} className={get_tab_class(!isProvider)}>
             Empleado TFS
           </Link>
-          <Link href="/login?tipo=proveedor" aria-current={isProvider ? "page" : undefined} className={get_tab_class(isProvider)}>
+          <Link href={with_next("/login?tipo=proveedor", nextPath)} aria-current={isProvider ? "page" : undefined} className={get_tab_class(isProvider)}>
             Proveedor
           </Link>
         </nav>
@@ -65,6 +67,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
         {isProvider ? (
           <form action={login_provider_action}>
+            {nextPath && <input type="hidden" name="next" value={nextPath} />}
             <label htmlFor="username" className={labelClass}>
               Usuario
             </label>
@@ -94,6 +97,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           </form>
         ) : (
           <form action={login_employee_action}>
+            {nextPath && <input type="hidden" name="next" value={nextPath} />}
             <label htmlFor="employeeNumber" className={labelClass}>
               Número de empleado
             </label>
