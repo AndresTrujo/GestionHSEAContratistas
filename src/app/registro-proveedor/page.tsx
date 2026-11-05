@@ -28,6 +28,21 @@ export default function ProviderRegistrationPage() {
             <label htmlFor="imssEmployerRegistration" className={labelClass}>Registro patronal del IMSS (opcional)</label>
             <input id="imssEmployerRegistration" name="imssEmployerRegistration" className={inputClass} />
           </div>
+          <fieldset className="space-y-3 rounded border border-neutral-light p-3">
+            <legend className="px-1 text-sm font-bold text-brand-navy">Responsable (administrador de la cuenta)</legend>
+            <div>
+              <label htmlFor="contactFirstName" className={labelClass}>Nombre(s)</label>
+              <input id="contactFirstName" name="contactFirstName" required className={inputClass} />
+            </div>
+            <div>
+              <label htmlFor="contactPaternalSurname" className={labelClass}>Apellido paterno</label>
+              <input id="contactPaternalSurname" name="contactPaternalSurname" required className={inputClass} />
+            </div>
+            <div>
+              <label htmlFor="contactMaternalSurname" className={labelClass}>Apellido materno (opcional)</label>
+              <input id="contactMaternalSurname" name="contactMaternalSurname" className={inputClass} />
+            </div>
+          </fieldset>
           <div>
             <label htmlFor="contactEmail" className={labelClass}>Correo de contacto</label>
             <input id="contactEmail" name="contactEmail" type="email" required className={inputClass} />

@@ -129,6 +129,9 @@ interface ProviderRow extends ProviderAuditCols {
   estatus: ProviderStatus;
   /** Giro escrito con el tipo "OTRO"; null si no aplica. */
   giro_otro: string | null;
+  contacto_nombre: string | null;
+  contacto_apellido_paterno: string | null;
+  contacto_apellido_materno: string | null;
   /** Códigos separados por coma (STRING_AGG); vacío si no hay. */
   tipos: string;
 }
@@ -276,6 +279,9 @@ function map_provider(row: ProviderRow): Provider {
       (code): code is ContractorTypeCode => find_contractor_type(code) !== undefined,
     ),
     otherContractorType: row.giro_otro,
+    contactFirstName: row.contacto_nombre,
+    contactPaternalSurname: row.contacto_apellido_paterno,
+    contactMaternalSurname: row.contacto_apellido_materno,
     ...map_audit(row),
   };
 }
@@ -733,12 +739,16 @@ export function create_contractor_repositories_azure(): ContractorRepositories {
           throw new ValidationError(`El giro no puede exceder ${maxOtherContractorTypeLength} caracteres`);
         }
 
+        const contactFirstName = require_text(input.contactFirstName, "El nombre del responsable");
+        const contactPaternalSurname = require_text(input.contactPaternalSurname, "El apellido paterno del responsable");
+
         try {
           return await with_transaction(async (db) => {
             const { rows } = await db.query<{ id: number }>(
               `INSERT INTO proveedores
-                 (razon_social, rfc, registro_patronal_imss, correo_contacto, telefono, giro_otro, creado_por, actualizado_por)
-               VALUES ($1, $2, $3, $4, $5, $6, 'AUTOREGISTRO', 'AUTOREGISTRO');
+                 (razon_social, rfc, registro_patronal_imss, correo_contacto, telefono, giro_otro,
+                  contacto_nombre, contacto_apellido_paterno, contacto_apellido_materno, creado_por, actualizado_por)
+               VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'AUTOREGISTRO', 'AUTOREGISTRO');
                SELECT CAST(SCOPE_IDENTITY() AS int) AS id`,
               [
                 name,
@@ -747,6 +757,9 @@ export function create_contractor_repositories_azure(): ContractorRepositories {
                 contactEmail,
                 optional_text(input.phone),
                 otherContractorType || null,
+                contactFirstName,
+                contactPaternalSurname,
+                optional_text(input.contactMaternalSurname),
               ],
             );
             const id = rows[0]?.id;

@@ -1,6 +1,7 @@
 "use client";
 
 import { startTransition, useActionState, useEffect, useRef, type FormEvent, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { initialActionState, type ActionState } from "@/lib/administracion/estado";
 import { dangerButtonClass, primaryButtonClass, secondaryButtonClass } from "./estilos";
 
@@ -17,6 +18,48 @@ const buttonClassByVariant = {
   danger: dangerButtonClass,
   secondary: secondaryButtonClass,
 } as const;
+
+/** Modal con el usuario y la contraseña de la cuenta administradora recién creada (se muestran una sola vez). */
+function AdminAccountDialog({ account }: { account: NonNullable<ActionState["adminAccount"]> }) {
+  const router = useRouter();
+  const dialogRef = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (dialog && !dialog.open) dialog.showModal();
+  }, []);
+
+  return (
+    <dialog
+      ref={dialogRef}
+      aria-labelledby="admin-account-title"
+      onCancel={(event) => event.preventDefault()}
+      onClose={() => router.refresh()}
+      className="m-auto w-[calc(100%-2rem)] max-w-md rounded-lg p-6 shadow-lg backdrop:bg-brand-navy/60"
+    >
+      <h2 id="admin-account-title" className="mb-1 text-2xl uppercase text-brand-navy">Cuenta creada</h2>
+      <p className="mb-4 text-sm text-neutral-dark">
+        Se creó la cuenta administradora de <strong>{account.providerName}</strong> para {account.name}.
+      </p>
+      <dl className="space-y-2 rounded border border-brand-cyan bg-neutral-light px-3 py-3 text-sm">
+        <div>
+          <dt className="text-xs font-bold text-neutral-dark">Usuario</dt>
+          <dd><code className="text-lg font-bold text-brand-navy">{account.username}</code></dd>
+        </div>
+        <div>
+          <dt className="text-xs font-bold text-neutral-dark">Contraseña temporal</dt>
+          <dd><code className="text-lg font-bold text-brand-navy">{account.password}</code></dd>
+        </div>
+      </dl>
+      <p className="mt-3 text-xs text-neutral-dark">
+        Se muestran una sola vez: anótalas y entrégalas al responsable. Deberá cambiar su contraseña al entrar.
+      </p>
+      <button type="button" onClick={() => dialogRef.current?.close()} className={`mt-4 ${primaryButtonClass}`}>
+        Entendido, ya las anoté
+      </button>
+    </dialog>
+  );
+}
 
 /**
  * Formulario que ejecuta una acción de servidor y muestra su resultado en el mismo lugar.
@@ -87,6 +130,7 @@ export function AdminForm({
           </span>
         </div>
       )}
+      {state.adminAccount && <AdminAccountDialog account={state.adminAccount} />}
       {state.secret && (
         <p className="mt-2 rounded border border-brand-cyan bg-neutral-light px-3 py-2 text-sm">
           Contraseña temporal:{" "}

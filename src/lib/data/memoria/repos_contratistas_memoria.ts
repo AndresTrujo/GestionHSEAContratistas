@@ -424,9 +424,15 @@ export function create_contractor_repositories(
           throw new ValidationError(`El giro no puede exceder ${maxOtherContractorTypeLength} caracteres`);
         }
 
+        const contactFirstName = require_text(input.contactFirstName, "El nombre del responsable");
+        const contactPaternalSurname = require_text(input.contactPaternalSurname, "El apellido paterno del responsable");
+
         const now = new Date().toISOString();
         const provider = {
           id: store.nextId.provider++,
+          contactFirstName,
+          contactPaternalSurname,
+          contactMaternalSurname: optional_text(input.contactMaternalSurname),
           name,
           taxId,
           imssEmployerRegistration: optional_text(input.imssEmployerRegistration),

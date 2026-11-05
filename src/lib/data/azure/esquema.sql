@@ -344,7 +344,10 @@ CREATE TABLE dbo.proveedores (
   estatus                 nvarchar(30) NOT NULL DEFAULT N'PENDIENTE_VALIDACION'
                           CHECK (estatus IN (N'PENDIENTE_VALIDACION', N'ACTIVO', N'SUSPENDIDO')),
   giro_otro               nvarchar(300) NULL,               -- giro escrito por el proveedor con el tipo 'OTRO'
-  creado_en               datetimeoffset(3) NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+  contacto_nombre         nvarchar(300) NULL,               -- responsable: base de la cuenta administradora
+  contacto_apellido_paterno nvarchar(300) NULL,
+  contacto_apellido_materno nvarchar(300) NULL,
+  creado_en              datetimeoffset(3) NOT NULL DEFAULT SYSDATETIMEOFFSET(),
   creado_por              nvarchar(450) NULL,               -- 'AUTOREGISTRO' en el alta inicial
   actualizado_en          datetimeoffset(3) NOT NULL DEFAULT SYSDATETIMEOFFSET(),
   actualizado_por         nvarchar(450) NULL,

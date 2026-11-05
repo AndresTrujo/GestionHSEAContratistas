@@ -26,6 +26,10 @@ export interface Provider extends AuditMetadata {
   contractorTypes: ContractorTypeCode[];
   /** Giro que el proveedor escribió con el tipo "OTRO"; null si no eligió ese tipo. */
   otherContractorType: string | null;
+  /** Responsable que se registró: con estos datos se crea la cuenta administradora al aprobar. Null en registros previos. */
+  contactFirstName: string | null;
+  contactPaternalSurname: string | null;
+  contactMaternalSurname: string | null;
 }
 
 /** Cuenta de acceso de proveedor. El hash de la contraseña nunca sale de la capa de datos. */
@@ -236,6 +240,10 @@ export interface RegisterProviderInput {
   contractorTypes: ContractorTypeCode[];
   /** Obligatorio si `contractorTypes` incluye "OTRO"; el repositorio lo limpia y pone la primera letra en mayúscula. */
   otherContractorType?: string | null;
+  /** Responsable de la empresa (será el administrador de la cuenta). */
+  contactFirstName: string;
+  contactPaternalSurname: string;
+  contactMaternalSurname: string | null;
 }
 
 export interface CreateProviderUserInput {

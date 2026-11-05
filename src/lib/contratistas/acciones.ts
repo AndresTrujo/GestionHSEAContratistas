@@ -279,8 +279,8 @@ function read_subject(formData: FormData): DocumentSubject {
 }
 
 export async function upload_document_action(_previous: ActionState, formData: FormData): Promise<ActionState> {
-  return run_action([], async (_session, actor) => {
-    revalidatePath(read_text(formData, "returnPath"));
+  const returnPath = read_text(formData, "returnPath");
+  return run_action(returnPath ? [returnPath] : [], async (_session, actor) => {
     const file = formData.get("file");
     if (!(file instanceof File)) throw new ValidationError("Selecciona un archivo");
     const documentTypeCode = read_text(formData, "documentTypeCode");
@@ -410,6 +410,9 @@ export async function register_provider_action(_previous: ActionState, formData:
       contractorTypes: types,
       // El repositorio lo limpia (espacios) y pone la primera letra en mayúscula; es obligatorio con "Otro".
       otherContractorType: read_optional(formData, "otherContractorType"),
+      contactFirstName: read_text(formData, "contactFirstName"),
+      contactPaternalSurname: read_text(formData, "contactPaternalSurname"),
+      contactMaternalSurname: read_optional(formData, "contactMaternalSurname"),
     });
     return {
       ok: true,

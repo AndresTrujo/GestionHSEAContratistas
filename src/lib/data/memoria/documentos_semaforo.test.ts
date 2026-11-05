@@ -66,6 +66,9 @@ beforeAll(async () => {
     contactEmail: "contacto@prueba.mx",
     phone: null,
     contractorTypes: ["MANTENIMIENTO"],
+    contactFirstName: "Ana",
+    contactPaternalSurname: "Prueba",
+    contactMaternalSurname: null,
   });
   providerId = provider.id;
   await repositories.providers.set_provider_status(providerId, "ACTIVO", null, firstAdminEmployeeNumber);

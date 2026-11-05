@@ -56,13 +56,15 @@ function build_area(scope: RoleScope, formData: FormData): AreaRef {
 
 async function run_action(
   paths: string[],
-  work: (employeeNumber: string) => Promise<{ message: string; secret?: string }>,
+  work: (employeeNumber: string) => Promise<Pick<ActionState, "secret" | "adminAccount"> & { message: string }>,
 ): Promise<ActionState> {
   const session = await require_employee_session();
   try {
     const result = await work(session.employeeNumber);
-    for (const path of paths) revalidatePath(path);
-    return { ok: true, message: result.message, secret: result.secret };
+    // Con credenciales por mostrar no se revalida: la lista cambiaría y desmontaría el formulario (y su modal).
+    // El modal refresca la página al cerrarse.
+    if (!result.adminAccount) for (const path of paths) revalidatePath(path);
+    return { ok: true, message: result.message, secret: result.secret, adminAccount: result.adminAccount };
   } catch (error) {
     if (is_expected_error(error)) return { ok: false, message: error.message };
     throw error;
@@ -232,8 +234,42 @@ export async function set_provider_status_action(_previous: ActionState, formDat
     if (providerId === null || (status !== "ACTIVO" && status !== "SUSPENDIDO")) {
       throw new ValidationError("Solicitud inválida");
     }
-    await get_repositories().providers.set_provider_status(providerId, status, read_optional(formData, "reason"), actor);
-    return { message: status === "ACTIVO" ? "Proveedor activado." : "Proveedor suspendido." };
+    const repositories = get_repositories();
+    const before = await repositories.providers.get_provider(providerId);
+    const provider = await repositories.providers.set_provider_status(providerId, status, read_optional(formData, "reason"), actor);
+    if (status !== "ACTIVO") return { message: "Proveedor suspendido." };
+    if (before?.status !== "PENDIENTE_VALIDACION") return { message: "Proveedor activado." };
+
+    // Aprobación del registro: la cuenta administradora se crea con los datos del formulario de registro.
+    if (!provider.contactFirstName || !provider.contactPaternalSurname) {
+      return { message: "Proveedor activado. El registro no incluye los datos del responsable: crea la cuenta administradora manualmente." };
+    }
+    try {
+      const created = await repositories.providerUsers.create_user(
+        {
+          providerId,
+          firstName: provider.contactFirstName,
+          paternalSurname: provider.contactPaternalSurname,
+          maternalSurname: provider.contactMaternalSurname,
+          providerEmployeeId: null,
+          email: provider.contactEmail,
+          isAdministrator: true,
+        },
+        { kind: "EMPLEADO", employeeNumber: actor },
+      );
+      return {
+        message: "Proveedor aprobado y cuenta administradora creada.",
+        adminAccount: {
+          providerName: provider.name,
+          name: created.user.name,
+          username: created.user.username,
+          password: created.temporaryPassword,
+        },
+      };
+    } catch (error) {
+      if (!is_expected_error(error)) throw error;
+      return { message: `Proveedor activado, pero no se pudo crear la cuenta administradora: ${error.message}. Créala manualmente.` };
+    }
   });
 }
 
