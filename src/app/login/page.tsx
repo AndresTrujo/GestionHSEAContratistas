@@ -117,11 +117,12 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         )}
 
         {isProvider && (
-          <p className="mt-4 text-center text-sm">
-            <Link href="/registro-proveedor" className="text-neutral-dark underline hover:text-brand-navy">
-              Mi empresa aún no está registrada
-            </Link>
-          </p>
+          <Link
+            href="/registro-proveedor"
+            className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-lg bg-brand-navy px-4 py-2 font-bold text-white shadow-sm transition hover:brightness-125 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-cyan"
+          >
+            Registrar mi empresa
+          </Link>
         )}
       </div>
     </main>
