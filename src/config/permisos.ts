@@ -69,7 +69,7 @@ export const signerRoleLabels: Record<SignerRole, string> = {
  * (HSEA, responsable operativo, servicio médico, etc.). Un proveedor no tiene roles:
  * se valida que pertenezca al proveedor del permiso y que su colaborador esté en VERDE.
  */
-export const providerSignerRoles: SignerRole[] = ["executor", "contractor"];
+export const providerSignerRoles: SignerRole[] = ["executor", "requester", "contractor"];
 
 export function get_required_permission(role: SignerRole): PermissionCode | null {
   return signerRolePermission[role];

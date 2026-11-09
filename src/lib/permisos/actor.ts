@@ -17,7 +17,7 @@ export interface PermitActor {
 }
 
 /** Pasos de firma que un usuario de proveedor puede firmar (siempre en permisos de su propia empresa). */
-const providerSignableKeys: string[] = [...providerSignerRoles, "requester"];
+const providerSignableKeys: string[] = [...providerSignerRoles];
 
 export async function require_permit_actor(): Promise<PermitActor> {
   const session = await get_session();
