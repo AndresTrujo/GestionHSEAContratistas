@@ -11,8 +11,8 @@ const nextConfig: NextConfig = {
   ],
   reactStrictMode: true,
   // `mssql` y `tedious` (driver de SQL Server) usan requires dinámicos, `net` y `tls`: se cargan desde
-  // node_modules (que el modo standalone copia), no se empaquetan.
-  serverExternalPackages: ["mssql", "tedious"],
+  // node_modules (que el modo standalone copia), no se empaquetan. `web-push` (notificaciones) igual.
+  serverExternalPackages: ["mssql", "tedious", "web-push"],
   experimental: {
     // Los documentos de contratistas se suben con acciones de servidor (máx. 5 MB por archivo).
     serverActions: {

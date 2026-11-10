@@ -12,6 +12,7 @@ import { adminRoleCode } from "@/config/permisos";
 import type { WorkPermit } from "@/domain/permisos";
 import { get_session } from "@/lib/auth/sesion";
 import { get_repositories } from "@/lib/data/proveedor_datos";
+import { notify_permit_created, notify_permit_signed } from "@/lib/notificaciones/avisos";
 import { employee_actor } from "./actor";
 import { read_permit_area } from "./area";
 import { resolve_provider_staff, resolve_tfs_employee } from "./ejecutantes";
@@ -143,6 +144,7 @@ export async function create_stop_observation(formData: FormData): Promise<void>
     occurredAt: now,
     details: { folio: String(fields.folio), damageClass: String(fields.damageClass) },
   });
+  notify_permit_created(permit, employeeNumber);
   redirect(`${basePath}/${permit.id}`);
 }
 
@@ -194,7 +196,7 @@ export async function sign_stop_observation(formData: FormData): Promise<void> {
   );
   const status = allSigned ? "closed" : permit.status;
 
-  await repositories.permits.save({
+  const updated = await repositories.permits.save({
     ...permit,
     signatures,
     status,
@@ -211,6 +213,7 @@ export async function sign_stop_observation(formData: FormData): Promise<void> {
     details: { event: "sign", key, status },
   });
 
+  notify_permit_signed(permit, updated, key, employeeNumber);
   revalidatePath(detailPath);
   redirect(detailPath);
 }
