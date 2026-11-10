@@ -17,6 +17,7 @@ import {
 } from "@/config/jsa";
 import type { WorkPermit } from "@/domain/permisos";
 import { get_repositories } from "@/lib/data/proveedor_datos";
+import { notify_permit_created, notify_permit_signed } from "@/lib/notificaciones/avisos";
 import { can_access_permit, can_sign_key, require_permit_actor } from "./actor";
 import { read_permit_area } from "./area";
 import { find_jsa_certification_issues, type CertificationIssue } from "./certificaciones_jsa";
@@ -162,6 +163,7 @@ export async function create_jsa(formData: FormData): Promise<void> {
     occurredAt: now,
     details: { folio: String(fields.folio), steps: stepCount },
   });
+  notify_permit_created(permit, employeeNumber);
   redirect(`${basePath}/${permit.id}`);
 }
 
@@ -211,7 +213,7 @@ export async function sign_jsa(formData: FormData): Promise<void> {
   );
   const status = allApproved ? "approved" : permit.status;
 
-  await repositories.permits.save({
+  const updated = await repositories.permits.save({
     ...permit,
     signatures,
     status,
@@ -228,6 +230,7 @@ export async function sign_jsa(formData: FormData): Promise<void> {
     details: { event: "sign", key, status },
   });
 
+  notify_permit_signed(permit, updated, key, employeeNumber);
   revalidatePath(detailPath);
   redirect(detailPath);
 }

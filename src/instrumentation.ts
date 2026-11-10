@@ -3,6 +3,16 @@
  * Node: así el empaquetado del runtime edge nunca ve `pg` ni `fs`.
  */
 
+/**
+ * Next la invoca una vez al arrancar el servidor: aquí se inicia la revisión periódica de recordatorios de
+ * firma (cada 5 minutos; la app corre con Always On, así que el proceso no se duerme).
+ */
+export async function register(): Promise<void> {
+  if (process.env.NEXT_RUNTIME !== "nodejs") return;
+  const { start_reminder_loop } = await import("./lib/notificaciones/recordatorios");
+  start_reminder_loop();
+}
+
 interface RequestErrorInfo {
   path: string;
   method: string;

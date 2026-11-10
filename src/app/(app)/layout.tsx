@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { appModules, is_module_visible } from "@/config/modulos";
 import { get_session } from "@/lib/auth/sesion";
+import { get_vapid_config } from "@/lib/notificaciones/envio";
 
 export default async function AuthenticatedLayout({
   children,
@@ -37,7 +38,7 @@ export default async function AuthenticatedLayout({
       >
         Saltar al contenido
       </a>
-      <AppHeader identity={identity} navItems={navItems} />
+      <AppHeader identity={identity} navItems={navItems} vapidPublicKey={get_vapid_config()?.publicKey ?? null} />
       <main id="contenido" className="mx-auto max-w-6xl px-4 py-8">
         {children}
       </main>

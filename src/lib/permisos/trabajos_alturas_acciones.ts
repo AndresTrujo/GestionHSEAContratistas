@@ -22,6 +22,7 @@ import type { AuditAction } from "@/domain/auditoria";
 import type { WorkPermit } from "@/domain/permisos";
 import { get_session } from "@/lib/auth/sesion";
 import { get_repositories } from "@/lib/data/proveedor_datos";
+import { notify_permit_created, notify_permit_signed } from "@/lib/notificaciones/avisos";
 import {
   can_access_permit,
   can_sign_key,
@@ -150,6 +151,7 @@ export async function create_heights_permit(formData: FormData): Promise<void> {
   await append_audit(permit.id, "crear", employeeNumber, {
     folio: String(fields.folio),
   });
+  notify_permit_created(permit, employeeNumber);
   redirect(`${basePath}/${permit.id}`);
 }
 
@@ -243,7 +245,7 @@ export async function sign_heights_permit(formData: FormData): Promise<void> {
   );
   const status = isApprovalKey && allApproved ? "approved" : permit.status;
 
-  await get_repositories().permits.save({
+  const updated = await get_repositories().permits.save({
     ...permit,
     fields,
     signatures,
@@ -257,6 +259,7 @@ export async function sign_heights_permit(formData: FormData): Promise<void> {
     status,
   });
 
+  notify_permit_signed(permit, updated, key, employeeNumber);
   revalidatePath(detailPath);
   redirect(detailPath);
 }

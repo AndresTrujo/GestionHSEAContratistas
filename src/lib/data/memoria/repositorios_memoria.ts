@@ -15,6 +15,11 @@ import {
   create_contractor_repositories,
   create_provider_signer_lookup,
 } from "./repos_contratistas_memoria";
+import {
+  create_notification_repository,
+  create_notification_store,
+  type NotificationStore,
+} from "./repos_notificaciones_memoria";
 import { create_organization_repositories } from "./repos_organizacion_memoria";
 
 /**
@@ -36,12 +41,14 @@ const globalStore = globalThis as typeof globalThis & {
   memoryStore?: MemoryStore;
   organizationStore?: OrganizationStore;
   contractorStore?: ContractorStore;
+  notificationStore?: NotificationStore;
 };
 
 export function create_memory_repositories(): DataRepositories {
   const store = (globalStore.memoryStore ??= create_store());
   const organizationStore = (globalStore.organizationStore ??= create_organization_store());
   const contractorStore = (globalStore.contractorStore ??= create_contractor_store());
+  const notificationStore = (globalStore.notificationStore ??= create_notification_store());
 
   function upsert<T extends { id: string }>(list: T[], item: T): T {
     const index = list.findIndex((existing) => existing.id === item.id);
@@ -106,6 +113,14 @@ export function create_memory_repositories(): DataRepositories {
     async list_by_type(permitTypeSlug) {
       return store.permits.filter((permit) => permit.permitTypeSlug === permitTypeSlug);
     },
+    async list_active(filter) {
+      return store.permits.filter(
+        (permit) =>
+          filter.permitTypeSlugs.includes(permit.permitTypeSlug) &&
+          filter.statuses.includes(permit.status) &&
+          permit.updatedAt >= filter.updatedSince,
+      );
+    },
     async get_by_id(id) {
       return store.permits.find((permit) => permit.id === id) ?? null;
     },
@@ -128,5 +143,7 @@ export function create_memory_repositories(): DataRepositories {
     permits,
   );
 
-  return { audit, serverLog, permits, ...organization, ...contractors };
+  const notifications = create_notification_repository(notificationStore);
+
+  return { audit, serverLog, permits, ...organization, ...contractors, notifications };
 }

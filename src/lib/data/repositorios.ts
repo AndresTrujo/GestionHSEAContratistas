@@ -55,10 +55,16 @@ import type {
   PermitArea,
   Subdepartment,
 } from "@/domain/organizacion";
-import type { SignerRole } from "@/domain/permisos";
+import type { PermitStatus, SignerRole } from "@/domain/permisos";
 import type { AuditEvent } from "@/domain/auditoria";
 import type { ServerLogEntry, ServerLogLevel } from "@/domain/registro_servidor";
 import type { WorkPermit } from "@/domain/permisos";
+import type {
+  NotificationLogEntry,
+  NotificationRecipient,
+  PushSubscriptionRecord,
+  SavePushSubscriptionInput,
+} from "@/domain/notificaciones";
 
 /**
  * Contratos de acceso a datos. Las implementaciones (memoria o Azure SQL)
@@ -107,6 +113,12 @@ export interface ServerLogRepository {
 
 export interface WorkPermitRepository {
   list_by_type(permitTypeSlug: string): Promise<WorkPermit[]>;
+  /** Permisos de esos tipos y estatus modificados desde la fecha ISO dada (sin trazos de firma). */
+  list_active(filter: {
+    permitTypeSlugs: string[];
+    statuses: PermitStatus[];
+    updatedSince: string;
+  }): Promise<WorkPermit[]>;
   get_by_id(id: string): Promise<WorkPermit | null>;
   save(permit: WorkPermit): Promise<WorkPermit>;
 }
@@ -406,6 +418,26 @@ export interface SignatureRepository {
   list_by_permit(permitId: string): Promise<SignatureRecord[]>;
 }
 
+/**
+ * Notificaciones push: suscripciones de dispositivos (se revocan, no se borran) y bitácora inmutable de avisos.
+ * La auditoría de suscribir/desuscribir la registra la capa de notificaciones.
+ */
+export interface NotificationRepository {
+  /** Guarda la suscripción del dispositivo; si el endpoint ya estaba activo, revoca la anterior (REEMPLAZADA). */
+  save_subscription(input: SavePushSubscriptionInput): Promise<PushSubscriptionRecord>;
+  /** Revoca la suscripción activa con ese endpoint (si la hay) y la devuelve. */
+  revoke_subscription(endpoint: string, reason: string): Promise<PushSubscriptionRecord | null>;
+  list_active_subscriptions(owner: NotificationRecipient): Promise<PushSubscriptionRecord[]>;
+  mark_subscriptions_used(subscriptionIds: string[], usedAt: string): Promise<void>;
+  append_log(entry: Omit<NotificationLogEntry, "id">): Promise<NotificationLogEntry>;
+  list_log_by_permit(permitId: string): Promise<NotificationLogEntry[]>;
+  /**
+   * Candado por tiempo para tareas programadas: true si esta instancia lo obtuvo (estaba libre o vencido).
+   * Con varias instancias evita que dos envíen los mismos recordatorios.
+   */
+  try_acquire_lease(taskName: string, instanceId: string, seconds: number): Promise<boolean>;
+}
+
 export interface DataRepositories {
   audit: AuditRepository;
   serverLog: ServerLogRepository;
@@ -422,4 +454,5 @@ export interface DataRepositories {
   documents: ContractorDocumentRepository;
   entries: EntryLogRepository;
   participants: PermitParticipantRepository;
+  notifications: NotificationRepository;
 }

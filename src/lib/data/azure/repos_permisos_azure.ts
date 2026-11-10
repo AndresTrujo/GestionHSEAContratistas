@@ -144,6 +144,27 @@ function get_folio_prefix(permit: WorkPermit): string {
   return match?.[1]?.toUpperCase() ?? "PT";
 }
 
+/** Listado sin trazos de firma (PNG en base64, pesados): los listados no los muestran. */
+async function list_permits(condition: string, params: unknown[]): Promise<WorkPermit[]> {
+  const { rows } = await get_db().query<PermitRow>(
+    `SELECT p.id, p.tipo_permiso_slug, p.anio, p.consecutivo, p.folio, p.estatus,
+            p.solicitante_no_empleado, p.solicitante_usuario_proveedor_id, p.proveedor_id,
+            p.departamento_id, p.subdepartamento_id, p.campos,
+            COALESCE((SELECT '[' + STRING_AGG(CAST(JSON_MODIFY(f.value, '$.image', NULL) AS nvarchar(max)), ',')
+                                   WITHIN GROUP (ORDER BY CAST(f.[key] AS int)) + ']'
+                        FROM OPENJSON(p.firmas_formato) AS f),
+                     '[]') AS firmas_formato,
+            p.creado_en, p.creado_por, p.actualizado_en, p.actualizado_por
+       FROM permisos_trabajo p WHERE ${condition} ORDER BY p.anio, p.consecutivo`,
+    params,
+  );
+  const roleSignatures = await load_role_signatures(get_db(), rows.map((row) => row.id), false);
+  return rows.map((row) => {
+    const permit = map_permit(row);
+    return { ...permit, signatures: merge_signatures(permit.signatures, roleSignatures.get(row.id) ?? []) };
+  });
+}
+
 /**
  * Permisos de trabajo sobre `permisos_trabajo`. Al crear, la BD asigna el consecutivo por tipo y
  * año (siguiente_consecutivo) y el folio se reescribe con ese número, también en `fields.folio`,
@@ -155,24 +176,16 @@ function get_folio_prefix(permit: WorkPermit): string {
 export function create_permit_repository_azure(): WorkPermitRepository {
   return {
     async list_by_type(permitTypeSlug) {
-      // Los listados no muestran firmas: se omiten los trazos (PNG en base64, pesados) de cada permiso.
-      const { rows } = await get_db().query<PermitRow>(
-        `SELECT p.id, p.tipo_permiso_slug, p.anio, p.consecutivo, p.folio, p.estatus,
-                p.solicitante_no_empleado, p.solicitante_usuario_proveedor_id, p.proveedor_id,
-                p.departamento_id, p.subdepartamento_id, p.campos,
-                COALESCE((SELECT '[' + STRING_AGG(CAST(JSON_MODIFY(f.value, '$.image', NULL) AS nvarchar(max)), ',')
-                                       WITHIN GROUP (ORDER BY CAST(f.[key] AS int)) + ']'
-                            FROM OPENJSON(p.firmas_formato) AS f),
-                         '[]') AS firmas_formato,
-                p.creado_en, p.creado_por, p.actualizado_en, p.actualizado_por
-           FROM permisos_trabajo p WHERE p.tipo_permiso_slug = $1 ORDER BY p.anio, p.consecutivo`,
-        [permitTypeSlug],
+      return list_permits(`p.tipo_permiso_slug = $1`, [permitTypeSlug]);
+    },
+    async list_active(filter) {
+      if (filter.permitTypeSlugs.length === 0 || filter.statuses.length === 0) return [];
+      return list_permits(
+        `p.tipo_permiso_slug IN (SELECT value FROM OPENJSON($1))
+           AND p.estatus IN (SELECT value FROM OPENJSON($2))
+           AND p.actualizado_en >= CAST($3 AS datetimeoffset(3))`,
+        [JSON.stringify(filter.permitTypeSlugs), JSON.stringify(filter.statuses), filter.updatedSince],
       );
-      const roleSignatures = await load_role_signatures(get_db(), rows.map((row) => row.id), false);
-      return rows.map((row) => {
-        const permit = map_permit(row);
-        return { ...permit, signatures: merge_signatures(permit.signatures, roleSignatures.get(row.id) ?? []) };
-      });
     },
     async get_by_id(id) {
       const { rows } = await get_db().query<PermitRow>(

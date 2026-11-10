@@ -20,7 +20,8 @@
     "pdf-lib": "^1.17.1",
     "qrcode": "^1.5.4",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.0",
@@ -30,6 +31,7 @@
     "@types/qrcode": "^1.5.5",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
+    "@types/web-push": "^3.6.4",
     "eslint": "^9.0.0",
     "eslint-config-next": "^15.5.0",
     "tailwindcss": "^4.1.0",
