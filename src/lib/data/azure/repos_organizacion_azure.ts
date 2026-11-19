@@ -55,7 +55,7 @@ function is_foreign_key_violation(error: unknown): boolean {
 }
 
 /** Restricción única de `firmas_permiso (permiso_id, rol_firma)`: un solo firmante por rol en cada permiso. */
-const uniqueRolePerPermitConstraint = "PK_firmas_permiso_roles_unicos";
+const uniqueRolePerPermitConstraint = "firmas_permiso_permiso_id_rol_firma_key";
 
 /** `columna IS NOT DISTINCT FROM $n` (T-SQL no lo trae en todos los niveles de compatibilidad). */
 function equals_nullable_int(column: string, placeholder: string): string {
