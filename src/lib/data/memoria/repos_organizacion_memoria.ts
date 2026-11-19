@@ -278,7 +278,7 @@ export function create_organization_repositories(
     }
 
     const permitSignatures = store.signatures.filter((s) => s.permitId === request.permitId);
-    if (request.permitTypeSlug !== jsaSlug && permitSignatures.some((s) => s.signerRole === request.role)) {
+    if (permitSignatures.some((s) => s.signerRole === request.role)) {
       return deny("ROL_YA_FIRMADO");
     }
     // En JSA se permite que un empleado firme más de un rol (participante, responsable del trabajo/área).
