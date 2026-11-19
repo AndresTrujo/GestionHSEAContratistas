@@ -735,7 +735,6 @@ CREATE UNIQUE INDEX uq_credencial_activa_proveedor
 CREATE TABLE dbo.firmas_permiso (
   id                      bigint IDENTITY(1,1) NOT NULL PRIMARY KEY,
   permiso_id              nvarchar(450) NOT NULL REFERENCES dbo.permisos_trabajo(id),
-  tipo_permiso_slug       nvarchar(100) NOT NULL,
   rol_firma               nvarchar(100) NOT NULL REFERENCES dbo.roles_firma(codigo),
   -- Firmante: empleado TFS o usuario de proveedor (sin número de empleado).
   firmante_tipo           nvarchar(30) NOT NULL CHECK (firmante_tipo IN (N'EMPLEADO', N'USUARIO_PROVEEDOR')),
@@ -760,12 +759,40 @@ CREATE TABLE dbo.firmas_permiso (
   CHECK ((firmante_tipo = N'EMPLEADO'          AND no_empleado IS NOT NULL AND usuario_proveedor_id IS NULL)
       OR (firmante_tipo = N'USUARIO_PROVEEDOR' AND usuario_proveedor_id IS NOT NULL AND no_empleado IS NULL))
 );
--- Para permisos distintos de JSA se conserva un solo firmante por rol.
--- En JSA se permiten múltiples firmas dentro del mismo rol.
-CREATE UNIQUE INDEX UX_firmas_permiso_permiso_rol_no_jsa
-  ON dbo.firmas_permiso(permiso_id, rol_firma)
-  WHERE tipo_permiso_slug <> N'analisis-seguridad-jsa';
+-- Registro de exclusividad por rol para permisos distintos de JSA.
+-- JSA no inserta aquí, por lo que admite varios firmantes en el mismo rol.
+CREATE TABLE dbo.firmas_permiso_roles_unicos (
+  permiso_id nvarchar(450) NOT NULL REFERENCES dbo.permisos_trabajo(id),
+  rol_firma nvarchar(100) NOT NULL REFERENCES dbo.roles_firma(codigo),
+  CONSTRAINT PK_firmas_permiso_roles_unicos PRIMARY KEY (permiso_id, rol_firma)
+);
 CREATE INDEX idx_firmas_permiso ON dbo.firmas_permiso(permiso_id);
+GO
+
+CREATE OR ALTER TRIGGER dbo.trg_firmas_permiso_un_rol_no_jsa
+ON dbo.firmas_permiso
+AFTER INSERT
+AS
+BEGIN
+  SET NOCOUNT ON;
+
+  IF EXISTS (
+    SELECT 1
+    FROM inserted i
+    INNER JOIN dbo.permisos_trabajo p ON p.id = i.permiso_id
+    WHERE p.tipo_permiso_slug <> N'analisis-seguridad-jsa'
+    GROUP BY i.permiso_id, i.rol_firma
+    HAVING COUNT(*) > 1
+  )
+    THROW 50000, N'Solo se permite un firmante por rol en este tipo de permiso.', 1;
+
+  INSERT INTO dbo.firmas_permiso_roles_unicos (permiso_id, rol_firma)
+  SELECT DISTINCT i.permiso_id, i.rol_firma
+  FROM inserted i
+  INNER JOIN dbo.permisos_trabajo p ON p.id = i.permiso_id
+  WHERE p.tipo_permiso_slug <> N'analisis-seguridad-jsa';
+END
+GO
 
 -- ---------------------------------------------------------------------
 -- 9. AUDITORÍA (append-only). Mismos valores que src/domain/auditoria.ts.
