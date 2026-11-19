@@ -12,7 +12,7 @@ export interface PermitActor {
   /** Proveedor del usuario; null para empleados. */
   providerId: string | null;
   providerUserId: number | null;
-  /** ADMIN_HSEA: exento de las reglas de segregación de firmas (puede firmar varios roles). */
+  /** ADMIN_HSEA: exento de la segregación de firmas de empleados TFS. */
   isAdmin?: boolean;
 }
 
