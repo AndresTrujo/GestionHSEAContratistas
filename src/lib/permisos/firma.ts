@@ -2,7 +2,6 @@ import { createHash } from "node:crypto";
 import type { SignerIdentity } from "@/domain/acceso";
 import type { PermitSignature, SignerRole, WorkPermit } from "@/domain/permisos";
 import { hseaDepartmentName } from "@/config/permisos";
-import { requireSigningPin } from "@/config/seguridad";
 import { find_permit_type } from "@/config/tipos_permiso";
 import { get_repositories } from "@/lib/data/proveedor_datos";
 import type { PermitActor } from "./actor";
@@ -39,7 +38,7 @@ function is_signer_role(permit: WorkPermit, key: string): key is SignerRole {
 }
 
 /**
- * Firma un paso del formato con PIN. Si el paso es un rol del permiso (executor, hsea…), se registra en
+ * Firma un paso del formato sin PIN. Si el paso es un rol del permiso (executor, hsea…), se registra en
  * `firmas_permiso` con autorización por rol, alcance de área y segregación; si no (verificaciones,
  * revalidaciones, participantes), solo se verifica el PIN. Debe llamarse cuando el resto de las
  * validaciones ya pasó: la firma de rol es irreversible.
@@ -50,7 +49,6 @@ export async function sign_step(
   permit: WorkPermit,
   key: string,
   image: string,
-  pin: string,
 ): Promise<SignStepResult> {
   const repositories = get_repositories();
   const signer = to_signer(actor);
@@ -59,10 +57,6 @@ export async function sign_step(
     // Las verificaciones durante el trabajo las firma cualquier empleado TFS del departamento HSEA.
     if (key.startsWith("verification_") && !(await is_hsea_employee(actor))) {
       return { ok: false, errorCode: "firma_NO_ES_HSEA" };
-    }
-    if (requireSigningPin) {
-      const check = await repositories.credentials.verify_pin(signer, pin);
-      if (check !== "OK") return { ok: false, errorCode: `firma_${check}` };
     }
     return { ok: true, signature: { key, employeeNumber: actor.actorId, signedAt: new Date().toISOString(), image } };
   }
@@ -74,7 +68,6 @@ export async function sign_step(
     role: key,
     signer,
     area: permit.area,
-    pin,
     image,
     documentHash: hash_permit_content(permit),
   });
