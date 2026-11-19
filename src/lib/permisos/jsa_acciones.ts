@@ -189,10 +189,8 @@ export async function sign_jsa(formData: FormData): Promise<void> {
     redirect(`${detailPath}?error=participant_not_you`);
   }
 
-  // Segregación: cada persona firma una sola vez en todo el JSA.
-  if (actor.actorType === "EMPLEADO" && !actor.isAdmin && permit.signatures.some((item) => item.employeeNumber === employeeNumber)) {
-    redirect(`${detailPath}?error=same_person`);
-  }
+  // En el JSA una misma persona puede participar y además firmar como responsable del trabajo o del área.
+  // La autorización específica de cada rol se valida más adelante en sign_step.
 
   const image = read_text(formData, "signatureImage");
   if (!image.startsWith(pngDataUrlPrefix) || image.length > maxSignatureLength) {
