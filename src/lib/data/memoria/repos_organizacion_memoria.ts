@@ -278,7 +278,9 @@ export function create_organization_repositories(
     }
 
     const permitSignatures = store.signatures.filter((s) => s.permitId === request.permitId);
-    if (permitSignatures.some((s) => s.signerRole === request.role)) return deny("ROL_YA_FIRMADO");
+    if (request.permitTypeSlug !== jsaSlug && permitSignatures.some((s) => s.signerRole === request.role)) {
+      return deny("ROL_YA_FIRMADO");
+    }
     // En JSA se permite que un empleado firme más de un rol (participante, responsable del trabajo/área).
     // Para los demás permisos se conserva la segregación individual de empleados TFS (salvo ADMIN_HSEA).
     if (
