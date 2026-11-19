@@ -4,7 +4,6 @@ import { SubmitButton } from "@/components/ui/SubmitButton";
 import { useRef, useState } from "react";
 import type { PointerEvent, ReactNode } from "react";
 import { primaryButtonClass, secondaryButtonClass } from "@/components/administracion/estilos";
-import { pinLength, requireSigningPin } from "@/config/seguridad";
 
 interface SignatureModalProps {
   /** Server action que recibe permitId, key y signatureImage (más los campos de children). */
@@ -116,24 +115,6 @@ export function SignatureModal({
           <p className="mb-3 text-sm text-neutral-dark">{label}</p>
 
           {children}
-
-          {requireSigningPin && (
-            <label className="mb-3 block text-sm">
-              <span className="mb-1 block font-bold">PIN de firma</span>
-              <input
-                name="pin"
-                type="password"
-                inputMode="numeric"
-                autoComplete="off"
-                required
-                minLength={pinLength}
-                maxLength={pinLength}
-                pattern={`\\d{${pinLength}}`}
-                placeholder={`${pinLength} dígitos`}
-                className="min-h-11 w-40 rounded-lg border border-neutral-dark/60 px-3 py-2 text-base focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-cyan sm:min-h-10"
-              />
-            </label>
-          )}
 
           <canvas
             ref={canvasRef}
