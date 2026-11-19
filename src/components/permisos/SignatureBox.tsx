@@ -34,7 +34,6 @@ export function SignatureBox({
   modalFields,
 }: SignatureBoxProps) {
   const signatures = permit.signatures.filter((item) => item.key === signatureKey);
-  const signature = signatures[0];
   const hasSignature = signatures.length > 0;
   const tone = hasSignature
     ? "border-brand-green bg-green-50/50"
@@ -87,9 +86,9 @@ export function SignatureBox({
         >
           {modalFields}
         </SignatureModal>
-      ) : (
+      ) : !hasSignature && !canSign ? (
         <p className="text-neutral-dark">Aún no se puede firmar.</p>
-      )}
+      ) : null}
     </div>
   );
 }
