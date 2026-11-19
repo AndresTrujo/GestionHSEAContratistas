@@ -6,7 +6,7 @@ import {
   type PermissionCode,
 } from "@/config/permisos";
 import { lastAdminMessage } from "../errores";
-import { lockoutMinutes, maxFailedAttempts, requireSigningPin } from "@/config/seguridad";
+import { lockoutMinutes, maxFailedAttempts } from "@/config/seguridad";
 import type {
   CanSignRequest,
   RoleAssignment,
@@ -670,11 +670,6 @@ export function create_organization_repositories(
       async sign_permit(input) {
         const decision = await can_sign_check(input);
         if (!decision.allowed) return { ok: false, reason: decision.reason };
-
-        if (requireSigningPin) {
-          const pinResult = await check_pin(input.signer, input.pin);
-          if (pinResult !== "OK") return { ok: false, reason: pinResult };
-        }
 
         // can_sign_check ya garantizó que el firmante existe y está activo.
         let signerName = "";
