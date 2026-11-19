@@ -278,7 +278,13 @@ export function create_organization_repositories(
 
     const permitSignatures = store.signatures.filter((s) => s.permitId === request.permitId);
     if (permitSignatures.some((s) => s.signerRole === request.role)) return deny("ROL_YA_FIRMADO");
-    if (!is_admin_signer(request.signer) && permitSignatures.some((s) => is_same_signer(s.signer, request.signer))) {
+    // Una cuenta de proveedor puede registrar varios apartados del mismo permiso.
+    // La segregación individual se conserva para empleados TFS (salvo ADMIN_HSEA).
+    if (
+      request.signer.kind === "EMPLEADO" &&
+      !is_admin_signer(request.signer) &&
+      permitSignatures.some((s) => is_same_signer(s.signer, request.signer))
+    ) {
       return deny("PERSONA_YA_FIRMO_OTRO_ROL");
     }
     return { allowed: true };
