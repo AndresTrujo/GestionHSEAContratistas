@@ -215,7 +215,7 @@ export default async function JsaDetailPage({ params, searchParams }: JsaDetailP
       <div className="mb-6">
         <SectionCard
           title="Personal que participa en el análisis"
-          description="Cada participante firma una vez (una persona, una firma en todo el JSA)."
+          description="Cada participante debe contar con su firma en el análisis de seguridad."
         >
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {participants.map((participant) => (
