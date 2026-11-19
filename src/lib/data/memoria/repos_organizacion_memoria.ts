@@ -6,7 +6,7 @@ import {
   type PermissionCode,
 } from "@/config/permisos";
 import { lastAdminMessage } from "../errores";
-import { lockoutMinutes, maxFailedAttempts, requireSigningPin } from "@/config/seguridad";
+import { lockoutMinutes, maxFailedAttempts } from "@/config/seguridad";
 import type {
   CanSignRequest,
   RoleAssignment,
@@ -278,7 +278,13 @@ export function create_organization_repositories(
 
     const permitSignatures = store.signatures.filter((s) => s.permitId === request.permitId);
     if (permitSignatures.some((s) => s.signerRole === request.role)) return deny("ROL_YA_FIRMADO");
-    if (!is_admin_signer(request.signer) && permitSignatures.some((s) => is_same_signer(s.signer, request.signer))) {
+    // Una cuenta de proveedor puede registrar varios apartados del mismo permiso.
+    // La segregación individual se conserva para empleados TFS (salvo ADMIN_HSEA).
+    if (
+      request.signer.kind === "EMPLEADO" &&
+      !is_admin_signer(request.signer) &&
+      permitSignatures.some((s) => is_same_signer(s.signer, request.signer))
+    ) {
       return deny("PERSONA_YA_FIRMO_OTRO_ROL");
     }
     return { allowed: true };
@@ -665,11 +671,6 @@ export function create_organization_repositories(
         const decision = await can_sign_check(input);
         if (!decision.allowed) return { ok: false, reason: decision.reason };
 
-        if (requireSigningPin) {
-          const pinResult = await check_pin(input.signer, input.pin);
-          if (pinResult !== "OK") return { ok: false, reason: pinResult };
-        }
-
         // can_sign_check ya garantizó que el firmante existe y está activo.
         let signerName = "";
         let signerJobTitle = "";
@@ -707,7 +708,7 @@ export function create_organization_repositories(
           },
           roleAssignmentId,
           areaAssignmentId,
-          credentialId: get_active_credential(input.signer)?.id ?? null,
+          credentialId: null,
           signerName,
           signerJobTitle,
           signedAt: new Date().toISOString(),

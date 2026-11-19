@@ -112,8 +112,6 @@ export interface CanSignRequest {
 }
 
 export interface SignPermitInput extends CanSignRequest {
-  /** PIN en claro; se verifica contra el hash y no se guarda ni se audita. */
-  pin: string;
   image: string | null;
   documentHash: string | null;
 }

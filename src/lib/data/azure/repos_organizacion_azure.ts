@@ -7,7 +7,7 @@ import {
 } from "@/config/permisos";
 import { lastAdminMessage } from "../errores";
 import { find_permit_type } from "@/config/tipos_permiso";
-import { lockoutMinutes, maxFailedAttempts, requireSigningPin } from "@/config/seguridad";
+import { lockoutMinutes, maxFailedAttempts } from "@/config/seguridad";
 import type {
   CanSignRequest,
   Role,
@@ -538,12 +538,16 @@ async function can_sign_db(db: Queryable, request: CanSignRequest): Promise<Sign
     [request.permitId],
   );
   if (existing.rows.some((row) => row.rol_firma === request.role)) return deny("ROL_YA_FIRMADO");
-  const requestActorId = get_signer_actor_id(request.signer);
-  if (
-    existing.rows.some((row) => get_signer_actor_id(map_signer(row)) === requestActorId) &&
-    !(request.signer.kind === "EMPLEADO" && (await is_hsea_admin_db(db, request.signer.employeeNumber)))
-  ) {
-    return deny("PERSONA_YA_FIRMO_OTRO_ROL");
+  // Las cuentas de proveedor pueden registrar varios apartados del mismo permiso
+  // (incluidos participantes de un JSA). La segregación individual se conserva para empleados TFS.
+  if (request.signer.kind === "EMPLEADO") {
+    const requestActorId = get_signer_actor_id(request.signer);
+    if (
+      existing.rows.some((row) => get_signer_actor_id(map_signer(row)) === requestActorId) &&
+      !(await is_hsea_admin_db(db, request.signer.employeeNumber))
+    ) {
+      return deny("PERSONA_YA_FIRMO_OTRO_ROL");
+    }
   }
   return { allowed: true };
 }
@@ -1065,12 +1069,6 @@ export function create_organization_repositories_azure(): OrganizationRepositori
             const decision = await can_sign_db(db, input);
             if (!decision.allowed) return { ok: false as const, reason: decision.reason };
 
-            // Si el PIN falla, el conteo de intentos se confirma (no se lanza excepción).
-            if (requireSigningPin) {
-              const pinResult = await check_pin_db(db, input.signer, input.pin);
-              if (pinResult !== "OK") return { ok: false as const, reason: pinResult };
-            }
-
             // can_sign_db ya garantizó que el firmante existe y está activo.
             let signerName = "";
             let signerJobTitle = "";
@@ -1136,16 +1134,8 @@ export function create_organization_repositories_azure(): OrganizationRepositori
               return { ok: false as const, reason: "ACTOR_NO_ENCONTRADO" as const };
             }
 
-            const credential = build_signer_filter(input.signer, 1);
-            const credentialRow = credential
-              ? await db.query<{ id: string }>(
-                  `SELECT id FROM credenciales_firma WHERE ${credential.sql} AND estado <> 'REVOCADA'`,
-                  [credential.value],
-                )
-              : null;
-            // Sin PIN exigido la firma no lleva credencial; con PIN, queda ligada a la verificada.
-            const credentialId = credentialRow?.rows[0]?.id ?? null;
-            if (requireSigningPin && !credentialId) return { ok: false as const, reason: "PIN_NO_ACTIVADO" as const };
+            // La firma ya no utiliza credenciales PIN.
+            const credentialId: string | null = null;
 
             const commandLine = await db.query<{ linea_mando_id: number }>(
               `SELECT linea_mando_id FROM departamentos WHERE id = $1`,
@@ -1189,10 +1179,10 @@ export function create_organization_repositories_azure(): OrganizationRepositori
         } catch (error) {
           // Carrera entre dos firmas simultáneas: las restricciones únicas son la última defensa.
           if (is_unique_violation(error)) {
-            const reason: SignDenialReason = get_sql_error(error).message.includes(uniqueRolePerPermitConstraint)
-              ? "ROL_YA_FIRMADO"
-              : "PERSONA_YA_FIRMO_OTRO_ROL";
-            return { ok: false, reason };
+            if (get_sql_error(error).message.includes(uniqueRolePerPermitConstraint)) {
+              return { ok: false, reason: "ROL_YA_FIRMADO" as const };
+            }
+            throw error;
           }
           if (is_foreign_key_violation(error)) throw new NotFoundError("Permiso", input.permitId);
           throw error;
