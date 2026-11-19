@@ -182,7 +182,7 @@ export async function sign_stop_observation(formData: FormData): Promise<void> {
     redirect(`${detailPath}?error=signature`);
   }
 
-  const attempt = await sign_step(employee_actor(employeeNumber), permit, key, image, read_text(formData, "pin"));
+  const attempt = await sign_step(employee_actor(employeeNumber), permit, key, image);
   if (!attempt.ok) redirect(`${detailPath}?error=${attempt.errorCode}`);
   const now = new Date().toISOString();
   const signatures = [
