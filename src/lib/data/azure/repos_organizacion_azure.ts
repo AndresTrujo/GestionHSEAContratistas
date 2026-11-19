@@ -55,7 +55,7 @@ function is_foreign_key_violation(error: unknown): boolean {
 }
 
 /** Restricción única de `firmas_permiso (permiso_id, rol_firma)`: un solo firmante por rol en cada permiso. */
-const uniqueRolePerPermitConstraint = "firmas_permiso_permiso_id_rol_firma_key";
+const uniqueRolePerPermitConstraint = "UX_firmas_permiso_permiso_rol_no_jsa";
 
 /** `columna IS NOT DISTINCT FROM $n` (T-SQL no lo trae en todos los niveles de compatibilidad). */
 function equals_nullable_int(column: string, placeholder: string): string {
@@ -538,7 +538,9 @@ async function can_sign_db(db: Queryable, request: CanSignRequest): Promise<Sign
        FROM firmas_permiso WHERE permiso_id = $1`,
     [request.permitId],
   );
-  if (existing.rows.some((row) => row.rol_firma === request.role)) return deny("ROL_YA_FIRMADO");
+  if (request.permitTypeSlug !== jsaSlug && existing.rows.some((row) => row.rol_firma === request.role)) {
+    return deny("ROL_YA_FIRMADO");
+  }
   // En JSA se permite que un empleado firme más de un rol (participante, responsable del trabajo/área).
   // Para los demás permisos se conserva la segregación individual de empleados TFS.
   if (request.signer.kind === "EMPLEADO" && request.permitTypeSlug !== jsaSlug) {
@@ -1144,13 +1146,14 @@ export function create_organization_repositories_azure(): OrganizationRepositori
             );
             const { rows } = await db.query<SignatureRow>(
               `INSERT INTO firmas_permiso
-                 (permiso_id, rol_firma, firmante_tipo, no_empleado, usuario_proveedor_id,
+                 (permiso_id, tipo_permiso_slug, rol_firma, firmante_tipo, no_empleado, usuario_proveedor_id,
                   linea_mando_id, departamento_id, subdepartamento_id, empleado_rol_id, cargo_area_id,
                   credencial_firma_id, nombre_firmante, puesto_firmante, hash_documento, imagen_firma)
-               VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15);
+               VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16);
                SELECT * FROM firmas_permiso WHERE id = SCOPE_IDENTITY();`,
               [
                 input.permitId,
+                input.permitTypeSlug,
                 input.role,
                 input.signer.kind,
                 input.signer.kind === "EMPLEADO" ? to_employee_int(input.signer.employeeNumber) : null,
