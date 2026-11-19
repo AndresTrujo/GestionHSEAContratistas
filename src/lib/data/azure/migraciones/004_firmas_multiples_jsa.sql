@@ -10,6 +10,7 @@ BEGIN
   ALTER TABLE dbo.firmas_permiso
     ADD tipo_permiso_slug nvarchar(100) NULL;
 END;
+GO
 
 UPDATE fp
    SET tipo_permiso_slug = pt.tipo_permiso_slug
