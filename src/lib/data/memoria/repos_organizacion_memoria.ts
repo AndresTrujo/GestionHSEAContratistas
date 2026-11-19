@@ -708,7 +708,7 @@ export function create_organization_repositories(
           },
           roleAssignmentId,
           areaAssignmentId,
-          credentialId: get_active_credential(input.signer)?.id ?? null,
+          credentialId: null,
           signerName,
           signerJobTitle,
           signedAt: new Date().toISOString(),
