@@ -735,6 +735,7 @@ CREATE UNIQUE INDEX uq_credencial_activa_proveedor
 CREATE TABLE dbo.firmas_permiso (
   id                      bigint IDENTITY(1,1) NOT NULL PRIMARY KEY,
   permiso_id              nvarchar(450) NOT NULL REFERENCES dbo.permisos_trabajo(id),
+  tipo_permiso_slug       nvarchar(100) NOT NULL,
   rol_firma               nvarchar(100) NOT NULL REFERENCES dbo.roles_firma(codigo),
   -- Firmante: empleado TFS o usuario de proveedor (sin número de empleado).
   firmante_tipo           nvarchar(30) NOT NULL CHECK (firmante_tipo IN (N'EMPLEADO', N'USUARIO_PROVEEDOR')),
@@ -758,9 +759,12 @@ CREATE TABLE dbo.firmas_permiso (
                                  OR (imagen_firma LIKE N'data:image/png;base64,%' AND LEN(imagen_firma) <= 300100)),
   CHECK ((firmante_tipo = N'EMPLEADO'          AND no_empleado IS NOT NULL AND usuario_proveedor_id IS NULL)
       OR (firmante_tipo = N'USUARIO_PROVEEDOR' AND usuario_proveedor_id IS NOT NULL AND no_empleado IS NULL)),
-  -- un solo firmante por rol en cada permiso
-  CONSTRAINT firmas_permiso_permiso_id_rol_firma_key UNIQUE (permiso_id, rol_firma)
 );
+-- Para permisos distintos de JSA se conserva un solo firmante por rol.
+-- En JSA se permiten múltiples firmas dentro del mismo rol.
+CREATE UNIQUE INDEX UX_firmas_permiso_permiso_rol_no_jsa
+  ON dbo.firmas_permiso(permiso_id, rol_firma)
+  WHERE tipo_permiso_slug <> N'analisis-seguridad-jsa';
 CREATE INDEX idx_firmas_permiso ON dbo.firmas_permiso(permiso_id);
 
 -- ---------------------------------------------------------------------
