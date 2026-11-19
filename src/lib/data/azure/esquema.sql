@@ -757,11 +757,42 @@ CREATE TABLE dbo.firmas_permiso (
                           CHECK (imagen_firma IS NULL
                                  OR (imagen_firma LIKE N'data:image/png;base64,%' AND LEN(imagen_firma) <= 300100)),
   CHECK ((firmante_tipo = N'EMPLEADO'          AND no_empleado IS NOT NULL AND usuario_proveedor_id IS NULL)
-      OR (firmante_tipo = N'USUARIO_PROVEEDOR' AND usuario_proveedor_id IS NOT NULL AND no_empleado IS NULL)),
-  -- un solo firmante por rol en cada permiso
-  CONSTRAINT firmas_permiso_permiso_id_rol_firma_key UNIQUE (permiso_id, rol_firma)
+      OR (firmante_tipo = N'USUARIO_PROVEEDOR' AND usuario_proveedor_id IS NOT NULL AND no_empleado IS NULL))
+);
+-- Registro de exclusividad por rol para permisos distintos de JSA.
+-- JSA no inserta aquí, por lo que admite varios firmantes en el mismo rol.
+CREATE TABLE dbo.firmas_permiso_roles_unicos (
+  permiso_id nvarchar(450) NOT NULL REFERENCES dbo.permisos_trabajo(id),
+  rol_firma nvarchar(100) NOT NULL REFERENCES dbo.roles_firma(codigo),
+  CONSTRAINT PK_firmas_permiso_roles_unicos PRIMARY KEY (permiso_id, rol_firma)
 );
 CREATE INDEX idx_firmas_permiso ON dbo.firmas_permiso(permiso_id);
+GO
+
+CREATE OR ALTER TRIGGER dbo.trg_firmas_permiso_un_rol_no_jsa
+ON dbo.firmas_permiso
+AFTER INSERT
+AS
+BEGIN
+  SET NOCOUNT ON;
+
+  IF EXISTS (
+    SELECT 1
+    FROM inserted i
+    INNER JOIN dbo.permisos_trabajo p ON p.id = i.permiso_id
+    WHERE p.tipo_permiso_slug <> N'analisis-seguridad-jsa'
+    GROUP BY i.permiso_id, i.rol_firma
+    HAVING COUNT(*) > 1
+  )
+    THROW 50000, N'Solo se permite un firmante por rol en este tipo de permiso.', 1;
+
+  INSERT INTO dbo.firmas_permiso_roles_unicos (permiso_id, rol_firma)
+  SELECT DISTINCT i.permiso_id, i.rol_firma
+  FROM inserted i
+  INNER JOIN dbo.permisos_trabajo p ON p.id = i.permiso_id
+  WHERE p.tipo_permiso_slug <> N'analisis-seguridad-jsa';
+END
+GO
 
 -- ---------------------------------------------------------------------
 -- 9. AUDITORÍA (append-only). Mismos valores que src/domain/auditoria.ts.

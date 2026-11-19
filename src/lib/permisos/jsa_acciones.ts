@@ -181,7 +181,8 @@ export async function sign_jsa(formData: FormData): Promise<void> {
     (participant) => get_participant_key(participant.position) === key,
   );
   if (!isApprovalKey && !isParticipantKey) redirect(detailPath);
-  if (permit.signatures.some((item) => item.key === key)) redirect(detailPath);
+  // Los apartados de aprobación admiten múltiples firmantes; cada participante conserva una firma por espacio.
+  if (!isApprovalKey && permit.signatures.some((item) => item.key === key)) redirect(detailPath);
   if (isApprovalKey && permit.status !== "submitted") redirect(detailPath);
 
   // Un participante ligado a una persona solo lo firma ella (o un usuario de su proveedor, si es colaborador de un contratista).
@@ -189,10 +190,8 @@ export async function sign_jsa(formData: FormData): Promise<void> {
     redirect(`${detailPath}?error=participant_not_you`);
   }
 
-  // Segregación: cada persona firma una sola vez en todo el JSA.
-  if (actor.actorType === "EMPLEADO" && !actor.isAdmin && permit.signatures.some((item) => item.employeeNumber === employeeNumber)) {
-    redirect(`${detailPath}?error=same_person`);
-  }
+  // En el JSA una misma persona puede participar y además firmar como responsable del trabajo o del área.
+  // La autorización específica de cada rol se valida más adelante en sign_step.
 
   const image = read_text(formData, "signatureImage");
   if (!image.startsWith(pngDataUrlPrefix) || image.length > maxSignatureLength) {

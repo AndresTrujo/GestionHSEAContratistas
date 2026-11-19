@@ -244,6 +244,7 @@ export default async function JsaDetailPage({ params, searchParams }: JsaDetailP
                 label={item.label}
                 description={item.help}
                 canSign={permit.status === "submitted"}
+                allowMultiple
               />
             ))}
           </div>
