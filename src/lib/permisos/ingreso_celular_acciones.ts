@@ -104,7 +104,7 @@ export async function sign_phone_permit(formData: FormData): Promise<void> {
   }
 
   // Segregación: una misma persona no puede firmar dos roles.
-  if (!actor.isAdmin && permit.signatures.some((item) => item.employeeNumber === employeeNumber)) {
+  if (actor.actorType === "EMPLEADO" && !actor.isAdmin && permit.signatures.some((item) => item.employeeNumber === employeeNumber)) {
     redirect(`${detailPath}?error=same_person`);
   }
 
@@ -113,7 +113,7 @@ export async function sign_phone_permit(formData: FormData): Promise<void> {
     redirect(`${detailPath}?error=signature`);
   }
 
-  const attempt = await sign_step(actor, permit, key, image, read_text(formData, "pin"));
+  const attempt = await sign_step(actor, permit, key, image);
   if (!attempt.ok) redirect(`${detailPath}?error=${attempt.errorCode}`);
   const now = new Date().toISOString();
   const signatures = [
