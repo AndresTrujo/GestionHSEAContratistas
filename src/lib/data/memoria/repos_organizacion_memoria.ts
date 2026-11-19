@@ -1,4 +1,5 @@
 import { find_permit_type } from "@/config/tipos_permiso";
+import { jsaSlug } from "@/config/jsa";
 import {
   adminRoleCode,
   get_required_permission,
@@ -278,10 +279,11 @@ export function create_organization_repositories(
 
     const permitSignatures = store.signatures.filter((s) => s.permitId === request.permitId);
     if (permitSignatures.some((s) => s.signerRole === request.role)) return deny("ROL_YA_FIRMADO");
-    // Una cuenta de proveedor puede registrar varios apartados del mismo permiso.
-    // La segregación individual se conserva para empleados TFS (salvo ADMIN_HSEA).
+    // En JSA se permite que un empleado firme más de un rol (participante, responsable del trabajo/área).
+    // Para los demás permisos se conserva la segregación individual de empleados TFS (salvo ADMIN_HSEA).
     if (
       request.signer.kind === "EMPLEADO" &&
+      request.permitTypeSlug !== jsaSlug &&
       !is_admin_signer(request.signer) &&
       permitSignatures.some((s) => is_same_signer(s.signer, request.signer))
     ) {
