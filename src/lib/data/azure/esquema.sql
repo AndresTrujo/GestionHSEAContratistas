@@ -758,7 +758,7 @@ CREATE TABLE dbo.firmas_permiso (
                           CHECK (imagen_firma IS NULL
                                  OR (imagen_firma LIKE N'data:image/png;base64,%' AND LEN(imagen_firma) <= 300100)),
   CHECK ((firmante_tipo = N'EMPLEADO'          AND no_empleado IS NOT NULL AND usuario_proveedor_id IS NULL)
-      OR (firmante_tipo = N'USUARIO_PROVEEDOR' AND usuario_proveedor_id IS NOT NULL AND no_empleado IS NULL)),
+      OR (firmante_tipo = N'USUARIO_PROVEEDOR' AND usuario_proveedor_id IS NOT NULL AND no_empleado IS NULL))
 );
 -- Para permisos distintos de JSA se conserva un solo firmante por rol.
 -- En JSA se permiten múltiples firmas dentro del mismo rol.
