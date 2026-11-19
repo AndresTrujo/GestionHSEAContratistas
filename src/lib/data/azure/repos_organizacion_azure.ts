@@ -1146,14 +1146,13 @@ export function create_organization_repositories_azure(): OrganizationRepositori
             );
             const { rows } = await db.query<SignatureRow>(
               `INSERT INTO firmas_permiso
-                 (permiso_id, tipo_permiso_slug, rol_firma, firmante_tipo, no_empleado, usuario_proveedor_id,
+                 (permiso_id, rol_firma, firmante_tipo, no_empleado, usuario_proveedor_id,
                   linea_mando_id, departamento_id, subdepartamento_id, empleado_rol_id, cargo_area_id,
                   credencial_firma_id, nombre_firmante, puesto_firmante, hash_documento, imagen_firma)
-               VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16);
+               VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15);
                SELECT * FROM firmas_permiso WHERE id = SCOPE_IDENTITY();`,
               [
                 input.permitId,
-                input.permitTypeSlug,
                 input.role,
                 input.signer.kind,
                 input.signer.kind === "EMPLEADO" ? to_employee_int(input.signer.employeeNumber) : null,
