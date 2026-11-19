@@ -400,7 +400,7 @@ export interface SigningCredentialRepository {
   verify_pin(signer: SignerIdentity, pin: string): Promise<PinCheckResult>;
 }
 
-/** Firmas inmutables. sign_permit autoriza, verifica el PIN, guarda y audita en una operación. */
+/** Firmas inmutables. sign_permit autoriza, guarda y audita en una operación. */
 export interface SignatureRepository {
   sign_permit(input: SignPermitInput): Promise<SignResult>;
   list_by_permit(permitId: string): Promise<SignatureRecord[]>;
