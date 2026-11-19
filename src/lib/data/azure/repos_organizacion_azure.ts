@@ -7,7 +7,7 @@ import {
 } from "@/config/permisos";
 import { lastAdminMessage } from "../errores";
 import { find_permit_type } from "@/config/tipos_permiso";
-import { lockoutMinutes, maxFailedAttempts, requireSigningPin } from "@/config/seguridad";
+import { lockoutMinutes, maxFailedAttempts } from "@/config/seguridad";
 import type {
   CanSignRequest,
   Role,
