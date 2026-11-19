@@ -34,7 +34,6 @@ interface JsaDetailPageProps {
 
 const errorMessages: Record<string, string> = {
   ...signErrorMessages,
-  same_person: "Cada persona puede firmar una sola vez en el JSA.",
   participant_not_you:
     "Este participante está ligado a otra persona: solo ella (o un usuario de su proveedor, si es colaborador de un contratista) puede firmar por él.",
   signature: "La firma no es válida; dibújala de nuevo.",
@@ -244,7 +243,6 @@ export default async function JsaDetailPage({ params, searchParams }: JsaDetailP
                 label={item.label}
                 description={item.help}
                 canSign={permit.status === "submitted"}
-                allowMultiple
               />
             ))}
           </div>

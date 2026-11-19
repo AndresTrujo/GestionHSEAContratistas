@@ -181,8 +181,8 @@ export async function sign_jsa(formData: FormData): Promise<void> {
     (participant) => get_participant_key(participant.position) === key,
   );
   if (!isApprovalKey && !isParticipantKey) redirect(detailPath);
-  // Los apartados de aprobación admiten múltiples firmantes; cada participante conserva una firma por espacio.
-  if (!isApprovalKey && permit.signatures.some((item) => item.key === key)) redirect(detailPath);
+  // Cada apartado del JSA admite una sola firma, tanto participantes como aprobaciones.
+  if (permit.signatures.some((item) => item.key === key)) redirect(detailPath);
   if (isApprovalKey && permit.status !== "submitted") redirect(detailPath);
 
   // Un participante ligado a una persona solo lo firma ella (o un usuario de su proveedor, si es colaborador de un contratista).

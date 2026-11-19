@@ -55,7 +55,7 @@ function is_foreign_key_violation(error: unknown): boolean {
 }
 
 /** Restricción única de `firmas_permiso (permiso_id, rol_firma)`: un solo firmante por rol en cada permiso. */
-const uniqueRolePerPermitConstraint = "UX_firmas_permiso_permiso_rol_no_jsa";
+const uniqueRolePerPermitConstraint = "firmas_permiso_permiso_id_rol_firma_key";
 
 /** `columna IS NOT DISTINCT FROM $n` (T-SQL no lo trae en todos los niveles de compatibilidad). */
 function equals_nullable_int(column: string, placeholder: string): string {
@@ -538,7 +538,7 @@ async function can_sign_db(db: Queryable, request: CanSignRequest): Promise<Sign
        FROM firmas_permiso WHERE permiso_id = $1`,
     [request.permitId],
   );
-  if (request.permitTypeSlug !== jsaSlug && existing.rows.some((row) => row.rol_firma === request.role)) {
+  if (existing.rows.some((row) => row.rol_firma === request.role)) {
     return deny("ROL_YA_FIRMADO");
   }
   // En JSA se permite que un empleado firme más de un rol (participante, responsable del trabajo/área).
