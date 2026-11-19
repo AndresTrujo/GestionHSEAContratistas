@@ -2,9 +2,6 @@
   Permite múltiples firmas por rol en JSA, conservando la restricción
   de un firmante por rol para los demás tipos de permiso.
 */
-SET XACT_ABORT ON;
-BEGIN TRANSACTION;
-
 IF COL_LENGTH(N'dbo.firmas_permiso', N'tipo_permiso_slug') IS NULL
 BEGIN
   ALTER TABLE dbo.firmas_permiso
@@ -53,4 +50,3 @@ BEGIN
     WHERE tipo_permiso_slug <> N'analisis-seguridad-jsa';
 END;
 
-COMMIT TRANSACTION;
