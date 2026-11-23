@@ -9,14 +9,18 @@ interface ExecutorFieldsProps {
   options: ExecutorFormOptions;
   maxExecutors: number;
   requiredWorkType: string | null;
+  startPosition?: number;
+  initialProviderId?: string | null;
+  requireExecutor?: boolean;
 }
 
 const semaphoreLabels = { VERDE: "verde", AMARILLO: "amarillo", ROJO: "rojo" } as const;
 
 /** Muestra seis ejecutantes inicialmente y agrega dos espacios al completar todos los visibles. */
-export function ExecutorFields({ options, maxExecutors, requiredWorkType }: ExecutorFieldsProps) {
-  const [providerId, set_provider_id] = useState(options.fixedProviderId === null ? "" : String(options.fixedProviderId));
-  const [visibleCount, set_visible_count] = useState(maxExecutors);
+export function ExecutorFields({ options, maxExecutors, requiredWorkType, startPosition = 0, initialProviderId = null, requireExecutor = true }: ExecutorFieldsProps) {
+  const initialProvider = options.fixedProviderId === null ? (initialProviderId ?? "") : String(options.fixedProviderId);
+  const [providerId, set_provider_id] = useState(initialProvider);
+  const [visibleCount, set_visible_count] = useState(Math.min(maxExecutors, 100 - startPosition));
   const [filled, set_filled] = useState<Record<number, boolean>>({});
   const provider = options.providers.find((item) => String(item.id) === providerId);
   const isFixed = options.fixedProviderId !== null;
@@ -24,14 +28,14 @@ export function ExecutorFields({ options, maxExecutors, requiredWorkType }: Exec
   function updatePosition(position: number, value: string) {
     const next = { ...filled, [position]: Boolean(value) };
     set_filled(next);
-    if (Array.from({ length: visibleCount }, (_, index) => index + 1).every((item) => next[item])) {
-      set_visible_count((count) => count + 2);
+    if (Array.from({ length: visibleCount }, (_, index) => startPosition + index + 1).every((item) => next[item])) {
+      set_visible_count((count) => Math.min(count + 2, 100 - startPosition));
     }
   }
 
   return (
     <div>
-      <input type="hidden" name="executorCount" value={visibleCount} />
+      <input type="hidden" name="executorCount" value={startPosition + visibleCount} />
       {isFixed ? (
         <input type="hidden" name="providerId" value={providerId} />
       ) : (
@@ -46,20 +50,20 @@ export function ExecutorFields({ options, maxExecutors, requiredWorkType }: Exec
 
       <div className="grid gap-3 sm:grid-cols-2">
         {Array.from({ length: visibleCount }, (_, index) => {
-          const position = index + 1;
+          const position = startPosition + index + 1;
           const hint = `Ejecutante ${position}${position === 1 ? " (obligatorio)" : ""}`;
           if (!provider) {
             return (
               <div key={position}>
                 <label htmlFor={`executor${position}`} className={labelClass}>{hint}</label>
-                <TfsEmployeePicker id={`executor${position}`} name={`executorTfs${position}`} required={position === 1} onValueChange={(value) => updatePosition(position, value)} />
+                <TfsEmployeePicker id={`executor${position}`} name={`executorTfs${position}`} required={requireExecutor && index === 0} onValueChange={(value) => updatePosition(position, value)} />
               </div>
             );
           }
           return (
             <div key={`${provider.id}-${position}`}>
               <label htmlFor={`executorEmployee${position}`} className={labelClass}>{hint}</label>
-              <select id={`executorEmployee${position}`} name={`executorEmployee${position}`} defaultValue="" required={position === 1} onChange={(event) => updatePosition(position, event.target.value)} className={inputClass}>
+              <select id={`executorEmployee${position}`} name={`executorEmployee${position}`} defaultValue="" required={requireExecutor && index === 0} onChange={(event) => updatePosition(position, event.target.value)} className={inputClass}>
                 <option value="">Elige un colaborador</option>
                 {provider.staff.map((member) => {
                   const isGreen = member.semaphore === "VERDE";
@@ -77,7 +81,7 @@ export function ExecutorFields({ options, maxExecutors, requiredWorkType }: Exec
           );
         })}
       </div>
-      <p className="mt-3 text-xs text-neutral-dark">Al completar todos los espacios disponibles se agregarán automáticamente dos más.</p>
+      <p className="mt-3 text-xs text-neutral-dark">Al completar todos los espacios disponibles se agregarán automáticamente dos más. Máximo 100 ejecutantes.</p>
       {provider && <p className="mt-1 text-xs text-neutral-dark">Solo se pueden elegir colaboradores con semáforo verde{requiredWorkType ? " y con este tipo de trabajo declarado (su DC-3 aprobado)" : ""}.</p>}
     </div>
   );
