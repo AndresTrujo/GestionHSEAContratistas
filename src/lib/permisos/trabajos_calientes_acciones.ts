@@ -68,7 +68,7 @@ async function load_open_permit(formData: FormData, actor: PermitActor, allowClo
   const permit = await get_repositories().permits.get_by_id(
     read_text(formData, "permitId"),
   );
-  if (!permit || permit.permitTypeSlug !== hotWorkSlug || !can_access_permit(actor, permit)) redirect(basePath);
+  if (!permit || permit.fields.deletedAt || permit.permitTypeSlug !== hotWorkSlug || !can_access_permit(actor, permit)) redirect(basePath);
   if (permit.status === "closed" && !allowClosed) redirect(`${basePath}/${permit.id}`);
   return permit;
 }
