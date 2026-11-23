@@ -171,7 +171,6 @@ export default async function ConfinedPermitDetailPage({
               <tbody>
                 {executors.map((name, index) => {
                   const position = index + 1;
-                  if (permit.fields[`executorRemovedAt_${position}`]) return null;
                   const evaluation = permit.fields[`medical${position}`] as
                     | ConfinedEvaluation
                     | undefined;
@@ -180,12 +179,12 @@ export default async function ConfinedPermitDetailPage({
                   return (
                     <tr key={position}>
                       <td className={tdClass}>{position}</td>
-                      <td className={tdClass}>{name}</td>
+                      <td className={tdClass}>{name}{permit.fields[`executorRemovedAt_${position}`] && <span className="ml-2 text-xs font-bold text-red-700">(Retirado)</span>}</td>
                       <td className={`${tdClass} font-bold ${evaluation === "unfit" ? "text-red-700" : ""}`}>
                         {evaluation === "unfit" && <span aria-hidden="true">✕ </span>}
                         {evaluation ? confinedEvaluationLabels[evaluation] : "Pendiente"}
                       </td>
-                      <td className={tdClass}><ExecutorRowActions permitId={permit.id} position={position} evaluation={evaluation} canEdit={canEdit} /></td>
+                      <td className={tdClass}><ExecutorRowActions permitId={permit.id} position={position} evaluation={evaluation} canEdit={canEdit && !permit.fields[`executorRemovedAt_${position}`]} /></td>
                       <td className={tdClass}>
                         {typeof entryAt === "string" ? (
                           format_time(entryAt)
