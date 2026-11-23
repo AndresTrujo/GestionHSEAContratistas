@@ -48,7 +48,7 @@ export function ParticipantFields({ options, maxParticipants, startPosition = 0,
       <div className="grid gap-4 sm:grid-cols-2">
         {Array.from({ length: visibleCount }, (_, index) => {
           const position = startPosition + index + 1;
-          const label = `Participante ${position}${position === 1 ? " (obligatorio)" : ""}`;
+          const label = `Participante ${position}${requireParticipant && index === 0 ? " (obligatorio)" : ""}`;
           return (
             <label key={`${providerId}-${position}`} className="block">
               <span className={labelClass}>{label}</span>
