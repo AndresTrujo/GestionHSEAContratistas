@@ -387,31 +387,6 @@ export default async function ConfinedPermitDetailPage({
                 signatureKey={item.key}
                 label={item.label}
                 canSign={permit.status === "submitted"}
-                modalFields={
-                  item.key === "medical_service" ? (
-                    <fieldset className="mb-3 space-y-2 text-sm">
-                      <legend className="mb-1 font-bold">Evaluación médica</legend>
-                      {executors.map((name, index) => (
-                        <div key={index} className="flex flex-wrap items-center justify-between gap-2">
-                          <span>
-                            {index + 1}. {name}
-                          </span>
-                          <span className="flex gap-2">
-                            {Object.entries(confinedEvaluationLabels).map(([value, label]) => (
-                              <label
-                                key={value}
-                                className="flex min-h-11 items-center gap-2 rounded-lg border border-neutral-light px-3 has-[:checked]:border-brand-navy has-[:checked]:bg-brand-navy has-[:checked]:text-white sm:min-h-10"
-                              >
-                                <input type="radio" name={`medical${index + 1}`} value={value} required className="h-4 w-4" />
-                                {label}
-                              </label>
-                            ))}
-                          </span>
-                        </div>
-                      ))}
-                    </fieldset>
-                  ) : undefined
-                }
               />
             ))}
           </div>
