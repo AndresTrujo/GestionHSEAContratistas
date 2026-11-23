@@ -60,7 +60,7 @@ export function filter_permits_for_actor(actor: PermitActor, permits: WorkPermit
 }
 
 export function can_sign_key(actor: PermitActor, key: string): boolean {
-  return actor.actorType === "EMPLEADO" || providerSignableKeys.includes(key) || key.startsWith("participant_");
+  return actor.actorType === "EMPLEADO" || providerSignableKeys.includes(key) || key.startsWith("participant_") || key.startsWith("executor_participant_");
 }
 
 
