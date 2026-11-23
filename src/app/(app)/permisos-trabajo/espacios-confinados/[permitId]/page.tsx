@@ -10,6 +10,7 @@ import {
   thClass,
 } from "@/components/administracion/estilos";
 import { DetailCard } from "@/components/permisos/DetailCard";
+import { ExecutorRowActions } from "@/components/permisos/ExecutorRowActions";
 import { FormAlert } from "@/components/permisos/FormAlert";
 import { PermitDetailHeader } from "@/components/permisos/PermitDetailHeader";
 import { SectionCard } from "@/components/permisos/SectionCard";
@@ -162,6 +163,7 @@ export default async function ConfinedPermitDetailPage({
                   <th scope="col" className={thClass}>#</th>
                   <th scope="col" className={thClass}>Nombre</th>
                   <th scope="col" className={thClass}>Evaluación médica</th>
+                  <th scope="col" className={thClass}>Acciones</th>
                   <th scope="col" className={thClass}>Entrada</th>
                   <th scope="col" className={thClass}>Salida</th>
                 </tr>
@@ -169,6 +171,7 @@ export default async function ConfinedPermitDetailPage({
               <tbody>
                 {executors.map((name, index) => {
                   const position = index + 1;
+                  if (permit.fields[`executorRemovedAt_${position}`]) return null;
                   const evaluation = permit.fields[`medical${position}`] as
                     | ConfinedEvaluation
                     | undefined;
@@ -178,6 +181,7 @@ export default async function ConfinedPermitDetailPage({
                     <tr key={position}>
                       <td className={tdClass}>{position}</td>
                       <td className={tdClass}>{name}</td>
+                      <td className={tdClass}><ExecutorRowActions permitId={permit.id} position={position} evaluation={evaluation} canEdit={canEdit} /></td>
                       <td className={`${tdClass} font-bold ${evaluation === "unfit" ? "text-red-700" : ""}`}>
                         {evaluation === "unfit" && <span aria-hidden="true">✕ </span>}
                         {evaluation ? confinedEvaluationLabels[evaluation] : "Pendiente"}
