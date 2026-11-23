@@ -56,7 +56,7 @@ export function ExecutorFields({ options, maxExecutors, requiredWorkType, startP
             return (
               <div key={position}>
                 <label htmlFor={`executor${position}`} className={labelClass}>{hint}</label>
-                <TfsEmployeePicker id={`executor${position}`} name={`executorTfs${position}`} required={requireExecutor && index === 0} onValueChange={(value) => update_position(position, value)} />
+                <TfsEmployeePicker id={`executor${position}`} name={`executorTfs${position}`} required={requireExecutor && index === 0} on_value_change={(value) => update_position(position, value)} />
               </div>
             );
           }
