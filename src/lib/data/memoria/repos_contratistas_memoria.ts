@@ -1146,7 +1146,6 @@ export function create_contractor_repositories(
       async add_participant(input, actor) {
         const permit = await permits.get_by_id(input.permitId);
         if (!permit) throw new NotFoundError("Permiso", input.permitId);
-        if (permit.status === "closed") throw new ValidationError("El permiso está cerrado");
         await authorize_permit_editor(actor, permit);
 
         let registeredName: string;
