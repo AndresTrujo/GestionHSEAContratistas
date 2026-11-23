@@ -187,7 +187,9 @@ export async function update_jsa(formData: FormData): Promise<void> {
     time: read_text(formData, "time"),
     jobName: read_text(formData, "jobName"),
     location: read_text(formData, "location"),
-    company: await resolve_requester_unit(formData, "company"),
+    company: read_text(formData, "company") === String(permit.fields.company ?? "")
+      ? read_text(formData, "company")
+      : await resolve_requester_unit(formData, "company"),
   };
   if (!fields.date || !fields.time || !fields.jobName || !fields.location || !fields.company) redirect(failure);
 
