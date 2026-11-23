@@ -73,7 +73,10 @@ async function update_executor_permit(
     if (typeof value !== "string" || ["permitId", "providerId", "executorCount", "departmentId", "subdepartmentId"].includes(name)) continue;
     if (Object.prototype.hasOwnProperty.call(fields, name)) fields[name] = value.trim();
   }
-  fields[options.unitField] = await resolve_requester_unit(formData, options.unitField);
+  const submittedUnit = read_text(formData, options.unitField);
+  fields[options.unitField] = submittedUnit === String(permit.fields[options.unitField] ?? "")
+    ? submittedUnit
+    : await resolve_requester_unit(formData, options.unitField);
   for (const [name, allowed] of Object.entries(options.listFields)) {
     fields[name] = formData.getAll(name)
       .filter((value): value is string => typeof value === "string")
@@ -161,6 +164,7 @@ async function update_executor_permit(
   }
 
   const now = new Date().toISOString();
+  for (const position of addedPositions) fields[`executorAddedAt_${position}`] = now;
   await repositories.permits.save({
     ...permit,
     providerId: addedPositions.length > 0 ? (executors.providerId ?? permit.providerId) : permit.providerId,
