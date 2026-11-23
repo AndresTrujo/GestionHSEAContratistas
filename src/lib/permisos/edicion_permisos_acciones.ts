@@ -117,8 +117,9 @@ async function update_executor_permit(
       if (!validChecklistAnswers.includes(read_text(formData, get_confined_check_field(id)))) redirect(failure);
     }
     for (const gas of confinedGases) {
-      const value = read_number(formData, `initial_${gas.key}`);
-      if (value === null) redirect(failure);
+      const raw = read_text(formData, `initial_${gas.key}`);
+      const value = raw ? read_number(formData, `initial_${gas.key}`) : fields[get_reading_field(1, gas.key)];
+      if (typeof value !== "number" || !Number.isFinite(value) || value < 0) redirect(failure);
       fields[get_reading_field(1, gas.key)] = value;
     }
     if (fields.monitoringMode === "periodic") {
@@ -140,19 +141,23 @@ async function update_executor_permit(
       fields.airChanges = null;
       fields.ventilationTime = "";
     }
-    fields.reading1At = new Date().toISOString();
-    fields.reading1By = actor.actorId;
+    // La lectura inicial y su autoría son evidencia histórica: editar el permiso no debe re-fecharla.
   }
 
   const selectedArea = await read_permit_area(formData);
   if (!selectedArea) redirect(failure);
-  if (addedProviderIds.length > 0) {
+  const addedProviderIds = new Set(
+    executors.providerParticipants
+      .filter((item) => item.position > oldMax)
+      .map((item) => item.providerEmployeeId),
+  );
+  if (addedProviderIds.size > 0) {
     const existingParticipants = await repositories.participants.list_by_permit(permit.id);
-    if (executors.providerParticipants.some((item) => existingParticipants.some(
-      (existing) => existing.role === "executor" &&
-        existing.participant.kind === "EMPLEADO_PROVEEDOR" &&
-        existing.participant.providerEmployeeId === item.providerEmployeeId,
-    ))) redirect(`/permisos-trabajo/${permit.permitTypeSlug}/nuevo?editar=${permit.id}&error=executor_invalid`);
+    if (existingParticipants.some((existing) =>
+      existing.role === "executor" &&
+      existing.participant.kind === "EMPLEADO_PROVEEDOR" &&
+      addedProviderIds.has(existing.participant.providerEmployeeId),
+    )) redirect(`/permisos-trabajo/${permit.permitTypeSlug}/nuevo?editar=${permit.id}&error=executor_invalid`);
   }
 
   const now = new Date().toISOString();
