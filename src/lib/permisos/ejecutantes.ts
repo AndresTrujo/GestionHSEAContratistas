@@ -169,6 +169,7 @@ export async function read_executors(
   maxExecutors: number,
 ): Promise<ReadExecutors | { ok: false; errorCode: string }> {
   const rawProvider = actor.providerId ?? (String(formData.get("providerId") ?? "").trim() || null);
+  maxExecutors = read_dynamic_count(formData, "executorCount", maxExecutors);
   const names: string[] = Array.from({ length: maxExecutors }, () => "");
 
   if (rawProvider === null) {
@@ -248,6 +249,7 @@ export async function read_jsa_participants(
   maxParticipants: number,
 ): Promise<ReadJsaParticipants | { ok: false; errorCode: string }> {
   const rawProvider = actor.providerId ?? (read_field(formData, "providerId") || null);
+  maxParticipants = read_dynamic_count(formData, "participantCount", maxParticipants);
   const { providers, providerEmployees, employees, organization } = get_repositories();
 
   let provider: Awaited<ReturnType<typeof providers.get_provider>> = null;
