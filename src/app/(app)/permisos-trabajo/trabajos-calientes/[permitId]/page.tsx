@@ -110,7 +110,7 @@ export default async function HotWorkPermitDetailPage({
             ),
           },
           { label: "Descripción del trabajo", value: String(permit.fields.description), wide: true },
-          { label: "Personas que ejecutan", value: get_executors(permit).join(", ") },
+          { label: "Personas que ejecutan", value: executors.join(", ") },
           { label: "Tipo de trabajo", value: get_activity_labels(permit).join(", ") },
           { label: "Hora de inicio", value: String(permit.fields.startTime) },
           { label: "Hora de terminación", value: String(permit.fields.endTime) },
