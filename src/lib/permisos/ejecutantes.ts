@@ -67,6 +67,15 @@ function get_full_name(parts: (string | null)[]): string {
   return parts.filter((part): part is string => Boolean(part)).join(" ");
 }
 
+function has_executor_gap(names: string[], startPosition: number): boolean {
+  let foundEmpty = false;
+  for (let index = startPosition; index < names.length; index += 1) {
+    if (!names[index]) foundEmpty = true;
+    else if (foundEmpty) return true;
+  }
+  return false;
+}
+
 function read_field(formData: FormData, name: string): string {
   const value = formData.get(name);
   return typeof value === "string" ? value.trim() : "";
@@ -168,6 +177,7 @@ export async function read_executors(
   actor: PermitActor,
   permitTypeSlug: string,
   maxExecutors: number,
+  startPosition = 0,
 ): Promise<ReadExecutors | { ok: false; errorCode: string }> {
   const rawProvider = actor.providerId ?? (String(formData.get("providerId") ?? "").trim() || null);
   maxExecutors = read_dynamic_count(formData, "executorCount", maxExecutors);
@@ -190,6 +200,7 @@ export async function read_executors(
       // Compatibilidad: nombre escrito a mano.
       names[position - 1] = read_field(formData, `executor${position}`);
     }
+    if (has_executor_gap(names, startPosition)) return { ok: false, errorCode: "executor_invalid" };
     return { ok: true, providerId: null, names, providerParticipants: [], executorParticipants };
   }
 
@@ -226,6 +237,7 @@ export async function read_executors(
     providerParticipants.push({ position, providerEmployeeId: member.id });
     executorParticipants.push({ position, participant: { kind: "EMPLEADO_PROVEEDOR", providerEmployeeId: member.id } });
   }
+  if (has_executor_gap(names, startPosition)) return { ok: false, errorCode: "executor_invalid" };
   return { ok: true, providerId: String(provider.id), names, providerParticipants, executorParticipants };
 }
 
