@@ -16,21 +16,29 @@ import {
   hotWorkMaxExecutors,
   hotWorkSlug,
   hotWorkValidityHours,
+  get_executors,
 } from "@/config/trabajos_calientes";
 import { find_permit_type } from "@/config/tipos_permiso";
-import { require_permit_actor } from "@/lib/permisos/actor";
+import { can_access_permit, can_edit_permit, require_permit_actor } from "@/lib/permisos/actor";
+import { get_repositories } from "@/lib/data/proveedor_datos";
 import { executorErrorMessages, load_executor_options } from "@/lib/permisos/ejecutantes";
 import { create_hot_work_permit } from "@/lib/permisos/trabajos_calientes_acciones";
+import { update_hot_work_permit } from "@/lib/permisos/edicion_permisos_acciones";
 
 interface NewHotWorkPageProps {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; editar?: string }>;
 }
 
 export default async function NewHotWorkPermitPage({
   searchParams,
 }: NewHotWorkPageProps) {
-  const { error } = await searchParams;
-  const executorOptions = await load_executor_options(await require_permit_actor());
+  const { error, editar } = await searchParams;
+  const actor = await require_permit_actor();
+  const editingPermit = editar ? await get_repositories().permits.get_by_id(editar) : null;
+  if (editar && (!editingPermit || editingPermit.permitTypeSlug !== hotWorkSlug || !can_access_permit(actor, editingPermit) || !(await can_edit_permit(actor, editingPermit)))) notFound();
+  const existingExecutors = editingPermit ? get_executors(editingPermit) : [];
+  const executorOffset = editingPermit ? Math.max(0, ...Object.entries(editingPermit.fields).flatMap(([key, value]) => { const match = /^executor(\\d+)$/.exec(key); return match && typeof value === "string" && value.trim() ? [Number(match[1])] : []; })) : 0;
+  const executorOptions = await load_executor_options(actor);
   const today = new Date().toLocaleDateString("en-CA");
   const permitType = find_permit_type(hotWorkSlug);
 
@@ -41,11 +49,11 @@ export default async function NewHotWorkPermitPage({
           { label: "Inicio", href: "/inicio" },
           { label: "Permisos de trabajo", href: "/permisos-trabajo" },
           { label: "Trabajos calientes", href: `/permisos-trabajo/${hotWorkSlug}` },
-          { label: "Nuevo" },
+          { label: editingPermit ? `Editar ${String(editingPermit.fields.folio)}` : "Nuevo" },
         ]}
       />
       <PageHeader
-        title="Permiso para trabajos calientes"
+        title={editingPermit ? `Editar permiso · ${String(editingPermit.fields.folio)}` : "Permiso para trabajos calientes"}
         eyebrow={
           permitType && (
             <span className="rounded-full bg-neutral-light/40 px-2.5 py-0.5 text-xs font-bold text-brand-navy">{permitType.formCode}</span>
@@ -61,21 +69,24 @@ export default async function NewHotWorkPermitPage({
       )}
       {error && executorErrorMessages[error] && <FormAlert>{executorErrorMessages[error]}</FormAlert>}
 
-      <form action={create_hot_work_permit} className="space-y-6">
+      <form action={editingPermit ? update_hot_work_permit : create_hot_work_permit} className="space-y-6">
+        {editingPermit && <input type="hidden" name="permitId" value={editingPermit.id} />}
         <SectionCard step={1} title="Datos generales" description="Quién solicita el permiso, dónde y qué se va a hacer.">
           <div className="grid gap-4 sm:grid-cols-2">
-            <PermitAreaField />
-            <RequesterUnitField name="department" />
-            <PermitField label="Fecha" name="date" type="date" defaultValue={today} />
-            <PermitField label="Área de trabajo o espacio" name="workArea" />
-            <PermitField label="Solicitante" name="requesterName" />
-            <PermitField label="Puesto del solicitante" name="requesterPosition" />
-            <PermitField label="Descripción del trabajo" name="description" rows={3} wide />
+            <PermitAreaField initialArea={editingPermit?.area ?? null} />
+            <RequesterUnitField name="department" initialValue={editingPermit ? String(editingPermit.fields.department ?? "") : undefined} />
+            <PermitField label="Fecha" name="date" type="date" defaultValue={String(editingPermit?.fields.date ?? today)} />
+            <PermitField label="Área de trabajo o espacio" name="workArea" defaultValue={String(editingPermit?.fields.workArea ?? "")} />
+            <PermitField label="Solicitante" name="requesterName" defaultValue={String(editingPermit?.fields.requesterName ?? "")} />
+            <PermitField label="Puesto del solicitante" name="requesterPosition" defaultValue={String(editingPermit?.fields.requesterPosition ?? "")} />
+            <PermitField label="Descripción del trabajo" name="description" rows={3} wide defaultValue={String(editingPermit?.fields.description ?? "")} />
           </div>
         </SectionCard>
 
         <SectionCard step={2} title="Personas que ejecutan" description="Quienes realizarán el trabajo en caliente.">
-          <ExecutorFields options={executorOptions} maxExecutors={hotWorkMaxExecutors} requiredWorkType={"CALIENTES"} />
+          {editingPermit && <div className="mb-4 rounded-xl border border-neutral-light p-4"><p className="mb-2 text-sm font-bold text-brand-navy">Ejecutantes actuales (se conservan)</p><ol className="list-decimal pl-5 text-sm">{existingExecutors.map((name, index) => <li key={index}>{name}</li>)}</ol></div>}
+          {editingPermit && <p className="mb-3 text-sm text-neutral-dark">Los ejecutantes actuales y sus firmas no se modificarán. Agrega únicamente personas nuevas.</p>}
+          <ExecutorFields options={executorOptions} maxExecutors={hotWorkMaxExecutors} requiredWorkType={"CALIENTES"} startPosition={executorOffset} initialProviderId={editingPermit?.providerId ?? null} requireExecutor={!editingPermit} />
         </SectionCard>
 
         <SectionCard step={3} title="Tipo de trabajo y horario" description="Marca todas las actividades que apliquen.">
@@ -87,15 +98,15 @@ export default async function NewHotWorkPermitPage({
                   key={activity.slug}
                   className="flex min-h-11 items-center gap-2 rounded-lg border border-neutral-light px-3 text-sm sm:min-h-10"
                 >
-                  <input type="checkbox" name="activities" value={activity.slug} className="h-4 w-4" />
+                  <input type="checkbox" name="activities" value={activity.slug} defaultChecked={String(editingPermit?.fields.activities ?? "").split(",").includes(activity.slug)} className="h-4 w-4" />
                   {activity.label}
                 </label>
               ))}
             </div>
           </fieldset>
           <div className="grid gap-4 sm:grid-cols-2">
-            <PermitField label="Hora de inicio del trabajo" name="startTime" type="time" />
-            <PermitField label="Hora de terminación del trabajo" name="endTime" type="time" />
+            <PermitField label="Hora de inicio del trabajo" name="startTime" type="time" defaultValue={String(editingPermit?.fields.startTime ?? "")} />
+            <PermitField label="Hora de terminación del trabajo" name="endTime" type="time" defaultValue={String(editingPermit?.fields.endTime ?? "")} />
           </div>
         </SectionCard>
 
@@ -120,7 +131,7 @@ export default async function NewHotWorkPermitPage({
                             key={value}
                             className="flex min-h-11 items-center gap-2 rounded-lg border border-neutral-light px-3 has-[:checked]:border-brand-navy has-[:checked]:bg-brand-navy has-[:checked]:text-white sm:min-h-10"
                           >
-                            <input type="radio" name={get_checklist_field(item.number)} value={value} required className="h-4 w-4" />
+                            <input type="radio" name={get_checklist_field(item.number)} value={value} required defaultChecked={editingPermit?.fields[get_checklist_field(item.number)] === value} className="h-4 w-4" />
                             {label}
                           </label>
                         ))}
@@ -139,8 +150,8 @@ export default async function NewHotWorkPermitPage({
           conoce los riesgos y cuenta con el equipo de protección personal. Las firmas se registran después de crear el permiso.
         </p>
 
-        <SubmitButton className={`${primaryButtonClass} px-8`} pendingLabel="Creando…">
-          Crear permiso
+        <SubmitButton className={`${primaryButtonClass} px-8`} pendingLabel={editingPermit ? "Guardando…" : "Creando…"}>
+          {editingPermit ? "Guardar cambios" : "Crear permiso"}
         </SubmitButton>
       </form>
     </>
