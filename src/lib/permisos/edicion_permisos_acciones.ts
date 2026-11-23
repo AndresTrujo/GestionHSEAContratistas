@@ -92,7 +92,7 @@ async function update_executor_permit(
     return Boolean(match && Number(match[1]) > oldMax && typeof value === "string" && value.trim());
   });
   const executors = hasNewExecutorInput
-    ? await read_executors(formData, actor, permit.permitTypeSlug, options.maxExecutors)
+    ? await read_executors(formData, actor, permit.permitTypeSlug, options.maxExecutors, oldMax)
     : { ok: true as const, providerId: permit.providerId, names: [], providerParticipants: [], executorParticipants: [] };
   if (!executors.ok) redirect(`/permisos-trabajo/${permit.permitTypeSlug}/nuevo?editar=${permit.id}&error=${executors.errorCode}`);
   const addedPositions: number[] = [];
