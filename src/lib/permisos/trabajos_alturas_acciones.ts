@@ -202,17 +202,6 @@ export async function sign_heights_permit(formData: FormData): Promise<void> {
     );
     if (alreadySigned && actor.actorType === "EMPLEADO" && !actor.isAdmin) redirect(`${detailPath}?error=same_person`);
 
-    if (key === "medical_service") {
-      // La evaluación médica de cada ejecutante se registra al firmar.
-      const executors = get_heights_executors(permit);
-      for (let position = 1; position <= executors.length; position += 1) {
-        const evaluation = read_text(formData, `medical${position}`);
-        if (!(evaluation in medicalEvaluationLabels)) {
-          redirect(`${detailPath}?error=medical`);
-        }
-        fields[`medical${position}`] = evaluation;
-      }
-    }
   } else if (isVerificationKey || isExtensionKey) {
     if (permit.status !== "approved") redirect(detailPath);
     if (!is_valid_today(permit)) redirect(`${detailPath}?error=expired`);
