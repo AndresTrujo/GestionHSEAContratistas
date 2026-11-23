@@ -104,7 +104,7 @@ export function create_memory_repositories(): DataRepositories {
 
   const permits: DataRepositories["permits"] = {
     async list_by_type(permitTypeSlug) {
-      return store.permits.filter((permit) => permit.permitTypeSlug === permitTypeSlug);
+      return store.permits.filter((permit) => permit.permitTypeSlug === permitTypeSlug && !permit.fields.deletedAt);
     },
     async get_by_id(id) {
       return store.permits.find((permit) => permit.id === id) ?? null;
