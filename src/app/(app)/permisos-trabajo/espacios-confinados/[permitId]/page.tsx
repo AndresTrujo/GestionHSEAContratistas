@@ -56,6 +56,7 @@ const errorMessages: Record<string, string> = {
   ...signErrorMessages,
   same_person: "Una misma persona no puede firmar dos roles del permiso.",
   signature: "La firma no es válida; dibújala de nuevo.",
+  participant_not_you: "Solo la persona asignada puede firmar como ejecutante agregado.",
   medical: "El servicio médico debe evaluar a todos los ejecutantes.",
   initial_limits:
     "La lectura inicial está fuera de límites; no se puede autorizar la entrada.",
@@ -85,6 +86,7 @@ export default async function ConfinedPermitDetailPage({
 
   const events = await repositories.audit.list_events_by_entity("permisos_trabajo", permit.id);
   const executors = get_confined_executors(permit);
+  const addedExecutorPositions = Array.from({ length: 100 }, (_, index) => index + 1).filter((position) => Boolean(permit.fields[`executorAddedAt_${position}`]));
   const validUntil = get_confined_valid_until(permit);
   const isExpired = validUntil !== null && validUntil.getTime() < Date.now();
   const isApproved = permit.status === "approved";
@@ -352,6 +354,25 @@ export default async function ConfinedPermitDetailPage({
       </details>
 
       <div className="mb-6">
+      {addedExecutorPositions.length > 0 && (
+        <div className="mb-6">
+          <SectionCard title="Firma de ejecutantes agregados">
+            <p className="mb-3 text-sm text-neutral-dark">Estas personas se incorporaron después de crear el permiso. Solo ellas tienen una firma individual pendiente; las firmas anteriores se conservan.</p>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {addedExecutorPositions.map((position) => (
+                <SignatureBox
+                  key={position}
+                  action={sign_confined_permit}
+                  permit={permit}
+                  signatureKey={`executor_participant_${position}`}
+                  label={String(permit.fields[`executor${position}`] ?? `Ejecutante ${position}`)}
+                  canSign
+                />
+              ))}
+            </div>
+          </SectionCard>
+        </div>
+      )}
         <SectionCard title="Autorización de entrada">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {confinedApprovalSignatures.map((item) => (
