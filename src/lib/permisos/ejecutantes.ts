@@ -43,6 +43,7 @@ export const executorErrorMessages: Record<string, string> = {
   executor_provider: "El proveedor elegido no existe o no está activo.",
   executor_tfs: "Alguno de los empleados TFS elegidos no existe, está inactivo o está repetido.",
   executor_invalid: "Alguno de los ejecutantes no es un colaborador activo de ese proveedor.",
+  executor_order: "Completa los espacios de ejecutantes en orden, sin dejar posiciones vacías entre personas.",
   executor_not_green:
     "Solo pueden ejecutar el trabajo colaboradores con semáforo VERDE (documentos aprobados y vigentes). Revisa a quién elegiste.",
   executor_work_type:
@@ -200,7 +201,7 @@ export async function read_executors(
       // Compatibilidad: nombre escrito a mano.
       names[position - 1] = read_field(formData, `executor${position}`);
     }
-    if (has_executor_gap(names, startPosition)) return { ok: false, errorCode: "executor_invalid" };
+    if (has_executor_gap(names, startPosition)) return { ok: false, errorCode: "executor_order" };
     return { ok: true, providerId: null, names, providerParticipants: [], executorParticipants };
   }
 
@@ -237,7 +238,7 @@ export async function read_executors(
     providerParticipants.push({ position, providerEmployeeId: member.id });
     executorParticipants.push({ position, participant: { kind: "EMPLEADO_PROVEEDOR", providerEmployeeId: member.id } });
   }
-  if (has_executor_gap(names, startPosition)) return { ok: false, errorCode: "executor_invalid" };
+  if (has_executor_gap(names, startPosition)) return { ok: false, errorCode: "executor_order" };
   return { ok: true, providerId: String(provider.id), names, providerParticipants, executorParticipants };
 }
 
