@@ -7,11 +7,12 @@ export const heightsVerificationCount = 4;
 export const heightsMaxExtensionHours = 4;
 export const heightsRevalidationHour = 18;
 
-export type MedicalEvaluation = "fit" | "unfit";
+export type MedicalEvaluation = "fit" | "unfit" | "absent";
 
 export const medicalEvaluationLabels: Record<MedicalEvaluation, string> = {
   fit: "APTO",
   unfit: "NO APTO",
+  absent: "NO ASISTIÓ",
 };
 
 /** A diferencia del FO-0131, la lista del FO-0060 solo admite SI / NO. */
