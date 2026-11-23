@@ -37,14 +37,14 @@ const optionClass =
   "flex min-h-11 items-center gap-2 rounded-lg border border-neutral-light px-3 has-[:checked]:border-brand-navy has-[:checked]:bg-brand-navy has-[:checked]:text-white sm:min-h-10";
 
 /** Campo numérico de lectura de gases (admite decimales y no negativos). */
-function GasField({ label, name, defaultValue }: { label: string; name: string; defaultValue?: string }) {
+function GasField({ label, name, defaultValue, disabled = false }: { label: string; name: string; defaultValue?: string; disabled?: boolean }) {
   const id = `campo-${name}`;
   return (
     <div>
       <label htmlFor={id} className={labelClass}>
         {label}
       </label>
-      <input id={id} name={name} type="number" min={0} step="any" required defaultValue={defaultValue} className={inputClass} />
+      <input id={id} name={name} type="number" min={0} step="any" required defaultValue={defaultValue} disabled={disabled} className={inputClass} />
     </div>
   );
 }
@@ -181,7 +181,7 @@ export default async function NewConfinedPermitPage({
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {confinedGases.map((gas) => (
-              <GasField key={gas.key} label={`${gas.label} · ${gas.limitLabel}`} name={`initial_${gas.key}`} defaultValue={editingPermit ? String(editingPermit.fields[get_reading_field(1, gas.key)] ?? "") : undefined} />
+              <GasField key={gas.key} label={`${gas.label} · ${gas.limitLabel}`} name={`initial_${gas.key}`} defaultValue={editingPermit ? String(editingPermit.fields[get_reading_field(1, gas.key)] ?? "") : undefined} disabled={Boolean(editingPermit)} />
             ))}
           </div>
         </SectionCard>
