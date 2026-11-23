@@ -181,11 +181,8 @@ export default async function ConfinedPermitDetailPage({
                     <tr key={position}>
                       <td className={tdClass}>{position}</td>
                       <td className={tdClass}>{name}</td>
+                      
                       <td className={tdClass}><ExecutorRowActions permitId={permit.id} position={position} evaluation={evaluation} canEdit={canEdit} /></td>
-                      <td className={`${tdClass} font-bold ${evaluation === "unfit" ? "text-red-700" : ""}`}>
-                        {evaluation === "unfit" && <span aria-hidden="true">✕ </span>}
-                        {evaluation ? confinedEvaluationLabels[evaluation] : "Pendiente"}
-                      </td>
                       <td className={tdClass}>
                         {typeof entryAt === "string" ? (
                           format_time(entryAt)
