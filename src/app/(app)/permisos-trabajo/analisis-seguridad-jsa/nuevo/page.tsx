@@ -120,6 +120,7 @@ export default async function NewJsaPage({ searchParams }: NewJsaPageProps) {
       {error && executorErrorMessages[error] && <FormAlert>{executorErrorMessages[error]}</FormAlert>}
 
       <JsaForm create_action={editingPermit ? update_jsa : create_jsa} check_action={check_jsa_certifications} className="space-y-6">
+        {editingPermit && <input type="hidden" name="permitId" value={editingPermit.id} />}
         <SectionCard step={1} title="Datos generales" description="Dónde y qué trabajo se va a analizar.">
           <div className="grid gap-4 sm:grid-cols-2">
             <PermitAreaField initialArea={editingPermit?.area ?? null} />
