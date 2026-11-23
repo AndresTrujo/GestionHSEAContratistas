@@ -88,7 +88,7 @@ async function update_executor_permit(
   const oldPositions = executor_positions(permit.fields);
   const oldMax = Math.max(0, ...oldPositions);
   const hasNewExecutorInput = [...formData.entries()].some(([name, value]) => {
-    const match = /^(?:executorTfs|executorEmployee|executor)(\\d+)$/.exec(name);
+    const match = /^(?:executorTfs|executorEmployee|executor)(\d+)$/.exec(name);
     return Boolean(match && Number(match[1]) > oldMax && typeof value === "string" && value.trim());
   });
   const executors = hasNewExecutorInput
