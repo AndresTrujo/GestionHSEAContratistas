@@ -176,7 +176,7 @@ export async function sign_hot_work_permit(formData: FormData): Promise<void> {
   const actor = await require_permit_actor();
   const employeeNumber = actor.actorId;
   const key = read_text(formData, "key");
-  const allowClosed = /^executor_participant_\\d+$/.test(key);
+  const allowClosed = /^executor_participant_\d+$/.test(key);
   const permit = await load_open_permit(formData, actor, allowClosed);
   const detailPath = `${basePath}/${permit.id}`;
   if (!can_sign_key(actor, key)) redirect(`${detailPath}?error=role`);
@@ -188,7 +188,7 @@ export async function sign_hot_work_permit(formData: FormData): Promise<void> {
     Number.isInteger(verificationPosition) &&
     verificationPosition >= 1 &&
     verificationPosition <= hotWorkVerificationCount;
-  const executorParticipantMatch = /^executor_participant_(\\d+)$/.exec(key);
+  const executorParticipantMatch = /^executor_participant_(\d+)$/.exec(key);
   const executorParticipantPosition = executorParticipantMatch ? Number(executorParticipantMatch[1]) : 0;
   const isExecutorParticipantKey = executorParticipantPosition > 0 &&
     Boolean(permit.fields[`executorAddedAt_${executorParticipantPosition}`]) &&
