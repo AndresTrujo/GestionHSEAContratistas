@@ -7,7 +7,6 @@ import {
   heightsPpeOptions,
   find_heights_signature,
   get_heights_checklist_field,
-  get_heights_executors,
   get_heights_verification_key,
   heightsApprovalSignatures,
   heightsChecklistItems,
@@ -16,7 +15,6 @@ import {
   heightsSlug,
   heightsVerificationCount,
   is_valid_today,
-  medicalEvaluationLabels,
 } from "@/config/trabajos_alturas";
 import type { AuditAction } from "@/domain/auditoria";
 import type { WorkPermit } from "@/domain/permisos";
