@@ -42,9 +42,10 @@ export default async function NewJsaPage({ searchParams }: NewJsaPageProps) {
   if (editar && (!editingPermit || editingPermit.permitTypeSlug !== jsaSlug || !can_access_permit(actor, editingPermit) || !(await can_edit_permit(actor, editingPermit)))) notFound();
   const executorOptions = await load_executor_options(actor);
   const existingParticipants = editingPermit ? get_jsa_participants(editingPermit) : [];
-  const participantOffset = editingPermit
-    ? Math.max(Number(editingPermit.fields.participantCount ?? jsaMaxParticipants), ...existingParticipants.map((item) => item.position), 0)
-    : 0;
+  const participantOffset = editingPermit ? Math.max(0, ...existingParticipants.map((item) => item.position)) : 0;
+  const participantOptions = editingPermit?.providerId
+    ? { ...executorOptions, fixedProviderId: Number(editingPermit.providerId) }
+    : executorOptions;
   const now = new Date();
   const today = now.toLocaleDateString("en-CA");
   const currentTime = now.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
@@ -207,7 +208,7 @@ export default async function NewJsaPage({ searchParams }: NewJsaPageProps) {
             </div>
           )}
           <p className="mb-3 text-sm text-neutral-dark">{editingPermit ? "Agrega participantes nuevos; no se modificarán las firmas de quienes ya participaron." : "Personal que participa en el análisis de los riesgos y aspectos ambientales. Cada participante firma después de crear el JSA."}</p>
-          <ParticipantFields options={executorOptions} maxParticipants={jsaMaxParticipants} startPosition={participantOffset} initialProviderId={editingPermit?.providerId ?? null} requireParticipant={!editingPermit} />
+          <ParticipantFields options={participantOptions} maxParticipants={jsaMaxParticipants} startPosition={participantOffset} initialProviderId={editingPermit?.providerId ?? null} requireParticipant={!editingPermit} />
         </SectionCard>
 
         <JsaSubmitButton className={`${primaryButtonClass} px-8`} pendingLabel={editingPermit ? "Guardando…" : "Creando…"}>
