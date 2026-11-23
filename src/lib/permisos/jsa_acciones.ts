@@ -128,6 +128,7 @@ export async function create_jsa(formData: FormData): Promise<void> {
     fields[`participant${position}Company`] = row?.company ?? "";
   }
   if (participants.rows.length === 0) redirect(failure);
+  fields.participantCount = Number(read_text(formData, "participantCount")) || jsaMaxParticipants;
 
   const selectedArea = await read_permit_area(formData);
   if (!selectedArea) redirect(`${basePath}/nuevo?error=incomplete`);
