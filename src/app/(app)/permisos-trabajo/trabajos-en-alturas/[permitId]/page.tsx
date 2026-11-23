@@ -47,6 +47,7 @@ const errorMessages: Record<string, string> = {
   signature: "La firma no es válida; dibújala de nuevo.",
   medical: "El servicio médico debe evaluar a todas las personas ejecutantes.",
   extension: `Indica una extensión de 1 a ${heightsMaxExtensionHours} horas con su horario.`,
+  participant_not_you: "Solo la persona asignada puede firmar como ejecutante agregado.",
 };
 
 const warningClass = "mb-5 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm font-bold text-red-900";
@@ -65,6 +66,7 @@ export default async function HeightsPermitDetailPage({
 
   const events = await repositories.audit.list_events_by_entity("permisos_trabajo", permit.id);
   const executors = get_heights_executors(permit);
+  const addedExecutorPositions = Array.from({ length: 100 }, (_, index) => index + 1).filter((position) => Boolean(permit.fields[`executorAddedAt_${position}`]));
   const validToday = is_valid_today(permit);
   const isClosed = permit.status === "closed";
   const isApproved = permit.status === "approved";
@@ -185,6 +187,25 @@ export default async function HeightsPermitDetailPage({
         </div>
       </details>
 
+      {addedExecutorPositions.length > 0 && (
+        <div className="mb-6">
+          <SectionCard title="Firma de ejecutantes agregados">
+            <p className="mb-3 text-sm text-neutral-dark">Estas personas se incorporaron después de crear el permiso. Solo ellas tienen una firma individual pendiente; las firmas anteriores se conservan.</p>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {addedExecutorPositions.map((position) => (
+                <SignatureBox
+                  key={position}
+                  action={sign_heights_permit}
+                  permit={permit}
+                  signatureKey={`executor_participant_${position}`}
+                  label={String(permit.fields[`executor${position}`] ?? `Ejecutante ${position}`)}
+                  canSign
+                />
+              ))}
+            </div>
+          </SectionCard>
+        </div>
+      )}
       <div className="mb-6">
         <SectionCard title="Autorización">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
