@@ -277,7 +277,7 @@ export async function update_jsa(formData: FormData): Promise<void> {
     actorType: actor.actorType,
     actorId: actor.actorId,
     occurredAt: now,
-    details: { event: "edit_jsa", addedParticipants: participants.rows.map((row) => row.position) },
+    details: { event: "edit_jsa", addedParticipants: participants.rows.map((row) => row.position).join(",") },
   });
   revalidatePath(detailPath);
   redirect(detailPath);
