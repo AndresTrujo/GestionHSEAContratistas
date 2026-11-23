@@ -1,5 +1,5 @@
 import type { EntryRecord } from "@/domain/contratistas";
-import { get_date_mx, get_start_of_day_mx } from "@/lib/data/identidad";
+import { get_date_mx } from "@/lib/data/identidad";
 
 /**
  * Horas en planta, calculadas siempre desde la bitácora (entrada y salida de cada ingreso permitido): no se guardan
