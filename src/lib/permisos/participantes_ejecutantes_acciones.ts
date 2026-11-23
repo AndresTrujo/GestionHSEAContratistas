@@ -31,7 +31,7 @@ export async function update_executor_medical_evaluation(formData: FormData): Pr
   const position = Number(readText(formData, "position"));
   const evaluation = readText(formData, "evaluation");
   if (!Number.isInteger(position) || position < 1 || position > 100 ||
-      !(evaluation in evaluationLabels) ||
+      !Object.prototype.hasOwnProperty.call(evaluationLabels, evaluation) ||
       !String(permit.fields[`executor${position}`] ?? "").trim() ||
       permit.fields[`executorRemovedAt_${position}`]) {
     redirect(detailPath);
