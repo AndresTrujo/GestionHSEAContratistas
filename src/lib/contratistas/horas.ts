@@ -29,6 +29,24 @@ export function format_decimal_hours(ms: number): string {
   return (ms / 3_600_000).toFixed(2);
 }
 
+/** Domingo de la semana (YYYY-MM-DD) de una fecha YYYY-MM-DD. */
+export function get_week_start_sunday(date: string): string {
+  const base = new Date(`${date}T00:00:00Z`);
+  base.setUTCDate(base.getUTCDate() - base.getUTCDay());
+  return base.toISOString().slice(0, 10);
+}
+
+/** Tiempo permitido dentro del intervalo; las sesiones abiertas llegan hasta el final del intervalo. */
+export function get_overlap_worked_ms(entry: Pick<EntryRecord, "result" | "enteredAt" | "exitedAt">, rangeStartMs: number, rangeEndMs: number): number | null {
+  if (entry.result !== "PERMITIDO") return null;
+  const entered = new Date(entry.enteredAt).getTime();
+  const exited = entry.exitedAt ? new Date(entry.exitedAt).getTime() : rangeEndMs;
+  if (!Number.isFinite(entered) || !Number.isFinite(exited)) return null;
+  const start = Math.max(entered, rangeStartMs);
+  const end = Math.min(exited, rangeEndMs);
+  return end > start ? end - start : null;
+}
+
 /** Lunes de la semana (YYYY-MM-DD) de una fecha YYYY-MM-DD. */
 export function get_week_start(date: string): string {
   const base = new Date(`${date}T00:00:00Z`);

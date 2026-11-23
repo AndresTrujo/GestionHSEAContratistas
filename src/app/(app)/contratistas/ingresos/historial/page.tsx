@@ -14,6 +14,7 @@ import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { require_employee_permission } from "@/lib/auth/guardas";
 import { format_decimal_hours, format_duration, get_worked_ms, summarize_hours, type HoursPeriod } from "@/lib/contratistas/horas";
+import { get_date_mx } from "@/lib/data/identidad";
 import { get_repositories } from "@/lib/data/proveedor_datos";
 
 interface HistoryPageProps {
@@ -69,11 +70,12 @@ export default async function EntryHistoryPage({ searchParams }: HistoryPageProp
             ? [employee.firstName, employee.middleName, employee.paternalSurname, employee.maternalSurname].filter(Boolean).join(" ")
             : `Colaborador ${employeeId}`,
           company: employee ? (providerNames.get(employee.providerId) ?? `Proveedor ${employee.providerId}`) : "—",
+          providerId: employee?.providerId ?? 0,
         },
       ] as const;
     }),
   );
-  const employeeInfo = new Map<number, { name: string; company: string }>(employeeEntries);
+  const employeeInfo = new Map<number, { name: string; company: string; providerId: number }>(employeeEntries);
   const get_name = (employeeId: number) => employeeInfo.get(employeeId)?.name ?? "";
 
   // Horas acumuladas por periodo (del más reciente al más antiguo) y, dentro de cada uno, por colaborador.
@@ -83,17 +85,28 @@ export default async function EntryHistoryPage({ searchParams }: HistoryPageProp
   );
   const totalMs = summaries.reduce((sum, item) => sum + item.totalMs, 0);
 
-  // Registros agrupados por colaborador (alfabético) y, dentro de cada uno, del más reciente al más antiguo.
-  const byEmployee = new Map<number, typeof entries>();
-  for (const entry of entries) byEmployee.set(entry.providerEmployeeId, [...(byEmployee.get(entry.providerEmployeeId) ?? []), entry]);
-  const groups = [...byEmployee.entries()]
-    .map(([employeeId, items]) => ({
-      employeeId,
-      info: employeeInfo.get(employeeId),
-      items,
-      workedMs: items.reduce((sum, entry) => sum + (get_worked_ms(entry) ?? 0), 0),
-    }))
-    .sort((first, second) => (first.info?.name ?? "").localeCompare(second.info?.name ?? "", "es"));
+  // Agrupación por día (hora de Ciudad de México), proveedor y colaborador.
+  const byDay = new Map<string, Map<number, Map<number, typeof entries>>>();
+  for (const entry of entries) {
+    const day = get_date_mx(entry.enteredAt);
+    const providerId = employeeInfo.get(entry.providerEmployeeId)?.providerId ?? 0;
+    const providerGroups = byDay.get(day) ?? new Map<number, Map<number, typeof entries>>();
+    const employeeGroups = providerGroups.get(providerId) ?? new Map<number, typeof entries>();
+    employeeGroups.set(entry.providerEmployeeId, [...(employeeGroups.get(entry.providerEmployeeId) ?? []), entry]);
+    providerGroups.set(providerId, employeeGroups);
+    byDay.set(day, providerGroups);
+  }
+  const groups = [...byDay.entries()].flatMap(([day, providerGroups]) =>
+    [...providerGroups.entries()].flatMap(([providerId, employeeGroups]) =>
+      [...employeeGroups.entries()].map(([employeeId, items]) => ({
+        day, providerId,
+        company: providerNames.get(providerId) ?? (providerId ? `Proveedor ${providerId}` : "Proveedor no identificado"),
+        employeeId, info: employeeInfo.get(employeeId),
+        items: items.sort((a, b) => b.enteredAt.localeCompare(a.enteredAt)),
+        workedMs: items.reduce((sum, entry) => sum + (get_worked_ms(entry) ?? 0), 0),
+      })),
+    ),
+  ).sort((a, b) => b.day.localeCompare(a.day) || a.company.localeCompare(b.company, "es") || (a.info?.name ?? "").localeCompare(b.info?.name ?? "", "es"));
 
   function build_href(nextPeriod: HoursPeriod): string {
     const urlParams = new URLSearchParams();
@@ -244,9 +257,9 @@ export default async function EntryHistoryPage({ searchParams }: HistoryPageProp
       </section>
 
       <section className={cardClass} aria-labelledby="titulo-registros">
-        <h2 id="titulo-registros" className="mb-1 text-2xl uppercase">Registros por colaborador</h2>
+        <h2 id="titulo-registros" className="mb-1 text-2xl uppercase">Registros por día, proveedor y colaborador</h2>
         <p className="mb-4 text-sm text-neutral-dark">
-          Todos los registros, incluidos los intentos denegados, del más reciente al más antiguo. Se leen hasta {maxEntries} registros.
+          Todos los registros, incluidos los intentos denegados, agrupados por fecha, proveedor y colaborador. Se leen hasta {maxEntries} registros.
         </p>
         {groups.length === 0 ? (
           <p className="rounded-lg bg-neutral-light/20 px-4 py-6 text-center text-sm text-neutral-dark">No hay registros con ese filtro.</p>
@@ -267,35 +280,27 @@ export default async function EntryHistoryPage({ searchParams }: HistoryPageProp
                 </tr>
               </thead>
               {groups.map((group) => (
-                <tbody key={group.employeeId}>
-                  <tr>
-                    <th scope="colgroup" colSpan={8} className="bg-neutral-light/30 px-3 py-2 text-left font-bold">
-                      {group.info?.name}
-                      <span className="font-normal text-neutral-dark">
-                        {" "}· {group.info?.company} · {group.items.length} registro{group.items.length === 1 ? "" : "s"} · {format_duration(group.workedMs)} acumuladas
-                      </span>
-                    </th>
-                  </tr>
+                <tbody key={group.day + "-" + group.providerId + "-" + group.employeeId}>
+                  <tr><th scope="colgroup" colSpan={8} className="bg-brand-navy/10 px-3 py-2 text-left font-bold capitalize">
+                    {new Intl.DateTimeFormat("es-MX", { timeZone: "UTC", dateStyle: "full" }).format(new Date(group.day + "T12:00:00Z"))}
+                  </th></tr>
+                  <tr><th scope="colgroup" colSpan={8} className="bg-neutral-light/40 px-3 py-2 text-left font-bold">Proveedor: {group.company}</th></tr>
+                  <tr><th scope="colgroup" colSpan={8} className="bg-neutral-light/20 px-3 py-2 text-left font-bold">
+                    {group.info?.name}<span className="font-normal text-neutral-dark">{" "}· {group.items.length} registro{group.items.length === 1 ? "" : "s"} · {format_duration(group.workedMs)} acumuladas</span>
+                  </th></tr>
                   {group.items.map((entry) => {
                     const worked = get_worked_ms(entry);
                     return (
                       <tr key={entry.id} className="hover:bg-neutral-light/10">
                         <td className={tdClass}>{format_time(entry.enteredAt)}</td>
-                        <td className={tdClass}>
-                          {entry.result === "DENEGADO" ? "—" : entry.exitedAt ? format_time(entry.exitedAt) : <span className="font-bold text-brand-green">Dentro de planta</span>}
-                        </td>
+                        <td className={tdClass}>{entry.result === "DENEGADO" ? "—" : entry.exitedAt ? format_time(entry.exitedAt) : <span className="font-bold text-brand-green">Dentro de planta</span>}</td>
                         <td className={tdClass}>{worked === null ? "—" : format_duration(worked)}</td>
-                        <td className={`${tdClass} font-bold ${entry.result === "PERMITIDO" ? "text-brand-green" : "text-red-700"}`}>
-                          {entry.result === "PERMITIDO" ? "Permitido" : "Denegado"}
-                        </td>
+                        <td className={tdClass + " font-bold " + (entry.result === "PERMITIDO" ? "text-brand-green" : "text-red-700")}>{entry.result === "PERMITIDO" ? "Permitido" : "Denegado"}</td>
                         <td className={tdClass}><SemaphoreBadge semaphore={entry.semaphoreAtEntry} /></td>
                         <td className={tdClass}>{entry.eppComplete ? "Completo" : "Incompleto"}</td>
                         <td className={tdClass}>{[entry.denialReason, entry.notes].filter(Boolean).join(" · ") || "—"}</td>
-                        <td className={tdClass}>
-                          {entry.registeredByEmployeeNumber}
-                          {entry.exitRegisteredByEmployeeNumber && entry.exitRegisteredByEmployeeNumber !== entry.registeredByEmployeeNumber && (
-                            <span className="block text-xs text-neutral-dark">Salida: {entry.exitRegisteredByEmployeeNumber}</span>
-                          )}
+                        <td className={tdClass}>{entry.registeredByEmployeeNumber}
+                          {entry.exitRegisteredByEmployeeNumber && entry.exitRegisteredByEmployeeNumber !== entry.registeredByEmployeeNumber && <span className="block text-xs text-neutral-dark">Salida: {entry.exitRegisteredByEmployeeNumber}</span>}
                         </td>
                       </tr>
                     );

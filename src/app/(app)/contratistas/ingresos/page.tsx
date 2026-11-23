@@ -15,7 +15,7 @@ import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { DisclosureCard } from "@/components/ui/DisclosureCard";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { register_entry_action, register_manual_exit_action } from "@/lib/contratistas/acciones";
-import { format_duration } from "@/lib/contratistas/horas";
+import { format_duration, get_overlap_worked_ms, get_week_start_sunday } from "@/lib/contratistas/horas";
 import { require_employee_permission } from "@/lib/auth/guardas";
 import { get_today_mx } from "@/lib/data/identidad";
 import { get_repositories } from "@/lib/data/proveedor_datos";
@@ -44,11 +44,12 @@ export default async function EntriesPage({ searchParams }: EntriesPageProps) {
   const provider = Number.isSafeInteger(providerId) ? providers.find((item) => item.id === providerId) : undefined;
   const providerNames = new Map(allProviders.map((item) => [item.id, item.name]));
 
-  const [allStaff, semaphores, openEntries, todayEntries, hiddenEmployeeIds] = await Promise.all([
+  const [allStaff, semaphores, openEntries, todayEntries, weeklyEntries, hiddenEmployeeIds] = await Promise.all([
     provider ? repositories.providerEmployees.list_employees(provider.id) : Promise.resolve([]),
     provider ? repositories.providerEmployees.list_semaphores(provider.id) : Promise.resolve([]),
     repositories.entries.list_open_entries(),
     repositories.entries.list_history({ from: today, to: today }),
+    repositories.entries.list_history({ limit: 5000 }),
     provider ? repositories.providerUsers.list_employee_ids_with_inactive_account(provider.id) : Promise.resolve([]),
   ]);
   // Quien tiene su cuenta eliminada (inactiva) no aparece, igual que en el listado de personal.
@@ -77,6 +78,16 @@ export default async function EntriesPage({ searchParams }: EntriesPageProps) {
   const allowedToday = todayEntries.filter((entry) => entry.result === "PERMITIDO").length;
   const deniedToday = todayEntries.filter((entry) => entry.result === "DENEGADO").length;
   const nowMs = new Date().getTime();
+  const weekStartMs = new Date(`${get_week_start_sunday(today)}T00:00:00-06:00`).getTime();
+  const weeklyStats = new Map<number, { workedMs: number; visits: number }>();
+  for (const entry of weeklyEntries) {
+    if (entry.result !== "PERMITIDO") continue;
+    const stats = weeklyStats.get(entry.providerEmployeeId) ?? { workedMs: 0, visits: 0 };
+    const enteredAtMs = new Date(entry.enteredAt).getTime();
+    if (enteredAtMs >= weekStartMs && enteredAtMs <= nowMs) stats.visits += 1;
+    stats.workedMs += get_overlap_worked_ms(entry, weekStartMs, nowMs) ?? 0;
+    weeklyStats.set(entry.providerEmployeeId, stats);
+  }
 
   const summary = [
     { label: "Dentro de planta ahora", value: openEntries.length, accent: "border-t-brand-navy" },
@@ -131,6 +142,8 @@ export default async function EntriesPage({ searchParams }: EntriesPageProps) {
                   <th scope="col" className={thClass}>Colaborador</th>
                   <th scope="col" className={thClass}>Entró</th>
                   <th scope="col" className={thClass}>Tiempo dentro</th>
+                  <th scope="col" className={thClass}>Tiempo dentro en la semana</th>
+                  <th scope="col" className={thClass}>Visitas esta semana</th>
                   <th scope="col" className={thClass}><span className="sr-only">Acciones</span></th>
                 </tr>
               </thead>
@@ -143,6 +156,8 @@ export default async function EntriesPage({ searchParams }: EntriesPageProps) {
                     </td>
                     <td className={tdClass}>{format_time(entry.enteredAt)}</td>
                     <td className={tdClass}>{format_duration(Math.max(0, nowMs - new Date(entry.enteredAt).getTime()))}</td>
+                    <td className={tdClass}>{format_duration(weeklyStats.get(entry.providerEmployeeId)?.workedMs ?? 0)}</td>
+                    <td className={tdClass}>{weeklyStats.get(entry.providerEmployeeId)?.visits ?? 0}</td>
                     <td className={`${tdClass} text-right`}>
                       <Link href={`/contratistas/ingresos/escanear?salida=${entry.id}`} className={secondaryButtonClass}>
                         Registrar salida (QR)
