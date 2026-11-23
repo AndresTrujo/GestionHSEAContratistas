@@ -114,8 +114,9 @@ export default async function NewJsaPage({ searchParams }: NewJsaPageProps) {
 
       {error === "incomplete" && (
         <FormAlert>
-          Completa los datos generales, responde las 4 preguntas de permiso, captura al menos un paso completo (peligros válidos, medidas
-          de control, P y S) y al menos un participante.
+          {editingPermit
+            ? "Completa los datos generales, responde las 4 preguntas y captura al menos un paso completo (peligros válidos, medidas de control, P y S)."
+            : "Completa los datos generales, responde las 4 preguntas de permiso, captura al menos un paso completo (peligros válidos, medidas de control, P y S) y al menos un participante."}
         </FormAlert>
       )}
       {error && executorErrorMessages[error] && <FormAlert>{executorErrorMessages[error]}</FormAlert>}
