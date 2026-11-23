@@ -253,8 +253,9 @@ export async function update_jsa(formData: FormData): Promise<void> {
     fields[`participant${row.position}Job`] = row.job;
     fields[`participant${row.position}Company`] = row.company;
   }
-  fields.participantCount = Math.max(jsaMaxParticipants, ...previousParticipantPositions, ...participants.rows.map((row) => row.position));
-  if (fields.participantCount > 100) redirect(failure);
+  const participantCount = Math.max(jsaMaxParticipants, ...previousParticipantPositions, ...participants.rows.map((row) => row.position));
+  if (participantCount > 100) redirect(failure);
+  fields.participantCount = participantCount;
 
   const selectedArea = await read_permit_area(formData);
   if (!selectedArea) redirect(failure);
