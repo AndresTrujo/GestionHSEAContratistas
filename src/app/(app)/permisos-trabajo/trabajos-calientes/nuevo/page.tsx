@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { primaryButtonClass } from "@/components/administracion/estilos";
 import { ExecutorFields } from "@/components/permisos/ExecutorFields";
