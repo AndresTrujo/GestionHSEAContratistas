@@ -246,17 +246,6 @@ export async function sign_confined_permit(formData: FormData): Promise<void> {
     if (permit.status !== "submitted") redirect(detailPath);
     if (is_reading_out_of_limits(permit, 1)) redirect(`${detailPath}?error=initial_limits`);
 
-    if (key === "medical_service") {
-      // La evaluación médica de cada ejecutante se registra al firmar.
-      const executors = get_confined_executors(permit);
-      for (let position = 1; position <= executors.length; position += 1) {
-        const evaluation = read_text(formData, `medical${position}`);
-        if (!(evaluation in confinedEvaluationLabels)) {
-          redirect(`${detailPath}?error=medical`);
-        }
-        fields[`medical${position}`] = evaluation;
-      }
-    }
   } else if (isClosingKey) {
     // HSEA verifica las condiciones finales: nadie debe seguir dentro.
     if (permit.status !== "approved") redirect(detailPath);
