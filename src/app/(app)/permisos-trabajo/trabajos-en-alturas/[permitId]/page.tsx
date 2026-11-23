@@ -2,6 +2,7 @@ import { SubmitButton } from "@/components/ui/SubmitButton";
 import { notFound } from "next/navigation";
 import { inputClass, labelClass, primaryButtonClass, tableClass, tdClass, thClass } from "@/components/administracion/estilos";
 import { DetailCard } from "@/components/permisos/DetailCard";
+import { ExecutorRowActions } from "@/components/permisos/ExecutorRowActions";
 import { FormAlert } from "@/components/permisos/FormAlert";
 import { PermitDetailHeader } from "@/components/permisos/PermitDetailHeader";
 import { SectionCard } from "@/components/permisos/SectionCard";
@@ -127,17 +128,21 @@ export default async function HeightsPermitDetailPage({
                   <th scope="col" className={thClass}>#</th>
                   <th scope="col" className={thClass}>Nombre</th>
                   <th scope="col" className={thClass}>Evaluación médica</th>
+                  <th scope="col" className={thClass}>Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {executors.map((name, index) => {
-                  const evaluation = permit.fields[`medical${index + 1}`] as
+                  const position = index + 1;
+                  if (permit.fields[`executorRemovedAt_${position}`]) return null;
+                  const evaluation = permit.fields[`medical${position}`] as
                     | MedicalEvaluation
                     | undefined;
                   return (
                     <tr key={index}>
-                      <td className={tdClass}>{index + 1}</td>
+                      <td className={tdClass}>{position}</td>
                       <td className={tdClass}>{name}</td>
+                      <td className={tdClass}><ExecutorRowActions permitId={permit.id} position={position} evaluation={evaluation} canEdit={canEdit} /></td>
                       <td className={`${tdClass} font-bold ${evaluation === "unfit" ? "text-red-700" : ""}`}>
                         {evaluation === "unfit" && <span aria-hidden="true">✕ </span>}
                         {evaluation ? medicalEvaluationLabels[evaluation] : "Pendiente"}
@@ -217,37 +222,6 @@ export default async function HeightsPermitDetailPage({
                 signatureKey={item.key}
                 label={item.label}
                 canSign={canSignApproval}
-                modalFields={
-                  item.key === "medical_service" ? (
-                    <fieldset className="mb-3 space-y-2 text-sm">
-                      <legend className="mb-1 font-bold">Evaluación médica</legend>
-                      {executors.map((name, index) => (
-                        <div key={index} className="flex flex-wrap items-center justify-between gap-2">
-                          <span>
-                            {index + 1}. {name}
-                          </span>
-                          <span className="flex gap-2">
-                            {Object.entries(medicalEvaluationLabels).map(([value, label]) => (
-                              <label
-                                key={value}
-                                className="flex min-h-11 items-center gap-2 rounded-lg border border-neutral-light px-3 has-[:checked]:border-brand-navy has-[:checked]:bg-brand-navy has-[:checked]:text-white sm:min-h-10"
-                              >
-                                <input
-                                  type="radio"
-                                  name={`medical${index + 1}`}
-                                  value={value}
-                                  required
-                                  className="h-4 w-4"
-                                />
-                                {label}
-                              </label>
-                            ))}
-                          </span>
-                        </div>
-                      ))}
-                    </fieldset>
-                  ) : undefined
-                }
               />
             ))}
           </div>
