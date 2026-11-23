@@ -175,7 +175,7 @@ export async function update_jsa(formData: FormData): Promise<void> {
   const repositories = get_repositories();
   const permitId = read_text(formData, "permitId");
   const permit = await repositories.permits.get_by_id(permitId);
-  if (!permit || permit.permitTypeSlug !== jsaSlug || !can_access_permit(actor, permit) || !(await can_edit_permit(actor, permit))) {
+  if (!permit || permit.fields.deletedAt || permit.permitTypeSlug !== jsaSlug || !can_access_permit(actor, permit) || !(await can_edit_permit(actor, permit))) {
     redirect(basePath);
   }
   const detailPath = `${basePath}/${permit.id}`;
@@ -312,7 +312,7 @@ export async function sign_jsa(formData: FormData): Promise<void> {
   const employeeNumber = actor.actorId;
   const repositories = get_repositories();
   const permit = await repositories.permits.get_by_id(read_text(formData, "permitId"));
-  if (!permit || permit.permitTypeSlug !== jsaSlug || !can_access_permit(actor, permit)) redirect(basePath);
+  if (!permit || permit.fields.deletedAt || permit.permitTypeSlug !== jsaSlug || !can_access_permit(actor, permit)) redirect(basePath);
 
   const detailPath = `${basePath}/${permit.id}`;
   const key = read_text(formData, "key");
