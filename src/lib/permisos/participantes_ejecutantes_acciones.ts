@@ -20,7 +20,7 @@ async function loadEditable(formData: FormData) {
   const actor = await require_permit_actor();
   const id = readText(formData, "permitId");
   const permit = await get_repositories().permits.get_by_id(id);
-  if (!permit || !allowedSlugs.has(permit.permitTypeSlug) || !can_access_permit(actor, permit) || !(await can_edit_permit(actor, permit))) {
+  if (!permit || permit.fields.deletedAt || !allowedSlugs.has(permit.permitTypeSlug) || !can_access_permit(actor, permit) || !(await can_edit_permit(actor, permit))) {
     redirect("/permisos-trabajo");
   }
   return { actor, permit, detailPath: `/permisos-trabajo/${permit.permitTypeSlug}/${permit.id}` };
