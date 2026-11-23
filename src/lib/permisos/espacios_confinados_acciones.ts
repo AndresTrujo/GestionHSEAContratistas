@@ -223,7 +223,8 @@ export async function sign_confined_permit(formData: FormData): Promise<void> {
   const executorParticipantPosition = executorParticipantMatch ? Number(executorParticipantMatch[1]) : 0;
   const isExecutorParticipantKey = executorParticipantPosition > 0 &&
     Boolean(permit.fields[`executorAddedAt_${executorParticipantPosition}`]) &&
-    Boolean(String(permit.fields[`executor${executorParticipantPosition}`] ?? "").trim());
+    Boolean(String(permit.fields[`executor${executorParticipantPosition}`] ?? "").trim()) &&
+    !permit.fields[`executorRemovedAt_${executorParticipantPosition}`];
   if (!isApprovalKey && !isClosingKey && !isExecutorParticipantKey) redirect(detailPath);
   if (isExecutorParticipantKey && !(await can_sign_participant(actor, permit.id, executorParticipantPosition, "executor"))) {
     redirect(`${detailPath}?error=participant_not_you`);
@@ -301,6 +302,7 @@ export async function record_confined_movement(formData: FormData): Promise<void
     !Number.isInteger(position) ||
     position < 1 ||
     position > executors.length ||
+    permit.fields[`executorRemovedAt_${position}`] ||
     (kind !== "entry" && kind !== "exit")
   ) {
     redirect(detailPath);
