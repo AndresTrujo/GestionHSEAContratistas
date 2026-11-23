@@ -25,7 +25,7 @@ export function ExecutorFields({ options, maxExecutors, requiredWorkType, startP
   const provider = options.providers.find((item) => String(item.id) === providerId);
   const isFixed = options.fixedProviderId !== null;
 
-  function updatePosition(position: number, value: string) {
+  function update_position(position: number, value: string) {
     const next = { ...filled, [position]: Boolean(value) };
     set_filled(next);
     if (Array.from({ length: visibleCount }, (_, index) => startPosition + index + 1).every((item) => next[item])) {
@@ -56,14 +56,14 @@ export function ExecutorFields({ options, maxExecutors, requiredWorkType, startP
             return (
               <div key={position}>
                 <label htmlFor={`executor${position}`} className={labelClass}>{hint}</label>
-                <TfsEmployeePicker id={`executor${position}`} name={`executorTfs${position}`} required={requireExecutor && index === 0} onValueChange={(value) => updatePosition(position, value)} />
+                <TfsEmployeePicker id={`executor${position}`} name={`executorTfs${position}`} required={requireExecutor && index === 0} onValueChange={(value) => update_position(position, value)} />
               </div>
             );
           }
           return (
             <div key={`${provider.id}-${position}`}>
               <label htmlFor={`executorEmployee${position}`} className={labelClass}>{hint}</label>
-              <select id={`executorEmployee${position}`} name={`executorEmployee${position}`} defaultValue="" required={requireExecutor && index === 0} onChange={(event) => updatePosition(position, event.target.value)} className={inputClass}>
+              <select id={`executorEmployee${position}`} name={`executorEmployee${position}`} defaultValue="" required={requireExecutor && index === 0} onChange={(event) => update_position(position, event.target.value)} className={inputClass}>
                 <option value="">Elige un colaborador</option>
                 {provider.staff.map((member) => {
                   const isGreen = member.semaphore === "VERDE";
