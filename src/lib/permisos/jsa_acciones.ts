@@ -121,11 +121,10 @@ export async function create_jsa(formData: FormData): Promise<void> {
 
   const participants = await read_jsa_participants(formData, actor, jsaMaxParticipants);
   if (!participants.ok) redirect(`${basePath}/nuevo?error=${participants.errorCode}`);
-  for (let position = 1; position <= jsaMaxParticipants; position += 1) {
-    const row = participants.rows.find((item) => item.position === position);
-    fields[`participant${position}Name`] = row?.name ?? "";
-    fields[`participant${position}Job`] = row?.job ?? "";
-    fields[`participant${position}Company`] = row?.company ?? "";
+  for (const row of participants.rows) {
+    fields[`participant${row.position}Name`] = row.name;
+    fields[`participant${row.position}Job`] = row.job;
+    fields[`participant${row.position}Company`] = row.company;
   }
   if (participants.rows.length === 0) redirect(failure);
   const submittedParticipantCount = Number(read_text(formData, "participantCount"));
