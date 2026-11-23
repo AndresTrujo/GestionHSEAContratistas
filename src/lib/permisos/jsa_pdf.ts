@@ -183,7 +183,7 @@ function format_date(value: unknown): string {
 }
 
 function format_signed_at(iso: string): string {
-  return new Date(iso).toLocaleString("es-MX");
+  return new Intl.DateTimeFormat("es-MX", { timeZone: "America/Mexico_City", dateStyle: "short", timeStyle: "short" }).format(new Date(iso));
 }
 
 async function embed_signature(pdf: PDFDocument, image: string | null | undefined): Promise<PDFImage | null> {
