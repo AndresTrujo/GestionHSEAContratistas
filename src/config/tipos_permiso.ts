@@ -96,10 +96,16 @@ export function is_next_approval_signature(permit: WorkPermit, key: string): boo
     : permitType.signerRoles.includes("requester")
       ? "requester"
       : null;
-  // Solo se consideran los roles que realmente existen en el formato.
-  const order = [firstRole, "operational_manager", "hsea"].filter(
-    (role): role is SignerRole => role !== null && permitType.signerRoles.includes(role),
-  );
+  // Construye la secuencia con roles válidos para el formato actual.
+  const order: SignerRole[] = [];
+  if (firstRole && permitType.signerRoles.includes(firstRole)) {
+    order.push(firstRole);
+  }
+  for (const role of approvalSignatureOrder.slice(1)) {
+    if (permitType.signerRoles.includes(role)) {
+      order.push(role);
+    }
+  }
   const position = order.indexOf(key as SignerRole);
   if (position <= 0) return true;
 
