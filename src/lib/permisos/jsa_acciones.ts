@@ -127,10 +127,7 @@ export async function create_jsa(formData: FormData): Promise<void> {
     fields[`participant${row.position}Company`] = row.company;
   }
   if (participants.rows.length === 0) redirect(failure);
-  const submittedParticipantCount = Number(read_text(formData, "participantCount"));
-  fields.participantCount = Number.isInteger(submittedParticipantCount) && submittedParticipantCount >= jsaMaxParticipants
-    ? Math.min(submittedParticipantCount, 100)
-    : jsaMaxParticipants;
+  fields.participantCount = Math.max(jsaMaxParticipants, ...participants.rows.map((row) => row.position));
 
   const selectedArea = await read_permit_area(formData);
   if (!selectedArea) redirect(`${basePath}/nuevo?error=incomplete`);
@@ -234,16 +231,13 @@ export async function update_jsa(formData: FormData): Promise<void> {
     redirect(`${basePath}/nuevo?editar=${permit.id}&error=certifications`);
   }
 
-  const submittedCount = Number(read_text(formData, "participantCount"));
-  const participantCount = Number.isInteger(submittedCount) && submittedCount >= jsaMaxParticipants
-    ? Math.min(submittedCount, 100)
-    : Math.max(jsaMaxParticipants, Number(permit.fields.participantCount ?? jsaMaxParticipants));
   for (const row of participants.rows) {
     fields[`participant${row.position}Name`] = row.name;
     fields[`participant${row.position}Job`] = row.job;
     fields[`participant${row.position}Company`] = row.company;
   }
-  fields.participantCount = Math.max(participantCount, Number(permit.fields.participantCount ?? jsaMaxParticipants));
+  const previousParticipantPositions = get_jsa_participants(permit).map((row) => row.position);
+  fields.participantCount = Math.max(jsaMaxParticipants, ...previousParticipantPositions, ...participants.rows.map((row) => row.position));
   if (fields.participantCount > 100) redirect(failure);
 
   const selectedArea = await read_permit_area(formData);
