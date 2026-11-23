@@ -1,11 +1,4 @@
-i
-
-function read_dynamic_count(formData: FormData, field: string, fallback: number): number {
-  const raw = read_field(formData, field);
-  if (!raw) return fallback;
-  const count = Number(raw);
-  return Number.isInteger(count) && count >= fallback && count <= 100 ? count : fallback;
-}mport type { ActorIdentity } from "@/domain/acceso";
+import type { ActorIdentity } from "@/domain/acceso";
 import type { ParticipantRef, Semaphore } from "@/domain/contratistas";
 import { workTypes, type WorkTypeCode } from "@/config/documentos_contratista";
 import { get_repositories } from "@/lib/data/proveedor_datos";
