@@ -40,6 +40,7 @@ const errorMessages: Record<string, string> = {
   expired: "El permiso superó sus 12 horas de vigencia; ya no admite verificaciones.",
   order: "Las firmas de autorización deben realizarse en orden: ejecución, responsable del área y HSE. Las verificaciones también se firman en orden.",
   signature: "La firma no es válida; dibújala de nuevo.",
+  participant_not_you: "Solo la persona asignada puede firmar como ejecutante agregado.",
 };
 
 export default async function HotWorkPermitDetailPage({
@@ -55,6 +56,8 @@ export default async function HotWorkPermitDetailPage({
   const canEdit = await can_edit_permit(actor, permit);
 
   const events = await repositories.audit.list_events_by_entity("permisos_trabajo", permit.id);
+  const executors = get_executors(permit);
+  const addedExecutorPositions = Array.from({ length: 100 }, (_, index) => index + 1).filter((position) => Boolean(permit.fields[`executorAddedAt_${position}`]));
   const validUntil = get_valid_until(permit);
   const isExpired = validUntil !== null && validUntil.getTime() < Date.now();
   const isClosed = permit.status === "closed";
@@ -143,6 +146,25 @@ export default async function HotWorkPermitDetailPage({
         </div>
       </details>
 
+      {addedExecutorPositions.length > 0 && (
+        <div className="mb-6">
+          <SectionCard title="Firma de ejecutantes agregados">
+            <p className="mb-3 text-sm text-neutral-dark">Estas personas se incorporaron después de crear el permiso. Solo ellas tienen una firma individual pendiente; las firmas anteriores se conservan.</p>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {addedExecutorPositions.map((position) => (
+                <SignatureBox
+                  key={position}
+                  action={sign_hot_work_permit}
+                  permit={permit}
+                  signatureKey={`executor_participant_${position}`}
+                  label={String(permit.fields[`executor${position}`] ?? `Ejecutante ${position}`)}
+                  canSign
+                />
+              ))}
+            </div>
+          </SectionCard>
+        </div>
+      )}
       <div className="mb-6">
         <SectionCard title="Autorización" description="Las cuatro firmas de autorización pasan el permiso a Autorizado.">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
