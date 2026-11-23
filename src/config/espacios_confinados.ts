@@ -2,7 +2,7 @@
 
 /** Estructura del formato FO-0234 (Permiso para entrada a espacios confinados). */
 export const confinedSlug = "espacios-confinados";
-export const confinedMaxExecutors = 4;
+export const confinedMaxExecutors = 6;
 export const confinedValidityHours = 8;
 /** Lectura inicial + 4 lecturas posteriores, como en el formato. */
 export const confinedReadingCount = 5;
