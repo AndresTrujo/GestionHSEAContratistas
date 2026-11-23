@@ -17,7 +17,7 @@ export async function delete_work_permit(formData: FormData): Promise<void> {
 
   const repositories = get_repositories();
   const permit = await repositories.permits.get_by_id(permitId);
-  if (!permit) throw new Error("El permiso no existe o ya fue eliminado.");
+  if (!permit || permit.fields.deletedAt) throw new Error("El permiso no existe o ya fue eliminado.");
 
   const now = new Date().toISOString();
   await repositories.permits.save({
