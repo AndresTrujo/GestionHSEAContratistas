@@ -120,6 +120,7 @@ export default async function NewJsaPage({ searchParams }: NewJsaPageProps) {
         </FormAlert>
       )}
       {error && executorErrorMessages[error] && <FormAlert>{executorErrorMessages[error]}</FormAlert>}
+      {error === "certifications" && <FormAlert>Algún participante de contratista no tiene las certificaciones vigentes requeridas para el trabajo. Revisa su documentación antes de guardar.</FormAlert>}
 
       <JsaForm create_action={editingPermit ? update_jsa : create_jsa} check_action={check_jsa_certifications} className="space-y-6">
         {editingPermit && <input type="hidden" name="permitId" value={editingPermit.id} />}
