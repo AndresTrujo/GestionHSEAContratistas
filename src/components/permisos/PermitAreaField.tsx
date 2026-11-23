@@ -16,9 +16,9 @@ export async function PermitAreaField({ initialArea }: { initialArea?: { departm
     <AreaSelector
       initialDepartmentId={initialArea?.departmentId ?? null}
       initialSubdepartmentId={initialArea?.subdepartmentId ?? null}
-      departments={departments.filter((item) => item.active).map((item) => ({ id: item.id, name: item.name }))}
+      departments={departments.filter((item) => item.active || item.id === initialArea?.departmentId).map((item) => ({ id: item.id, name: item.name }))}
       subdepartments={subdepartments
-        .filter((item) => item.active)
+        .filter((item) => item.active || item.id === initialArea?.subdepartmentId)
         .map((item) => ({ id: item.id, name: item.name, departmentId: item.departmentId }))}
     />
   );
