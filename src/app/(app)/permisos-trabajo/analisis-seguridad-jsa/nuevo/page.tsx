@@ -41,6 +41,9 @@ export default async function NewJsaPage({ searchParams }: NewJsaPageProps) {
   const editingPermit = editar ? await get_repositories().permits.get_by_id(editar) : null;
   if (editar && (!editingPermit || editingPermit.permitTypeSlug !== jsaSlug || !can_access_permit(actor, editingPermit) || !(await can_edit_permit(actor, editingPermit)))) notFound();
   const executorOptions = await load_executor_options(actor);
+  const participantOptions = editingPermit?.providerId
+    ? { ...executorOptions, fixedProviderId: Number(editingPermit.providerId) }
+    : executorOptions;
   const existingParticipants = editingPermit ? get_jsa_participants(editingPermit) : [];
   const participantOffset = editingPermit ? Math.max(0, ...existingParticipants.map((item) => item.position)) : 0;
   const participantOptions = editingPermit?.providerId
