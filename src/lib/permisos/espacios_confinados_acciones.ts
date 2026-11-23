@@ -278,7 +278,7 @@ export async function sign_confined_permit(formData: FormData): Promise<void> {
   const allApproved = confinedApprovalSignatures.every((item) =>
     signatures.some((signature) => signature.key === item.key),
   );
-  const status = isClosingKey ? "closed" : allApproved ? "approved" : permit.status;
+  const status = isClosingKey ? "closed" : isApprovalKey && allApproved ? "approved" : permit.status;
 
   await get_repositories().permits.save({
     ...permit,
