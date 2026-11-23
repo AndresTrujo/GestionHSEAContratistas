@@ -209,9 +209,9 @@ export async function update_jsa(formData: FormData): Promise<void> {
     const probability = Number(read_text(formData, `step${row}P`));
     const severity = Number(read_text(formData, `step${row}S`));
     if (!description && !hazards && !controls) continue;
-    const hazardIds = hazards.split(/[,\\s]+/).filter(Boolean);
+    const hazardIds = hazards.split(/[,\s]+/).filter(Boolean);
     if (!description || !controls || hazardIds.length === 0 ||
-      !hazardIds.every((id) => jsaRiskIds.includes(id) || /^\\d{1,2}$/.test(id)) ||
+      !hazardIds.every((id) => jsaRiskIds.includes(id) || /^\d{1,2}$/.test(id)) ||
       !scale.includes(probability) || !scale.includes(severity)) redirect(failure);
     stepCount += 1;
     fields[`step${stepCount}Description`] = description;
