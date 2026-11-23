@@ -22,7 +22,7 @@ export function ParticipantFields({ options, maxParticipants, startPosition = 0,
   const provider = options.providers.find((item) => String(item.id) === providerId);
   const isFixed = options.fixedProviderId !== null;
 
-  function updatePosition(position: number, value: string) {
+  function update_position(position: number, value: string) {
     const next = { ...filled, [position]: Boolean(value) };
     set_filled(next);
     if (Array.from({ length: visibleCount }, (_, index) => startPosition + index + 1).every((item) => next[item])) {
@@ -53,7 +53,7 @@ export function ParticipantFields({ options, maxParticipants, startPosition = 0,
             <label key={`${providerId}-${position}`} className="block">
               <span className={labelClass}>{label}</span>
               {provider ? (
-                <select name={`participantStaff${position}`} defaultValue="" required={requireParticipant && index === 0} onChange={(event) => updatePosition(position, event.target.value)} className={inputClass}>
+                <select name={`participantStaff${position}`} defaultValue="" required={requireParticipant && index === 0} onChange={(event) => update_position(position, event.target.value)} className={inputClass}>
                   <option value="">Elige un colaborador de {provider.name}</option>
                   {provider.staff.map((member) => (
                     <option key={member.id} value={member.id} disabled={member.semaphore !== "VERDE"}>
@@ -63,7 +63,7 @@ export function ParticipantFields({ options, maxParticipants, startPosition = 0,
                   ))}
                 </select>
               ) : (
-                <TfsEmployeePicker name={`participantEmployee${position}`} required={requireParticipant && index === 0} onValueChange={(value) => updatePosition(position, value)} />
+                <TfsEmployeePicker name={`participantEmployee${position}`} required={requireParticipant && index === 0} onValueChange={(value) => update_position(position, value)} />
               )}
             </label>
           );
