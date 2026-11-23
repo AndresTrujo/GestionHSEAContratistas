@@ -114,9 +114,9 @@ export function get_ppe_labels(permit: WorkPermit): string[] {
 /** Firmas que autorizan el permiso (las 4 obligatorias, personas distintas). */
 export const heightsApprovalSignatures = [
   { key: "executor", label: "Responsable de la ejecución" },
-  { key: "medical_service", label: "Servicio médico" },
   { key: "operational_manager", label: "Responsable operativo del área" },
   { key: "hsea", label: "HSEA" },
+  { key: "medical_service", label: "Servicio médico" },
 ] as const;
 
 export function get_heights_verification_key(position: number): string {

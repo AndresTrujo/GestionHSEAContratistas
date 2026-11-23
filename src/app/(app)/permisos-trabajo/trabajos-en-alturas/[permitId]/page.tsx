@@ -43,7 +43,7 @@ const errorMessages: Record<string, string> = {
   ...signErrorMessages,
   same_person: "Una misma persona no puede firmar dos roles de autorización.",
   expired: "Este permiso es válido sólo en la fecha solicitada; ya no admite más firmas.",
-  order: "Las verificaciones se firman en orden.",
+  order: "Las firmas de autorización deben realizarse en orden: ejecución, responsable del área y HSE. Las verificaciones también se firman en orden.",
   signature: "La firma no es válida; dibújala de nuevo.",
   medical: "El servicio médico debe evaluar a todas las personas ejecutantes.",
   extension: `Indica una extensión de 1 a ${heightsMaxExtensionHours} horas con su horario.`,

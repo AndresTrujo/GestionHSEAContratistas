@@ -1,5 +1,6 @@
 /** Mensajes de los errores de firma (`?error=firma_<motivo>`), comunes a todos los formatos. */
 export const signErrorMessages: Record<string, string> = {
+  order: "Debes esperar a que firme el responsable anterior (ejecución, área y HSE).",
   firma_SIN_AREA: "Este permiso no tiene un área asignada, por lo que no se puede firmar por rol.",
   firma_ACTOR_NO_ENCONTRADO: "No se encontró a la persona que firma.",
   firma_ACTOR_INACTIVO: "Tu cuenta o tu registro está inactivo.",

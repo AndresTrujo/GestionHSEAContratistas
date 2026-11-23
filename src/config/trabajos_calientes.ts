@@ -95,9 +95,9 @@ export function get_checklist_field(number: number): string {
 /** Firmas que autorizan el permiso (las 4 obligatorias, personas distintas). */
 export const hotWorkApprovalSignatures = [
   { key: "executor", label: "Responsable de la ejecución" },
-  { key: "tfs_executor", label: "Responsable de la ejecución por parte de TFS" },
   { key: "operational_manager", label: "Responsable operativo del área" },
   { key: "hsea", label: "HSEA" },
+  { key: "tfs_executor", label: "Responsable de la ejecución por parte de TFS" },
 ] as const;
 
 export function get_verification_key(position: number): string {

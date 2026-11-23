@@ -37,6 +37,7 @@ const errorMessages: Record<string, string> = {
   participant_not_you:
     "Este participante está ligado a otra persona: solo ella (o un usuario de su proveedor, si es colaborador de un contratista) puede firmar por él.",
   signature: "La firma no es válida; dibújala de nuevo.",
+  order: "Debes esperar a que firme el responsable anterior.",
 };
 
 export default async function JsaDetailPage({ params, searchParams }: JsaDetailPageProps) {
