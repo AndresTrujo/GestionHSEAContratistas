@@ -17,7 +17,7 @@ import {
 } from "@/config/jsa";
 import type { WorkPermit } from "@/domain/permisos";
 import { get_repositories } from "@/lib/data/proveedor_datos";
-import { can_access_permit, can_sign_key, require_permit_actor } from "./actor";
+import { can_access_permit, can_edit_permit, can_sign_key, require_permit_actor } from "./actor";
 import { read_permit_area } from "./area";
 import { find_jsa_certification_issues, type CertificationIssue } from "./certificaciones_jsa";
 import { can_sign_participant, read_jsa_participants, register_jsa_participants } from "./ejecutantes";
@@ -169,6 +169,111 @@ export async function create_jsa(formData: FormData): Promise<void> {
   redirect(`${basePath}/${permit.id}`);
 }
 
+
+/**
+ * Actualiza un JSA reutilizando el mismo formato de creación. Conserva folio, estado y firmas existentes;
+ * los nuevos participantes ocupan posiciones nuevas y solo ellos quedan sin firma.
+ */
+export async function update_jsa(formData: FormData): Promise<void> {
+  const actor = await require_permit_actor();
+  const repositories = get_repositories();
+  const permitId = read_text(formData, "permitId");
+  const permit = await repositories.permits.get_by_id(permitId);
+  if (!permit || permit.permitTypeSlug !== jsaSlug || !can_access_permit(actor, permit) || !(await can_edit_permit(actor, permit))) {
+    redirect(basePath);
+  }
+  const detailPath = `${basePath}/${permit.id}`;
+  const failure = `${basePath}/nuevo?editar=${permit.id}&error=incomplete`;
+
+  const fields: WorkPermit["fields"] = {
+    ...permit.fields,
+    date: read_text(formData, "date"),
+    time: read_text(formData, "time"),
+    jobName: read_text(formData, "jobName"),
+    location: read_text(formData, "location"),
+    company: await resolve_requester_unit(formData, "company"),
+  };
+  if (!fields.date || !fields.time || !fields.jobName || !fields.location || !fields.company) redirect(failure);
+
+  for (const question of jsaPermitQuestions) {
+    const answer = read_text(formData, question.field);
+    if (answer !== "yes" && answer !== "no") redirect(failure);
+    fields[question.field] = answer;
+  }
+
+  const scale: number[] = [...jsaScale];
+  let stepCount = 0;
+  for (let row = 1; row <= jsaMaxSteps; row += 1) {
+    const description = read_text(formData, `step${row}Description`);
+    const hazards = read_text(formData, `step${row}Hazards`);
+    const controls = read_text(formData, `step${row}Controls`);
+    const probability = Number(read_text(formData, `step${row}P`));
+    const severity = Number(read_text(formData, `step${row}S`));
+    if (!description && !hazards && !controls) continue;
+    const hazardIds = hazards.split(/[,\\s]+/).filter(Boolean);
+    if (!description || !controls || hazardIds.length === 0 ||
+      !hazardIds.every((id) => jsaRiskIds.includes(id) || /^\\d{1,2}$/.test(id)) ||
+      !scale.includes(probability) || !scale.includes(severity)) redirect(failure);
+    stepCount += 1;
+    fields[`step${stepCount}Description`] = description;
+    fields[`step${stepCount}Hazards`] = hazardIds.join(", ");
+    fields[`step${stepCount}Controls`] = controls;
+    fields[`step${stepCount}P`] = probability;
+    fields[`step${stepCount}S`] = severity;
+    fields[`step${stepCount}R`] = probability * severity;
+  }
+  if (stepCount === 0) redirect(failure);
+  fields.stepCount = stepCount;
+  fields.risks = read_list(formData, "risks", jsaRiskIds).join(",");
+  fields.checklists = read_list(formData, "checklists", jsaChecklists.map((item) => item.slug)).join(",");
+  fields.environmental = read_list(formData, "environmental", jsaEnvironmental.map((item) => item.slug)).join(",");
+  fields.environmentalOther = read_text(formData, "environmentalOther");
+
+  const participants = await read_jsa_participants(formData, actor, jsaMaxParticipants);
+  if (!participants.ok) redirect(`${basePath}/nuevo?editar=${permit.id}&error=${participants.errorCode}`);
+  if ((await find_jsa_certification_issues(formData, actor)).length > 0) {
+    redirect(`${basePath}/nuevo?editar=${permit.id}&error=certifications`);
+  }
+
+  const submittedCount = Number(read_text(formData, "participantCount"));
+  const participantCount = Number.isInteger(submittedCount) && submittedCount >= jsaMaxParticipants
+    ? Math.min(submittedCount, 100)
+    : Math.max(jsaMaxParticipants, Number(permit.fields.participantCount ?? jsaMaxParticipants));
+  for (const row of participants.rows) {
+    fields[`participant${row.position}Name`] = row.name;
+    fields[`participant${row.position}Job`] = row.job;
+    fields[`participant${row.position}Company`] = row.company;
+  }
+  fields.participantCount = Math.max(participantCount, Number(permit.fields.participantCount ?? jsaMaxParticipants));
+  if (fields.participantCount > 100) redirect(failure);
+
+  const selectedArea = await read_permit_area(formData);
+  if (!selectedArea) redirect(failure);
+  const now = new Date().toISOString();
+  await repositories.permits.save({
+    ...permit,
+    providerId: participants.providerId ?? permit.providerId,
+    area: selectedArea.area,
+    fields,
+    // No se modifica el estado ni se eliminan firmas: un JSA autorizado sigue autorizado.
+    signatures: permit.signatures,
+    updatedAt: now,
+    updatedBy: actor.actorId,
+  });
+  await register_jsa_participants(permit.id, participants, actor);
+  await repositories.audit.append_event({
+    entityType: "permisos_trabajo",
+    entityId: permit.id,
+    action: "actualizar",
+    actorType: actor.actorType,
+    actorId: actor.actorId,
+    occurredAt: now,
+    details: { event: "edit_jsa", addedParticipants: participants.rows.map((row) => row.position) },
+  });
+  revalidatePath(detailPath);
+  redirect(detailPath);
+}
+
 /** Firma de aprobación (responsable del trabajo, del área, HSE) o de un participante. */
 export async function sign_jsa(formData: FormData): Promise<void> {
   const actor = await require_permit_actor();
@@ -212,7 +317,7 @@ export async function sign_jsa(formData: FormData): Promise<void> {
   const allApproved = jsaApprovalSignatures.every((item) =>
     signatures.some((signature) => signature.key === item.key),
   );
-  const status = allApproved ? "approved" : permit.status;
+  const status = permit.status === "submitted" && allApproved ? "approved" : permit.status;
 
   await repositories.permits.save({
     ...permit,
