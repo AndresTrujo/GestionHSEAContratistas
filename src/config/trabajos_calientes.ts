@@ -3,7 +3,7 @@
 /** Estructura del formato FO-0131 (Permiso para trabajos calientes). */
 export const hotWorkSlug = "trabajos-calientes";
 export const hotWorkValidityHours = 12;
-export const hotWorkMaxExecutors = 5;
+export const hotWorkMaxExecutors = 6;
 export const hotWorkVerificationCount = 4;
 
 export const hotWorkActivities = [
