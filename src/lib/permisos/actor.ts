@@ -67,7 +67,7 @@ export function can_sign_key(actor: PermitActor, key: string): boolean {
 /** Solo el creador o un empleado con permisos:crear, o un usuario activo del proveedor dueño, puede editar. */
 export async function can_edit_permit(actor: PermitActor, permit: WorkPermit): Promise<boolean> {
   if (actor.actorType === "EMPLEADO") {
-    if (permit.requestedByEmployeeNumber === actor.actorId) return true;
+    if (permit.requestedByEmployeeNumber === actor.actorId || permit.createdBy === actor.actorId) return true;
     return get_repositories().access.has_permission(actor.actorId, "permisos:crear");
   }
   if (actor.providerId === null || permit.providerId !== actor.providerId || actor.providerUserId === null) return false;
