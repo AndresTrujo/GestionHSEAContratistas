@@ -35,7 +35,7 @@ import {
   type PermitActor,
 } from "./actor";
 import { read_permit_area } from "./area";
-import { read_executors, register_executor_participants } from "./ejecutantes";
+import { can_sign_participant, read_executors, register_executor_participants } from "./ejecutantes";
 import { sign_step } from "./firma";
 import { resolve_requester_unit } from "./unidad_solicitante";
 
@@ -79,12 +79,12 @@ async function append_audit(
   });
 }
 
-async function load_open_permit(formData: FormData, actor: PermitActor): Promise<WorkPermit> {
+async function load_open_permit(formData: FormData, actor: PermitActor, allowClosed = false): Promise<WorkPermit> {
   const permit = await get_repositories().permits.get_by_id(
     read_text(formData, "permitId"),
   );
   if (!permit || permit.permitTypeSlug !== confinedSlug || !can_access_permit(actor, permit)) redirect(basePath);
-  if (permit.status === "closed") redirect(`${basePath}/${permit.id}`);
+  if (permit.status === "closed" && !allowClosed) redirect(`${basePath}/${permit.id}`);
   return permit;
 }
 
@@ -211,18 +211,27 @@ export async function create_confined_permit(formData: FormData): Promise<void> 
 export async function sign_confined_permit(formData: FormData): Promise<void> {
   const actor = await require_permit_actor();
   const employeeNumber = actor.actorId;
-  const permit = await load_open_permit(formData, actor);
   const key = read_text(formData, "key");
+  const allowClosed = /^executor_participant_\\d+$/.test(key);
+  const permit = await load_open_permit(formData, actor, allowClosed);
   const detailPath = `${basePath}/${permit.id}`;
   if (!can_sign_key(actor, key)) redirect(`${detailPath}?error=role`);
 
   const isApprovalKey = confinedApprovalSignatures.some((item) => item.key === key);
   const isClosingKey = key === confinedClosingSignature.key;
-  if (!isApprovalKey && !isClosingKey) redirect(detailPath);
+  const executorParticipantMatch = /^executor_participant_(\\d+)$/.exec(key);
+  const executorParticipantPosition = executorParticipantMatch ? Number(executorParticipantMatch[1]) : 0;
+  const isExecutorParticipantKey = executorParticipantPosition > 0 &&
+    Boolean(permit.fields[`executorAddedAt_${executorParticipantPosition}`]) &&
+    Boolean(String(permit.fields[`executor${executorParticipantPosition}`] ?? "").trim());
+  if (!isApprovalKey && !isClosingKey && !isExecutorParticipantKey) redirect(detailPath);
+  if (isExecutorParticipantKey && !(await can_sign_participant(actor, permit.id, executorParticipantPosition, "executor"))) {
+    redirect(`${detailPath}?error=participant_not_you`);
+  }
   if (find_confined_signature(permit, key)) redirect(detailPath);
 
   // Segregación: una misma persona no puede firmar dos roles del permiso.
-  if (actor.actorType === "EMPLEADO" && !actor.isAdmin && permit.signatures.some((item) => item.employeeNumber === employeeNumber)) {
+  if (!isExecutorParticipantKey && actor.actorType === "EMPLEADO" && !actor.isAdmin && permit.signatures.some((item) => item.employeeNumber === employeeNumber)) {
     redirect(`${detailPath}?error=same_person`);
   }
 
@@ -248,7 +257,7 @@ export async function sign_confined_permit(formData: FormData): Promise<void> {
         fields[`medical${position}`] = evaluation;
       }
     }
-  } else {
+  } else if (isClosingKey) {
     // HSEA verifica las condiciones finales: nadie debe seguir dentro.
     if (permit.status !== "approved") redirect(detailPath);
     const executors = get_confined_executors(permit);
