@@ -36,7 +36,7 @@ export default async function NewHeightsPermitPage({
   const editingPermit = editar ? await get_repositories().permits.get_by_id(editar) : null;
   if (editar && (!editingPermit || editingPermit.permitTypeSlug !== heightsSlug || !can_access_permit(actor, editingPermit) || !(await can_edit_permit(actor, editingPermit)))) notFound();
   const existingExecutors = editingPermit ? get_heights_executors(editingPermit) : [];
-  const executorOffset = editingPermit ? Math.max(0, ...Object.entries(editingPermit.fields).flatMap(([key, value]) => { const match = /^executor(\\d+)$/.exec(key); return match && typeof value === "string" && value.trim() ? [Number(match[1])] : []; })) : 0;
+  const executorOffset = editingPermit ? Math.max(0, ...Object.entries(editingPermit.fields).flatMap(([key, value]) => { const match = /^executor(\d+)$/.exec(key); return match && typeof value === "string" && value.trim() ? [Number(match[1])] : []; })) : 0;
   const executorOptions = await load_executor_options(actor);
   const today = new Date().toLocaleDateString("en-CA");
   const permitType = find_permit_type(heightsSlug);
