@@ -154,13 +154,21 @@ async function update_executor_permit(
       .filter((item) => item.position > oldMax)
       .map((item) => item.providerEmployeeId),
   );
-  if (addedProviderIds.size > 0) {
+  if (addedProviderIds.size > 0 || addedPositions.length > 0) {
     const existingParticipants = await repositories.participants.list_by_permit(permit.id);
-    if (existingParticipants.some((existing) =>
-      existing.role === "executor" &&
-      existing.participant.kind === "EMPLEADO_PROVEEDOR" &&
-      addedProviderIds.has(existing.participant.providerEmployeeId),
-    )) redirect(`/permisos-trabajo/${permit.permitTypeSlug}/nuevo?editar=${permit.id}&error=executor_invalid`);
+    const duplicatesExisting = executors.executorParticipants.some((item) =>
+      item.position > oldMax && existingParticipants.some((existing) => {
+        if (existing.role !== "executor") return false;
+        if (item.participant.kind === "EMPLEADO" && existing.participant.kind === "EMPLEADO") {
+          return item.participant.employeeNumber === existing.participant.employeeNumber;
+        }
+        if (item.participant.kind === "EMPLEADO_PROVEEDOR" && existing.participant.kind === "EMPLEADO_PROVEEDOR") {
+          return item.participant.providerEmployeeId === existing.participant.providerEmployeeId;
+        }
+        return false;
+      }),
+    );
+    if (duplicatesExisting) redirect(`/permisos-trabajo/${permit.permitTypeSlug}/nuevo?editar=${permit.id}&error=executor_invalid`);
   }
 
   const now = new Date().toISOString();
