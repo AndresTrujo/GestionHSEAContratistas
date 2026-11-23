@@ -17,6 +17,7 @@ import {
 } from "@/config/jsa";
 import type { WorkPermit } from "@/domain/permisos";
 import { get_repositories } from "@/lib/data/proveedor_datos";
+import { get_year_mx } from "@/lib/data/identidad";
 import { can_access_permit, can_edit_permit, can_sign_key, require_permit_actor } from "./actor";
 import { read_permit_area } from "./area";
 import { find_jsa_certification_issues, type CertificationIssue } from "./certificaciones_jsa";
@@ -132,7 +133,7 @@ export async function create_jsa(formData: FormData): Promise<void> {
   const selectedArea = await read_permit_area(formData);
   if (!selectedArea) redirect(`${basePath}/nuevo?error=incomplete`);
   const existing = await repositories.permits.list_by_type(jsaSlug);
-  const year = new Date().getFullYear();
+  const year = get_year_mx();
   fields.folio = `JSA-${year}-${String(existing.length + 1).padStart(4, "0")}`;
 
   const now = new Date().toISOString();
