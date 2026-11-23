@@ -16,12 +16,13 @@ export async function RequesterUnitField({ name, initialValue }: RequesterUnitFi
   const unit = await get_current_requester_unit();
   const id = `campo-${name}`;
   const label = unit.kind === "COMPANY" ? "Compañía del solicitante" : "Departamento del solicitante";
+  const options = initialValue && !unit.options.includes(initialValue) ? [...unit.options, initialValue] : unit.options;
 
   return (
     <div>
       <label htmlFor={id} className={labelClass}>{label}</label>
       <select id={id} name={name} required defaultValue={initialValue ?? unit.value} className={inputClass}>
-        {unit.options.map((option) => (
+        {options.map((option) => (
           <option key={option} value={option}>{option}</option>
         ))}
       </select>
