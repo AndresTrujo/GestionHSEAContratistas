@@ -1,3 +1,4 @@
+import { DeletePermitButton } from "@/components/permisos/DeletePermitButton";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { notFound } from "next/navigation";
 import {
@@ -83,7 +84,7 @@ export default async function ConfinedPermitDetailPage({
   const repositories = get_repositories();
   const permit = await repositories.permits.get_by_id(permitId);
   const actor = await require_permit_actor();
-  if (!permit || permit.permitTypeSlug !== confinedSlug || !can_access_permit(actor, permit)) notFound();
+  if (!permit || permit.fields.deletedAt || permit.permitTypeSlug !== confinedSlug || !can_access_permit(actor, permit)) notFound();
   const canEdit = await can_edit_permit(actor, permit);
 
   const events = await repositories.audit.list_events_by_entity("permisos_trabajo", permit.id);
@@ -118,6 +119,7 @@ export default async function ConfinedPermitDetailPage({
         formCode={permitType?.formCode}
         status={permit.status}
       >
+        {actor.isAdmin === true && <div className="mb-5"><DeletePermitButton permitId={permit.id} label="Eliminar Permiso" /></div>}
         {canEdit && <p className="mb-5"><a href={`/permisos-trabajo/${confinedSlug}/nuevo?editar=${permit.id}`} className="inline-flex min-h-11 items-center rounded-xl border border-brand-navy px-4 py-2 text-sm font-bold text-brand-navy hover:bg-neutral-light/40">Editar permiso</a></p>}
         {error && errorMessages[error] && <FormAlert>{errorMessages[error]}</FormAlert>}
         {latestOutOfLimits && !isClosed && (
