@@ -263,7 +263,8 @@ export function get_participant_key(position: number): string {
 
 export function get_jsa_participants(permit: WorkPermit) {
   const participants: { position: number; name: string; job: string; company: string }[] = [];
-  for (let position = 1; position <= jsaMaxParticipants; position += 1) {
+  const count = Number(permit.fields.participantCount ?? jsaMaxParticipants);
+  for (let position = 1; position <= Math.min(count, 100); position += 1) {
     const name = permit.fields[`participant${position}Name`];
     if (typeof name === "string" && name) {
       participants.push({

@@ -4,6 +4,7 @@ import { get_current_requester_unit } from "@/lib/permisos/unidad_solicitante";
 interface RequesterUnitFieldProps {
   /** Nombre del campo en el formato (`company` o `department`, según el permiso). */
   name: string;
+  initialValue?: string;
 }
 
 /**
@@ -11,16 +12,17 @@ interface RequesterUnitFieldProps {
  * la de su perfil seleccionada por omisión. El servidor valida lo elegido al crear el documento
  * (`resolve_requester_unit`), así que un valor ajeno a la lista no se guarda.
  */
-export async function RequesterUnitField({ name }: RequesterUnitFieldProps) {
+export async function RequesterUnitField({ name, initialValue }: RequesterUnitFieldProps) {
   const unit = await get_current_requester_unit();
   const id = `campo-${name}`;
   const label = unit.kind === "COMPANY" ? "Compañía del solicitante" : "Departamento del solicitante";
+  const options = initialValue && !unit.options.includes(initialValue) ? [...unit.options, initialValue] : unit.options;
 
   return (
     <div>
       <label htmlFor={id} className={labelClass}>{label}</label>
-      <select id={id} name={name} required defaultValue={unit.value} className={inputClass}>
-        {unit.options.map((option) => (
+      <select id={id} name={name} required defaultValue={initialValue ?? unit.value} className={inputClass}>
+        {options.map((option) => (
           <option key={option} value={option}>{option}</option>
         ))}
       </select>

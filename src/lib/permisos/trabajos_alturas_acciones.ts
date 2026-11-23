@@ -7,7 +7,6 @@ import {
   heightsPpeOptions,
   find_heights_signature,
   get_heights_checklist_field,
-  get_heights_executors,
   get_heights_verification_key,
   heightsApprovalSignatures,
   heightsChecklistItems,
@@ -16,7 +15,6 @@ import {
   heightsSlug,
   heightsVerificationCount,
   is_valid_today,
-  medicalEvaluationLabels,
 } from "@/config/trabajos_alturas";
 import type { AuditAction } from "@/domain/auditoria";
 import type { WorkPermit } from "@/domain/permisos";
@@ -30,7 +28,7 @@ import {
   type PermitActor,
 } from "./actor";
 import { read_permit_area } from "./area";
-import { read_executors, register_executor_participants } from "./ejecutantes";
+import { can_sign_participant, read_executors, register_executor_participants } from "./ejecutantes";
 import { sign_step } from "./firma";
 import { resolve_requester_unit } from "./unidad_solicitante";
 
@@ -66,12 +64,12 @@ async function append_audit(
   });
 }
 
-async function load_open_permit(formData: FormData, actor: PermitActor): Promise<WorkPermit> {
+async function load_open_permit(formData: FormData, actor: PermitActor, allowClosed = false): Promise<WorkPermit> {
   const permit = await get_repositories().permits.get_by_id(
     read_text(formData, "permitId"),
   );
-  if (!permit || permit.permitTypeSlug !== heightsSlug || !can_access_permit(actor, permit)) redirect(basePath);
-  if (permit.status === "closed") redirect(`${basePath}/${permit.id}`);
+  if (!permit || permit.fields.deletedAt || permit.permitTypeSlug !== heightsSlug || !can_access_permit(actor, permit)) redirect(basePath);
+  if (permit.status === "closed" && !allowClosed) redirect(`${basePath}/${permit.id}`);
   return permit;
 }
 
@@ -98,6 +96,10 @@ export async function create_heights_permit(formData: FormData): Promise<void> {
     fields[`executor${index + 1}`] = name;
   });
   const executorCount = executors.names.filter(Boolean).length;
+  const submittedExecutorCount = Number(read_text(formData, "executorCount"));
+  fields.executorCount = Number.isInteger(submittedExecutorCount) && submittedExecutorCount >= 6
+    ? Math.min(submittedExecutorCount, 100)
+    : 6;
 
   const validAnswers: string[] = Object.keys(heightsAnswerLabels);
   let isChecklistComplete = true;
@@ -157,8 +159,9 @@ export async function create_heights_permit(formData: FormData): Promise<void> {
 export async function sign_heights_permit(formData: FormData): Promise<void> {
   const actor = await require_permit_actor();
   const employeeNumber = actor.actorId;
-  const permit = await load_open_permit(formData, actor);
   const key = read_text(formData, "key");
+  const allowClosed = /^executor_participant_\d+$/.test(key);
+  const permit = await load_open_permit(formData, actor, allowClosed);
   const detailPath = `${basePath}/${permit.id}`;
   if (!can_sign_key(actor, key)) redirect(`${detailPath}?error=role`);
 
@@ -170,7 +173,16 @@ export async function sign_heights_permit(formData: FormData): Promise<void> {
     verificationPosition >= 1 &&
     verificationPosition <= heightsVerificationCount;
   const isExtensionKey = key === "extension";
-  if (!isApprovalKey && !isVerificationKey && !isExtensionKey) redirect(detailPath);
+  const executorParticipantMatch = /^executor_participant_(\d+)$/.exec(key);
+  const executorParticipantPosition = executorParticipantMatch ? Number(executorParticipantMatch[1]) : 0;
+  const isExecutorParticipantKey = executorParticipantPosition > 0 &&
+    Boolean(permit.fields[`executorAddedAt_${executorParticipantPosition}`]) &&
+    Boolean(String(permit.fields[`executor${executorParticipantPosition}`] ?? "").trim()) &&
+    !permit.fields[`executorRemovedAt_${executorParticipantPosition}`];
+  if (!isApprovalKey && !isVerificationKey && !isExtensionKey && !isExecutorParticipantKey) redirect(detailPath);
+  if (isExecutorParticipantKey && !(await can_sign_participant(actor, permit.id, executorParticipantPosition, "executor"))) {
+    redirect(`${detailPath}?error=participant_not_you`);
+  }
   if (find_heights_signature(permit, key)) redirect(detailPath);
 
   const image = read_text(formData, "signatureImage");
@@ -189,18 +201,7 @@ export async function sign_heights_permit(formData: FormData): Promise<void> {
     );
     if (alreadySigned && actor.actorType === "EMPLEADO" && !actor.isAdmin) redirect(`${detailPath}?error=same_person`);
 
-    if (key === "medical_service") {
-      // La evaluación médica de cada ejecutante se registra al firmar.
-      const executors = get_heights_executors(permit);
-      for (let position = 1; position <= executors.length; position += 1) {
-        const evaluation = read_text(formData, `medical${position}`);
-        if (!(evaluation in medicalEvaluationLabels)) {
-          redirect(`${detailPath}?error=medical`);
-        }
-        fields[`medical${position}`] = evaluation;
-      }
-    }
-  } else {
+  } else if (isVerificationKey || isExtensionKey) {
     if (permit.status !== "approved") redirect(detailPath);
     if (!is_valid_today(permit)) redirect(`${detailPath}?error=expired`);
 

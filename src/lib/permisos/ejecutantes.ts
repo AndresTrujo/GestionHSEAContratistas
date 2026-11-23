@@ -43,6 +43,7 @@ export const executorErrorMessages: Record<string, string> = {
   executor_provider: "El proveedor elegido no existe o no está activo.",
   executor_tfs: "Alguno de los empleados TFS elegidos no existe, está inactivo o está repetido.",
   executor_invalid: "Alguno de los ejecutantes no es un colaborador activo de ese proveedor.",
+  executor_order: "Completa los espacios de ejecutantes en orden, sin dejar posiciones vacías entre personas.",
   executor_not_green:
     "Solo pueden ejecutar el trabajo colaboradores con semáforo VERDE (documentos aprobados y vigentes). Revisa a quién elegiste.",
   executor_work_type:
@@ -67,9 +68,24 @@ function get_full_name(parts: (string | null)[]): string {
   return parts.filter((part): part is string => Boolean(part)).join(" ");
 }
 
+function has_executor_gap(names: string[], startPosition: number): boolean {
+  let foundEmpty = false;
+  for (let index = startPosition; index < names.length; index += 1) {
+    if (!names[index]) foundEmpty = true;
+    else if (foundEmpty) return true;
+  }
+  return false;
+}
+
 function read_field(formData: FormData, name: string): string {
   const value = formData.get(name);
   return typeof value === "string" ? value.trim() : "";
+}
+
+function read_dynamic_count(formData: FormData, field: string, fallback: number): number {
+  const raw = read_field(formData, field);
+  const count = Number(raw);
+  return raw && Number.isInteger(count) && count >= fallback && count <= 100 ? count : fallback;
 }
 
 /** Empleado TFS activo a partir de su número (el que envía el selector); null si no existe o está inactivo. */
@@ -148,6 +164,8 @@ export interface ReadExecutors {
   names: string[];
   /** Colaboradores de proveedor elegidos, para registrarlos como participantes del permiso. */
   providerParticipants: { position: number; providerEmployeeId: number }[];
+  /** Personas ligadas por posición, tanto empleados TFS como colaboradores de proveedor. */
+  executorParticipants: { position: number; participant: ParticipantRef }[];
 }
 
 /**
@@ -160,9 +178,13 @@ export async function read_executors(
   actor: PermitActor,
   permitTypeSlug: string,
   maxExecutors: number,
+  startPosition = 0,
 ): Promise<ReadExecutors | { ok: false; errorCode: string }> {
   const rawProvider = actor.providerId ?? (String(formData.get("providerId") ?? "").trim() || null);
+  maxExecutors = read_dynamic_count(formData, "executorCount", maxExecutors);
   const names: string[] = Array.from({ length: maxExecutors }, () => "");
+
+  const executorParticipants: { position: number; participant: ParticipantRef }[] = [];
 
   if (rawProvider === null) {
     const used = new Set<string>();
@@ -173,12 +195,14 @@ export async function read_executors(
         if (!person || used.has(person.employeeNumber)) return { ok: false, errorCode: "executor_tfs" };
         used.add(person.employeeNumber);
         names[position - 1] = person.name;
+        executorParticipants.push({ position, participant: { kind: "EMPLEADO", employeeNumber: person.employeeNumber } });
         continue;
       }
       // Compatibilidad: nombre escrito a mano.
       names[position - 1] = read_field(formData, `executor${position}`);
     }
-    return { ok: true, providerId: null, names, providerParticipants: [] };
+    if (has_executor_gap(names, startPosition)) return { ok: false, errorCode: "executor_order" };
+    return { ok: true, providerId: null, names, providerParticipants: [], executorParticipants };
   }
 
   const providerId = Number(rawProvider);
@@ -212,8 +236,10 @@ export async function read_executors(
     }
     names[position - 1] = get_full_name([member.firstName, member.middleName, member.paternalSurname, member.maternalSurname]);
     providerParticipants.push({ position, providerEmployeeId: member.id });
+    executorParticipants.push({ position, participant: { kind: "EMPLEADO_PROVEEDOR", providerEmployeeId: member.id } });
   }
-  return { ok: true, providerId: String(provider.id), names, providerParticipants };
+  if (has_executor_gap(names, startPosition)) return { ok: false, errorCode: "executor_order" };
+  return { ok: true, providerId: String(provider.id), names, providerParticipants, executorParticipants };
 }
 
 export interface JsaParticipantRow {
@@ -241,6 +267,7 @@ export async function read_jsa_participants(
   maxParticipants: number,
 ): Promise<ReadJsaParticipants | { ok: false; errorCode: string }> {
   const rawProvider = actor.providerId ?? (read_field(formData, "providerId") || null);
+  maxParticipants = read_dynamic_count(formData, "participantCount", maxParticipants);
   const { providers, providerEmployees, employees, organization } = get_repositories();
 
   let provider: Awaited<ReturnType<typeof providers.get_provider>> = null;
@@ -312,11 +339,11 @@ export async function read_jsa_participants(
  * está a un colaborador de proveedor, un usuario de su proveedor (muchos colaboradores no tienen cuenta propia).
  * Un participante sin liga (solo texto) lo firma quien sea, como antes. El ADMIN_HSEA puede firmar por cualquiera.
  */
-export async function can_sign_participant(actor: PermitActor, permitId: string, position: number): Promise<boolean> {
+export async function can_sign_participant(actor: PermitActor, permitId: string, position: number, role: "participant" | "executor" = "participant"): Promise<boolean> {
   if (actor.isAdmin) return true;
   const { participants, providerEmployees } = get_repositories();
   const linked = (await participants.list_by_permit(permitId)).find(
-    (item) => item.role === "participant" && item.position === position,
+    (item) => item.role === role && item.position === position,
   );
   if (!linked) return true;
   if (linked.participant.kind === "EMPLEADO") {
@@ -356,13 +383,13 @@ export async function register_executor_participants(
   actor: PermitActor,
 ): Promise<void> {
   const { participants } = get_repositories();
-  for (const item of executors.providerParticipants) {
+  for (const item of executors.executorParticipants) {
     await participants.add_participant(
       {
         permitId,
         role: "executor",
         position: item.position,
-        participant: { kind: "EMPLEADO_PROVEEDOR", providerEmployeeId: item.providerEmployeeId },
+        participant: item.participant,
       },
       to_actor_identity(actor),
     );

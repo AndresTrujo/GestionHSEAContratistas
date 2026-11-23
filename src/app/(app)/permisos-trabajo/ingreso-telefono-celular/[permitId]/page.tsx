@@ -1,3 +1,4 @@
+import { DeletePermitButton } from "@/components/permisos/DeletePermitButton";
 import { notFound } from "next/navigation";
 import { DetailCard } from "@/components/permisos/DetailCard";
 import { FormAlert } from "@/components/permisos/FormAlert";
@@ -35,7 +36,8 @@ export default async function PhonePermitDetailPage({
   const { error } = await searchParams;
   const repositories = get_repositories();
   const permit = await repositories.permits.get_by_id(permitId);
-  if (!permit || permit.permitTypeSlug !== phoneSlug || !can_access_permit(await require_permit_actor(), permit)) notFound();
+  const actor = await require_permit_actor();
+  if (!permit || permit.fields.deletedAt || permit.permitTypeSlug !== phoneSlug || !can_access_permit(actor, permit)) notFound();
 
   const events = await repositories.audit.list_events_by_entity("permisos_trabajo", permit.id);
   const validUntil = get_phone_valid_until(permit);
@@ -59,6 +61,7 @@ export default async function PhonePermitDetailPage({
         formCode={permitType?.formCode}
         status={permit.status}
       >
+        {actor.isAdmin === true && <div className="mb-5"><DeletePermitButton permitId={permit.id} label="Eliminar Permiso" /></div>}
         {error && errorMessages[error] && <FormAlert>{errorMessages[error]}</FormAlert>}
         {validUntil && (
           <p

@@ -1,3 +1,4 @@
+import { DeletePermitButton } from "@/components/permisos/DeletePermitButton";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { notFound } from "next/navigation";
 import { primaryButtonClass, secondaryButtonClass } from "@/components/administracion/estilos";
@@ -23,7 +24,7 @@ import type { ChecklistAnswer } from "@/config/trabajos_calientes";
 import { find_permit_type } from "@/config/tipos_permiso";
 import { get_repositories } from "@/lib/data/proveedor_datos";
 import { signErrorMessages } from "@/lib/permisos/mensajes_firma";
-import { can_access_permit, require_permit_actor } from "@/lib/permisos/actor";
+import { can_access_permit, can_edit_permit, require_permit_actor } from "@/lib/permisos/actor";
 import {
   register_post_inspection,
   sign_hot_work_permit,
@@ -40,6 +41,7 @@ const errorMessages: Record<string, string> = {
   expired: "El permiso superó sus 12 horas de vigencia; ya no admite verificaciones.",
   order: "Las firmas de autorización deben realizarse en orden: ejecución, responsable del área y HSE. Las verificaciones también se firman en orden.",
   signature: "La firma no es válida; dibújala de nuevo.",
+  participant_not_you: "Solo la persona asignada puede firmar como ejecutante agregado.",
 };
 
 export default async function HotWorkPermitDetailPage({
@@ -50,9 +52,13 @@ export default async function HotWorkPermitDetailPage({
   const { error } = await searchParams;
   const repositories = get_repositories();
   const permit = await repositories.permits.get_by_id(permitId);
-  if (!permit || permit.permitTypeSlug !== hotWorkSlug || !can_access_permit(await require_permit_actor(), permit)) notFound();
+  const actor = await require_permit_actor();
+  if (!permit || permit.fields.deletedAt || permit.permitTypeSlug !== hotWorkSlug || !can_access_permit(actor, permit)) notFound();
+  const canEdit = await can_edit_permit(actor, permit);
 
   const events = await repositories.audit.list_events_by_entity("permisos_trabajo", permit.id);
+  const executors = get_executors(permit);
+  const addedExecutorPositions = Array.from({ length: 100 }, (_, index) => index + 1).filter((position) => Boolean(permit.fields[`executorAddedAt_${position}`]) && !permit.fields[`executorRemovedAt_${position}`]);
   const validUntil = get_valid_until(permit);
   const isExpired = validUntil !== null && validUntil.getTime() < Date.now();
   const isClosed = permit.status === "closed";
@@ -77,6 +83,8 @@ export default async function HotWorkPermitDetailPage({
         formCode={permitType?.formCode}
         status={permit.status}
       >
+        {actor.isAdmin === true && <div className="mb-5"><DeletePermitButton permitId={permit.id} label="Eliminar Permiso" /></div>}
+        {canEdit && <p className="mb-5"><a href={`/permisos-trabajo/${hotWorkSlug}/nuevo?editar=${permit.id}`} className="inline-flex min-h-11 items-center rounded-xl border border-brand-navy px-4 py-2 text-sm font-bold text-brand-navy hover:bg-neutral-light/40">Editar permiso</a></p>}
         {error && errorMessages[error] && <FormAlert>{errorMessages[error]}</FormAlert>}
         {validUntil && !isClosed && (
           <p
@@ -104,7 +112,7 @@ export default async function HotWorkPermitDetailPage({
             ),
           },
           { label: "Descripción del trabajo", value: String(permit.fields.description), wide: true },
-          { label: "Personas que ejecutan", value: get_executors(permit).join(", ") },
+          { label: "Personas que ejecutan", value: executors.join(", ") },
           { label: "Tipo de trabajo", value: get_activity_labels(permit).join(", ") },
           { label: "Hora de inicio", value: String(permit.fields.startTime) },
           { label: "Hora de terminación", value: String(permit.fields.endTime) },
@@ -140,6 +148,25 @@ export default async function HotWorkPermitDetailPage({
         </div>
       </details>
 
+      {addedExecutorPositions.length > 0 && (
+        <div className="mb-6">
+          <SectionCard title="Firma de ejecutantes agregados">
+            <p className="mb-3 text-sm text-neutral-dark">Estas personas se incorporaron después de crear el permiso. Solo ellas tienen una firma individual pendiente; las firmas anteriores se conservan.</p>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {addedExecutorPositions.map((position) => (
+                <SignatureBox
+                  key={position}
+                  action={sign_hot_work_permit}
+                  permit={permit}
+                  signatureKey={`executor_participant_${position}`}
+                  label={String(permit.fields[`executor${position}`] ?? `Ejecutante ${position}`)}
+                  canSign
+                />
+              ))}
+            </div>
+          </SectionCard>
+        </div>
+      )}
       <div className="mb-6">
         <SectionCard title="Autorización" description="Las cuatro firmas de autorización pasan el permiso a Autorizado.">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

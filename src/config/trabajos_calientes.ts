@@ -3,7 +3,7 @@
 /** Estructura del formato FO-0131 (Permiso para trabajos calientes). */
 export const hotWorkSlug = "trabajos-calientes";
 export const hotWorkValidityHours = 12;
-export const hotWorkMaxExecutors = 5;
+export const hotWorkMaxExecutors = 6;
 export const hotWorkVerificationCount = 4;
 
 export const hotWorkActivities = [
@@ -106,7 +106,8 @@ export function get_verification_key(position: number): string {
 
 export function get_executors(permit: WorkPermit): string[] {
   const executors: string[] = [];
-  for (let position = 1; position <= hotWorkMaxExecutors; position += 1) {
+  const count = Number(permit.fields.executorCount ?? hotWorkMaxExecutors);
+  for (let position = 1; position <= Math.min(count, 100); position += 1) {
     const name = permit.fields[`executor${position}`];
     if (typeof name === "string" && name) executors.push(name);
   }

@@ -7,7 +7,6 @@ import {
   confinedApprovalSignatures,
   confinedChecklistIds,
   confinedClosingSignature,
-  confinedEvaluationLabels,
   confinedGases,
   confinedMaxExecutors,
   confinedReadingCount,
@@ -35,7 +34,7 @@ import {
   type PermitActor,
 } from "./actor";
 import { read_permit_area } from "./area";
-import { read_executors, register_executor_participants } from "./ejecutantes";
+import { can_sign_participant, read_executors, register_executor_participants } from "./ejecutantes";
 import { sign_step } from "./firma";
 import { resolve_requester_unit } from "./unidad_solicitante";
 
@@ -79,12 +78,12 @@ async function append_audit(
   });
 }
 
-async function load_open_permit(formData: FormData, actor: PermitActor): Promise<WorkPermit> {
+async function load_open_permit(formData: FormData, actor: PermitActor, allowClosed = false): Promise<WorkPermit> {
   const permit = await get_repositories().permits.get_by_id(
     read_text(formData, "permitId"),
   );
-  if (!permit || permit.permitTypeSlug !== confinedSlug || !can_access_permit(actor, permit)) redirect(basePath);
-  if (permit.status === "closed") redirect(`${basePath}/${permit.id}`);
+  if (!permit || permit.fields.deletedAt || permit.permitTypeSlug !== confinedSlug || !can_access_permit(actor, permit)) redirect(basePath);
+  if (permit.status === "closed" && !allowClosed) redirect(`${basePath}/${permit.id}`);
   return permit;
 }
 
@@ -133,6 +132,10 @@ export async function create_confined_permit(formData: FormData): Promise<void> 
     fields[`executor${index + 1}`] = name;
   });
   const executorCount = executors.names.filter(Boolean).length;
+  const submittedExecutorCount = Number(read_text(formData, "executorCount"));
+  fields.executorCount = Number.isInteger(submittedExecutorCount) && submittedExecutorCount >= 6
+    ? Math.min(submittedExecutorCount, 100)
+    : 6;
   if (executorCount === 0) redirect(failure);
 
   // Cada categoría de riesgo requiere al menos una opción ("No aplica" incluida).
@@ -207,18 +210,28 @@ export async function create_confined_permit(formData: FormData): Promise<void> 
 export async function sign_confined_permit(formData: FormData): Promise<void> {
   const actor = await require_permit_actor();
   const employeeNumber = actor.actorId;
-  const permit = await load_open_permit(formData, actor);
   const key = read_text(formData, "key");
+  const allowClosed = /^executor_participant_\d+$/.test(key);
+  const permit = await load_open_permit(formData, actor, allowClosed);
   const detailPath = `${basePath}/${permit.id}`;
   if (!can_sign_key(actor, key)) redirect(`${detailPath}?error=role`);
 
   const isApprovalKey = confinedApprovalSignatures.some((item) => item.key === key);
   const isClosingKey = key === confinedClosingSignature.key;
-  if (!isApprovalKey && !isClosingKey) redirect(detailPath);
+  const executorParticipantMatch = /^executor_participant_(\d+)$/.exec(key);
+  const executorParticipantPosition = executorParticipantMatch ? Number(executorParticipantMatch[1]) : 0;
+  const isExecutorParticipantKey = executorParticipantPosition > 0 &&
+    Boolean(permit.fields[`executorAddedAt_${executorParticipantPosition}`]) &&
+    Boolean(String(permit.fields[`executor${executorParticipantPosition}`] ?? "").trim()) &&
+    !permit.fields[`executorRemovedAt_${executorParticipantPosition}`];
+  if (!isApprovalKey && !isClosingKey && !isExecutorParticipantKey) redirect(detailPath);
+  if (isExecutorParticipantKey && !(await can_sign_participant(actor, permit.id, executorParticipantPosition, "executor"))) {
+    redirect(`${detailPath}?error=participant_not_you`);
+  }
   if (find_confined_signature(permit, key)) redirect(detailPath);
 
   // Segregación: una misma persona no puede firmar dos roles del permiso.
-  if (actor.actorType === "EMPLEADO" && !actor.isAdmin && permit.signatures.some((item) => item.employeeNumber === employeeNumber)) {
+  if (!isExecutorParticipantKey && actor.actorType === "EMPLEADO" && !actor.isAdmin && permit.signatures.some((item) => item.employeeNumber === employeeNumber)) {
     redirect(`${detailPath}?error=same_person`);
   }
 
@@ -233,18 +246,7 @@ export async function sign_confined_permit(formData: FormData): Promise<void> {
     if (permit.status !== "submitted") redirect(detailPath);
     if (is_reading_out_of_limits(permit, 1)) redirect(`${detailPath}?error=initial_limits`);
 
-    if (key === "medical_service") {
-      // La evaluación médica de cada ejecutante se registra al firmar.
-      const executors = get_confined_executors(permit);
-      for (let position = 1; position <= executors.length; position += 1) {
-        const evaluation = read_text(formData, `medical${position}`);
-        if (!(evaluation in confinedEvaluationLabels)) {
-          redirect(`${detailPath}?error=medical`);
-        }
-        fields[`medical${position}`] = evaluation;
-      }
-    }
-  } else {
+  } else if (isClosingKey) {
     // HSEA verifica las condiciones finales: nadie debe seguir dentro.
     if (permit.status !== "approved") redirect(detailPath);
     const executors = get_confined_executors(permit);
@@ -265,7 +267,7 @@ export async function sign_confined_permit(formData: FormData): Promise<void> {
   const allApproved = confinedApprovalSignatures.every((item) =>
     signatures.some((signature) => signature.key === item.key),
   );
-  const status = isClosingKey ? "closed" : allApproved ? "approved" : permit.status;
+  const status = isClosingKey ? "closed" : isApprovalKey && allApproved ? "approved" : permit.status;
 
   await get_repositories().permits.save({
     ...permit,
@@ -299,6 +301,7 @@ export async function record_confined_movement(formData: FormData): Promise<void
     !Number.isInteger(position) ||
     position < 1 ||
     position > executors.length ||
+    (permit.fields[`executorRemovedAt_${position}`] && kind !== "exit") ||
     (kind !== "entry" && kind !== "exit")
   ) {
     redirect(detailPath);

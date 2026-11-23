@@ -173,7 +173,7 @@ export function create_permit_repository_azure(): WorkPermitRepository {
                             FROM OPENJSON(p.firmas_formato) AS f),
                          '[]') AS firmas_formato,
                 p.creado_en, p.creado_por, p.actualizado_en, p.actualizado_por
-           FROM permisos_trabajo p WHERE p.tipo_permiso_slug = $1 ORDER BY p.anio, p.consecutivo`,
+           FROM permisos_trabajo p WHERE p.tipo_permiso_slug = $1 AND JSON_VALUE(p.campos, '$.deletedAt') IS NULL ORDER BY p.anio, p.consecutivo`,
         [permitTypeSlug],
       );
       const roleSignatures = await load_role_signatures(get_db(), rows.map((row) => row.id), false);

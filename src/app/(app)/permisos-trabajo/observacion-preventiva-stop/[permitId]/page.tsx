@@ -1,3 +1,4 @@
+import { DeletePermitButton } from "@/components/permisos/DeletePermitButton";
 import { notFound } from "next/navigation";
 import { DetailCard } from "@/components/permisos/DetailCard";
 import { FormAlert } from "@/components/permisos/FormAlert";
@@ -39,7 +40,8 @@ export default async function StopObservationDetailPage({
   const { error } = await searchParams;
   const repositories = get_repositories();
   const permit = await repositories.permits.get_by_id(permitId);
-  if (!permit || permit.permitTypeSlug !== stopSlug || !can_access_permit(await require_permit_actor(), permit)) notFound();
+  const actor = await require_permit_actor();
+  if (!permit || permit.fields.deletedAt || permit.permitTypeSlug !== stopSlug || !can_access_permit(actor, permit)) notFound();
 
   const events = await repositories.audit.list_events_by_entity("permisos_trabajo", permit.id);
   const damage = damageClasses.find((item) => item.value === permit.fields.damageClass);
@@ -65,6 +67,7 @@ export default async function StopObservationDetailPage({
         formCode={permitType?.formCode}
         status={permit.status}
       >
+        {actor.isAdmin === true && <div className="mb-5"><DeletePermitButton permitId={permit.id} label="Eliminar Permiso" /></div>}
         {damage && (
           <p className="mb-5">
             <span className={`inline-block rounded px-2 py-0.5 text-xs font-bold ${damage.className}`}>

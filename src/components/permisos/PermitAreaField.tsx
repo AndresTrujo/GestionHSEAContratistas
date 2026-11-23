@@ -5,7 +5,7 @@ import { get_repositories } from "@/lib/data/proveedor_datos";
  * Selector del área del permiso (departamento y subdepartamento). De ella depende quién puede autorizar:
  * los roles de firma tienen alcance por área. Va dentro de una cuadrícula de dos columnas.
  */
-export async function PermitAreaField() {
+export async function PermitAreaField({ initialArea }: { initialArea?: { departmentId: number; subdepartmentId: number | null } | null }) {
   const { organization } = get_repositories();
   const [departments, subdepartments] = await Promise.all([
     organization.list_departments(),
@@ -14,9 +14,11 @@ export async function PermitAreaField() {
 
   return (
     <AreaSelector
-      departments={departments.filter((item) => item.active).map((item) => ({ id: item.id, name: item.name }))}
+      initialDepartmentId={initialArea?.departmentId ?? null}
+      initialSubdepartmentId={initialArea?.subdepartmentId ?? null}
+      departments={departments.filter((item) => item.active || item.id === initialArea?.departmentId).map((item) => ({ id: item.id, name: item.name }))}
       subdepartments={subdepartments
-        .filter((item) => item.active)
+        .filter((item) => item.active || item.id === initialArea?.subdepartmentId)
         .map((item) => ({ id: item.id, name: item.name, departmentId: item.departmentId }))}
     />
   );

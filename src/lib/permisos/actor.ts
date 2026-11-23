@@ -3,6 +3,7 @@ import type { ActorType } from "@/domain/auditoria";
 import type { WorkPermit } from "@/domain/permisos";
 import { adminRoleCode, providerSignerRoles } from "@/config/permisos";
 import { get_session } from "@/lib/auth/sesion";
+import { get_repositories } from "@/lib/data/proveedor_datos";
 
 /** Quien crea o firma un permiso: empleado TFS o usuario de un proveedor. */
 export interface PermitActor {
@@ -59,5 +60,21 @@ export function filter_permits_for_actor(actor: PermitActor, permits: WorkPermit
 }
 
 export function can_sign_key(actor: PermitActor, key: string): boolean {
-  return actor.actorType === "EMPLEADO" || providerSignableKeys.includes(key) || key.startsWith("participant_");
+  return actor.actorType === "EMPLEADO" || providerSignableKeys.includes(key) || key.startsWith("participant_") || key.startsWith("executor_participant_");
+}
+
+
+/** Solo el creador o un empleado con permisos:crear, o un usuario activo del proveedor dueño, puede editar. */
+export async function can_edit_permit(actor: PermitActor, permit: WorkPermit): Promise<boolean> {
+  if (actor.actorType === "EMPLEADO") {
+    if (permit.requestedByEmployeeNumber === actor.actorId) return true;
+    return get_repositories().access.has_permission(actor.actorId, "permisos:crear");
+  }
+  if (actor.providerId === null || permit.providerId !== actor.providerId || actor.providerUserId === null) return false;
+  const repositories = get_repositories();
+  const [user, provider] = await Promise.all([
+    repositories.providerUsers.get_user(actor.providerUserId),
+    repositories.providers.get_provider(Number(actor.providerId)),
+  ]);
+  return user !== null && user.active && user.providerId === Number(actor.providerId) && provider?.status === "ACTIVO";
 }

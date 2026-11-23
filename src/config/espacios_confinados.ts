@@ -2,7 +2,7 @@
 
 /** Estructura del formato FO-0234 (Permiso para entrada a espacios confinados). */
 export const confinedSlug = "espacios-confinados";
-export const confinedMaxExecutors = 4;
+export const confinedMaxExecutors = 6;
 export const confinedValidityHours = 8;
 /** Lectura inicial + 4 lecturas posteriores, como en el formato. */
 export const confinedReadingCount = 5;
@@ -164,11 +164,12 @@ export const confinedClosingSignature = {
   label: "Departamento HSEA",
 } as const;
 
-export type ConfinedEvaluation = "fit" | "unfit";
+export type ConfinedEvaluation = "fit" | "unfit" | "absent";
 
 export const confinedEvaluationLabels: Record<ConfinedEvaluation, string> = {
   fit: "APTO",
   unfit: "NO APTO",
+  absent: "NO ASISTIÓ",
 };
 
 export function find_confined_signature(permit: WorkPermit, key: string) {
@@ -177,7 +178,8 @@ export function find_confined_signature(permit: WorkPermit, key: string) {
 
 export function get_confined_executors(permit: WorkPermit): string[] {
   const executors: string[] = [];
-  for (let position = 1; position <= confinedMaxExecutors; position += 1) {
+  const count = Number(permit.fields.executorCount ?? confinedMaxExecutors);
+  for (let position = 1; position <= Math.min(count, 100); position += 1) {
     const name = permit.fields[`executor${position}`];
     if (typeof name === "string" && name) executors.push(name);
   }

@@ -11,6 +11,7 @@ interface TfsEmployeePickerProps {
   required?: boolean;
   /** Id del campo visible, para asociarlo con su etiqueta. */
   id?: string;
+  on_value_change?: (value: string) => void;
 }
 
 const iconButtonClass =
@@ -22,7 +23,7 @@ const debounceMs = 300;
  * Selector de empleados TFS con buscador: la lupa abre un panel donde se busca por nombre o número de empleado.
  * La búsqueda se hace en el servidor (solo viajan las coincidencias) y envía el número elegido en un campo oculto.
  */
-export function TfsEmployeePicker({ name, required = false, id }: TfsEmployeePickerProps) {
+export function TfsEmployeePicker({ name, required = false, id, on_value_change }: TfsEmployeePickerProps) {
   const [open, set_open] = useState(false);
   const [query, set_query] = useState("");
   const [results, set_results] = useState<TfsEmployeeOption[]>([]);
@@ -54,6 +55,7 @@ export function TfsEmployeePicker({ name, required = false, id }: TfsEmployeePic
 
   function choose(employee: TfsEmployeeOption | null) {
     set_selected(employee);
+    on_value_change?.(employee?.employeeNumber ?? "");
     set_open(false);
     set_query("");
     set_results([]);

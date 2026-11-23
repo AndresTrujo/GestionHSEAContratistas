@@ -53,14 +53,16 @@ function JsaStepFieldsBase({
   hazards,
   on_hazards_change,
   on_description_change,
+  initialStep,
 }: {
   row: number;
   hazards: string[];
   on_hazards_change: (row: number, hazards: string[]) => void;
   on_description_change: (row: number, filled: boolean) => void;
+  initialStep?: { description: string; controls: string; probability: number | null; severity: number | null };
 }) {
-  const [probability, set_probability] = useState<number | null>(null);
-  const [severity, set_severity] = useState<number | null>(null);
+  const [probability, set_probability] = useState<number | null>(initialStep?.probability ?? null);
+  const [severity, set_severity] = useState<number | null>(initialStep?.severity ?? null);
 
   const risk = probability && severity ? probability * severity : null;
   const level = risk ? get_risk_level(risk) : null;
@@ -81,6 +83,7 @@ function JsaStepFieldsBase({
             id={`step${row}Description`}
             name={`step${row}Description`}
             rows={2}
+            defaultValue={initialStep?.description ?? ""}
             className={inputClass}
             onChange={(event) => on_description_change(row, event.target.value.trim().length > 0)}
           />
@@ -94,7 +97,7 @@ function JsaStepFieldsBase({
           <label htmlFor={`step${row}Controls`} className={labelClass}>
             Medidas de control
           </label>
-          <textarea id={`step${row}Controls`} name={`step${row}Controls`} rows={2} className={inputClass} />
+          <textarea id={`step${row}Controls`} name={`step${row}Controls`} rows={2} defaultValue={initialStep?.controls ?? ""} className={inputClass} />
         </div>
         <div>
           <p

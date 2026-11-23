@@ -2,7 +2,8 @@
 
 import { useCallback, useState, type ReactNode } from "react";
 import { secondaryButtonClass } from "@/components/administracion/estilos";
-import { jsaHazards, jsaInitialSteps, jsaMaxSteps } from "@/config/jsa";
+import { get_jsa_selected_risk_ids, get_jsa_steps, jsaHazards, jsaInitialSteps, jsaMaxSteps } from "@/config/jsa";
+import type { WorkPermit } from "@/domain/permisos";
 import { SectionCard } from "./SectionCard";
 import { JsaStepFields } from "./JsaStepFields";
 
@@ -13,11 +14,18 @@ const noHazards: string[] = [];
  * Análisis del trabajo (pasos) y lista de peligros y riesgos. Los dos comparten estado: los peligros elegidos en
  * cualquier paso se marcan solos en la lista, y al llenar todos los pasos se pueden agregar más.
  */
-export function JsaAnalysis({ legend }: { legend: ReactNode }) {
-  const [stepCount, set_step_count] = useState(jsaInitialSteps);
-  const [filledSteps, set_filled_steps] = useState<Record<number, boolean>>({});
-  const [stepHazards, set_step_hazards] = useState<Record<number, string[]>>({});
-  const [manualRisks, set_manual_risks] = useState<string[]>([]);
+export function JsaAnalysis({ legend, initialPermit }: { legend: ReactNode; initialPermit?: WorkPermit | null }) {
+  const initialSteps = initialPermit ? get_jsa_steps(initialPermit) : [];
+  const initialStepCount = Math.max(jsaInitialSteps, initialSteps.length);
+  const initialStepHazards = Object.fromEntries(initialSteps.map((step) => [step.number, step.hazards.split(/[,\s]+/).filter(Boolean)]));
+  const risksFromSteps = new Set(initialSteps.flatMap((step) => step.hazards.split(/[,\s]+/).filter(Boolean)));
+  const initialRisks = initialPermit ? get_jsa_selected_risk_ids(initialPermit) : [];
+  const [stepCount, set_step_count] = useState(initialStepCount);
+  const [filledSteps, set_filled_steps] = useState<Record<number, boolean>>(
+    Object.fromEntries(initialSteps.map((step) => [step.number, Boolean(step.description.trim())])),
+  );
+  const [stepHazards, set_step_hazards] = useState<Record<number, string[]>>(initialStepHazards);
+  const [manualRisks, set_manual_risks] = useState<string[]>(initialRisks.filter((risk) => !risksFromSteps.has(risk)));
 
   const stepRisks = new Set(Object.values(stepHazards).flat());
   const allFilled = Array.from({ length: stepCount }, (_, index) => filledSteps[index + 1] === true).every(Boolean);
@@ -50,6 +58,7 @@ export function JsaAnalysis({ legend }: { legend: ReactNode }) {
               key={index}
               row={index + 1}
               hazards={stepHazards[index + 1] ?? noHazards}
+              initialStep={initialSteps[index] ? { description: initialSteps[index].description, controls: initialSteps[index].controls, probability: initialSteps[index].probability, severity: initialSteps[index].severity } : undefined}
               on_hazards_change={handle_hazards_change}
               on_description_change={handle_description_change}
             />

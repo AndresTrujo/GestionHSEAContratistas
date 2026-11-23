@@ -93,7 +93,7 @@ export async function sign_phone_permit(formData: FormData): Promise<void> {
   const employeeNumber = actor.actorId;
   const repositories = get_repositories();
   const permit = await repositories.permits.get_by_id(read_text(formData, "permitId"));
-  if (!permit || permit.permitTypeSlug !== phoneSlug || !can_access_permit(actor, permit)) redirect(basePath);
+  if (!permit || permit.fields.deletedAt || permit.permitTypeSlug !== phoneSlug || !can_access_permit(actor, permit)) redirect(basePath);
 
   const detailPath = `${basePath}/${permit.id}`;
   const key = read_text(formData, "key");

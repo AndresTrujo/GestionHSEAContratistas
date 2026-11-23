@@ -150,7 +150,7 @@ export async function sign_stop_observation(formData: FormData): Promise<void> {
   const employeeNumber = await require_employee_number();
   const repositories = get_repositories();
   const permit = await repositories.permits.get_by_id(read_text(formData, "permitId"));
-  if (!permit || permit.permitTypeSlug !== stopSlug) redirect(basePath);
+  if (!permit || permit.fields.deletedAt || permit.permitTypeSlug !== stopSlug) redirect(basePath);
 
   const detailPath = `${basePath}/${permit.id}`;
   const key = read_text(formData, "key");

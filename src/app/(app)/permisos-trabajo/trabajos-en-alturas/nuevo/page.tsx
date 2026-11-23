@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { inputClass, primaryButtonClass } from "@/components/administracion/estilos";
 import { ExecutorFields } from "@/components/permisos/ExecutorFields";
@@ -15,21 +16,29 @@ import {
   heightsPpeOptions,
   heightsMaxExecutors,
   heightsSlug,
+  get_heights_executors,
 } from "@/config/trabajos_alturas";
 import { find_permit_type } from "@/config/tipos_permiso";
-import { require_permit_actor } from "@/lib/permisos/actor";
+import { can_access_permit, can_edit_permit, require_permit_actor } from "@/lib/permisos/actor";
+import { get_repositories } from "@/lib/data/proveedor_datos";
 import { executorErrorMessages, load_executor_options } from "@/lib/permisos/ejecutantes";
 import { create_heights_permit } from "@/lib/permisos/trabajos_alturas_acciones";
+import { update_heights_permit } from "@/lib/permisos/edicion_permisos_acciones";
 
 interface NewHeightsPageProps {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; editar?: string }>;
 }
 
 export default async function NewHeightsPermitPage({
   searchParams,
 }: NewHeightsPageProps) {
-  const { error } = await searchParams;
-  const executorOptions = await load_executor_options(await require_permit_actor());
+  const { error, editar } = await searchParams;
+  const actor = await require_permit_actor();
+  const editingPermit = editar ? await get_repositories().permits.get_by_id(editar) : null;
+  if (editar && (!editingPermit || editingPermit.permitTypeSlug !== heightsSlug || !can_access_permit(actor, editingPermit) || !(await can_edit_permit(actor, editingPermit)))) notFound();
+  const existingExecutors = editingPermit ? get_heights_executors(editingPermit) : [];
+  const executorOffset = editingPermit ? Math.max(0, ...Object.entries(editingPermit.fields).flatMap(([key, value]) => { const match = /^executor(\d+)$/.exec(key); return match && typeof value === "string" && value.trim() ? [Number(match[1])] : []; })) : 0;
+  const executorOptions = await load_executor_options(actor);
   const today = new Date().toLocaleDateString("en-CA");
   const permitType = find_permit_type(heightsSlug);
 
@@ -40,11 +49,11 @@ export default async function NewHeightsPermitPage({
           { label: "Inicio", href: "/inicio" },
           { label: "Permisos de trabajo", href: "/permisos-trabajo" },
           { label: "Trabajos en alturas", href: `/permisos-trabajo/${heightsSlug}` },
-          { label: "Nuevo" },
+          { label: editingPermit ? `Editar ${String(editingPermit.fields.folio)}` : "Nuevo" },
         ]}
       />
       <PageHeader
-        title="Permiso para trabajos en alturas"
+        title={editingPermit ? `Editar permiso · ${String(editingPermit.fields.folio)}` : "Permiso para trabajos en alturas"}
         eyebrow={
           permitType && (
             <span className="rounded-full bg-neutral-light/40 px-2.5 py-0.5 text-xs font-bold text-brand-navy">{permitType.formCode}</span>
@@ -60,14 +69,15 @@ export default async function NewHeightsPermitPage({
       )}
       {error && executorErrorMessages[error] && <FormAlert>{executorErrorMessages[error]}</FormAlert>}
 
-      <form action={create_heights_permit} className="space-y-6">
+      <form action={editingPermit ? update_heights_permit : create_heights_permit} className="space-y-6">
+        {editingPermit && <input type="hidden" name="permitId" value={editingPermit.id} />}
         <SectionCard step={1} title="Datos generales" description="Quién solicita el permiso, dónde y qué se va a hacer.">
           <div className="grid gap-4 sm:grid-cols-2">
-            <PermitAreaField />
-            <RequesterUnitField name="department" />
-            <PermitField label="Fecha" name="date" type="date" defaultValue={today} />
-            <PermitField label="Área de trabajo o espacio" name="workArea" />
-            <PermitField label="Descripción del trabajo" name="description" rows={3} wide />
+            <PermitAreaField initialArea={editingPermit?.area ?? null} />
+            <RequesterUnitField name="department" initialValue={editingPermit ? String(editingPermit.fields.department ?? "") : undefined} />
+            <PermitField label="Fecha" name="date" type="date" defaultValue={String(editingPermit?.fields.date ?? today)} />
+            <PermitField label="Área de trabajo o espacio" name="workArea" defaultValue={String(editingPermit?.fields.workArea ?? "")} />
+            <PermitField label="Descripción del trabajo" name="description" rows={3} wide defaultValue={String(editingPermit?.fields.description ?? "")} />
           </div>
         </SectionCard>
 
@@ -76,13 +86,15 @@ export default async function NewHeightsPermitPage({
           title="Personas que ejecutan"
           description="La evaluación médica (apto / no apto) la registra el servicio médico al firmar."
         >
-          <ExecutorFields options={executorOptions} maxExecutors={heightsMaxExecutors} requiredWorkType={"ALTURAS"} />
+          {editingPermit && <div className="mb-4 rounded-xl border border-neutral-light p-4"><p className="mb-2 text-sm font-bold text-brand-navy">Ejecutantes actuales (se conservan)</p><ol className="list-decimal pl-5 text-sm">{existingExecutors.map((name, index) => <li key={index}>{name}</li>)}</ol></div>}
+          {editingPermit && <p className="mb-3 text-sm text-neutral-dark">Los ejecutantes actuales y sus firmas no se modificarán. Agrega únicamente personas nuevas.</p>}
+          <ExecutorFields options={executorOptions} maxExecutors={heightsMaxExecutors} requiredWorkType={"ALTURAS"} startPosition={executorOffset} initialProviderId={editingPermit?.providerId ?? null} requireExecutor={!editingPermit} />
         </SectionCard>
 
         <SectionCard step={3} title="Horario" description="Hora de inicio y de terminación del trabajo.">
           <div className="grid gap-4 sm:grid-cols-2">
-            <PermitField label="Hora de inicio del trabajo" name="startTime" type="time" />
-            <PermitField label="Hora de terminación del trabajo" name="endTime" type="time" />
+            <PermitField label="Hora de inicio del trabajo" name="startTime" type="time" defaultValue={String(editingPermit?.fields.startTime ?? "")} />
+            <PermitField label="Hora de terminación del trabajo" name="endTime" type="time" defaultValue={String(editingPermit?.fields.endTime ?? "")} />
           </div>
         </SectionCard>
 
@@ -113,6 +125,7 @@ export default async function NewHeightsPermitPage({
                                 name={get_heights_checklist_field(item.id)}
                                 value={value}
                                 required
+                                defaultChecked={editingPermit?.fields[get_heights_checklist_field(item.id)] === value}
                                 className="h-4 w-4"
                               />
                               {label}
@@ -127,12 +140,13 @@ export default async function NewHeightsPermitPage({
                               key={option.slug}
                               className="flex min-h-11 items-center gap-2 rounded-lg border border-neutral-light px-3 sm:min-h-10"
                             >
-                              <input type="checkbox" name="ppe" value={option.slug} className="h-4 w-4" />
+                              <input type="checkbox" name="ppe" value={option.slug} defaultChecked={String(editingPermit?.fields.ppe ?? "").split(",").includes(option.slug)} className="h-4 w-4" />
                               {option.label}
                             </label>
                           ))}
                           <input
                             name="ppeOther"
+                            defaultValue={String(editingPermit?.fields.ppeOther ?? "")}
                             placeholder="Otro"
                             aria-label="Otro equipo de protección personal"
                             className={`${inputClass} sm:max-w-48`}
@@ -154,8 +168,8 @@ export default async function NewHeightsPermitPage({
           registran después de crear el permiso.
         </p>
 
-        <SubmitButton className={`${primaryButtonClass} px-8`} pendingLabel="Creando…">
-          Crear permiso
+        <SubmitButton className={`${primaryButtonClass} px-8`} pendingLabel={editingPermit ? "Guardando…" : "Creando…"}>
+          {editingPermit ? "Guardar cambios" : "Crear permiso"}
         </SubmitButton>
       </form>
     </>

@@ -1944,7 +1944,6 @@ async function load_permit_for_edit(db: Queryable, permitId: string): Promise<Pe
   );
   const permit = rows[0];
   if (!permit) throw new NotFoundError("Permiso", permitId);
-  if (permit.estatus === "closed") throw new ValidationError("El permiso está cerrado");
   return permit;
 }
 

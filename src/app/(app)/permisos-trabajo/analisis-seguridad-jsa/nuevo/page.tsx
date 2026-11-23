@@ -1,4 +1,5 @@
 import { inputClass, labelClass, primaryButtonClass } from "@/components/administracion/estilos";
+import { notFound } from "next/navigation";
 import { FormAlert } from "@/components/permisos/FormAlert";
 import { JsaAnalysis } from "@/components/permisos/JsaAnalysis";
 import { JsaForm, JsaSubmitButton } from "@/components/permisos/JsaForm";
@@ -12,6 +13,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import {
   get_level_class,
   get_risk_level,
+  get_jsa_participants,
   jsaChecklists,
   jsaEnvironmental,
   jsaMaxParticipants,
@@ -21,20 +23,29 @@ import {
   jsaSlug,
 } from "@/config/jsa";
 import { find_permit_type } from "@/config/tipos_permiso";
-import { require_permit_actor } from "@/lib/permisos/actor";
+import { can_access_permit, can_edit_permit, require_permit_actor } from "@/lib/permisos/actor";
+import { get_repositories } from "@/lib/data/proveedor_datos";
 import { executorErrorMessages, load_executor_options } from "@/lib/permisos/ejecutantes";
-import { check_jsa_certifications, create_jsa } from "@/lib/permisos/jsa_acciones";
+import { check_jsa_certifications, create_jsa, update_jsa } from "@/lib/permisos/jsa_acciones";
 
 interface NewJsaPageProps {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; editar?: string }>;
 }
 
 const optionClass =
   "flex min-h-11 items-center gap-2 rounded-lg border border-neutral-light px-3 text-sm has-[:checked]:border-brand-navy has-[:checked]:bg-brand-navy has-[:checked]:text-white sm:min-h-10";
 
 export default async function NewJsaPage({ searchParams }: NewJsaPageProps) {
-  const { error } = await searchParams;
-  const executorOptions = await load_executor_options(await require_permit_actor());
+  const { error, editar } = await searchParams;
+  const actor = await require_permit_actor();
+  const editingPermit = editar ? await get_repositories().permits.get_by_id(editar) : null;
+  if (editar && (!editingPermit || editingPermit.permitTypeSlug !== jsaSlug || !can_access_permit(actor, editingPermit) || !(await can_edit_permit(actor, editingPermit)))) notFound();
+  const executorOptions = await load_executor_options(actor);
+  const participantOptions = editingPermit?.providerId
+    ? { ...executorOptions, fixedProviderId: Number(editingPermit.providerId) }
+    : executorOptions;
+  const existingParticipants = editingPermit ? get_jsa_participants(editingPermit) : [];
+  const participantOffset = editingPermit ? Math.max(0, ...existingParticipants.map((item) => item.position)) : 0;
   const now = new Date();
   const today = now.toLocaleDateString("en-CA");
   const currentTime = now.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
@@ -88,11 +99,11 @@ export default async function NewJsaPage({ searchParams }: NewJsaPageProps) {
           { label: "Inicio", href: "/inicio" },
           { label: "Permisos de trabajo", href: "/permisos-trabajo" },
           { label: "Análisis de seguridad (JSA)", href: `/permisos-trabajo/${jsaSlug}` },
-          { label: "Nuevo" },
+          { label: editingPermit ? `Editar ${String(editingPermit.fields.folio)}` : "Nuevo" },
         ]}
       />
       <PageHeader
-        title="Análisis de seguridad en el trabajo (JSA)"
+        title={editingPermit ? `Editar JSA · ${String(editingPermit.fields.folio)}` : "Análisis de seguridad en el trabajo (JSA)"}
         eyebrow={
           permitType && (
             <span className="rounded-full bg-neutral-light/40 px-2.5 py-0.5 text-xs font-bold text-brand-navy">{permitType.formCode}</span>
@@ -103,21 +114,24 @@ export default async function NewJsaPage({ searchParams }: NewJsaPageProps) {
 
       {error === "incomplete" && (
         <FormAlert>
-          Completa los datos generales, responde las 4 preguntas de permiso, captura al menos un paso completo (peligros válidos, medidas
-          de control, P y S) y al menos un participante.
+          {editingPermit
+            ? "Completa los datos generales, responde las 4 preguntas y captura al menos un paso completo (peligros válidos, medidas de control, P y S)."
+            : "Completa los datos generales, responde las 4 preguntas de permiso, captura al menos un paso completo (peligros válidos, medidas de control, P y S) y al menos un participante."}
         </FormAlert>
       )}
       {error && executorErrorMessages[error] && <FormAlert>{executorErrorMessages[error]}</FormAlert>}
+      {error === "certifications" && <FormAlert>Algún participante de contratista no tiene las certificaciones vigentes requeridas para el trabajo. Revisa su documentación antes de guardar.</FormAlert>}
 
-      <JsaForm create_action={create_jsa} check_action={check_jsa_certifications} className="space-y-6">
+      <JsaForm create_action={editingPermit ? update_jsa : create_jsa} check_action={check_jsa_certifications} className="space-y-6">
+        {editingPermit && <input type="hidden" name="permitId" value={editingPermit.id} />}
         <SectionCard step={1} title="Datos generales" description="Dónde y qué trabajo se va a analizar.">
           <div className="grid gap-4 sm:grid-cols-2">
-            <PermitAreaField />
-            <PermitField label="Nombre del trabajo a ejecutar" name="jobName" />
-            <PermitField label="Ubicación del área de trabajo" name="location" />
-            <RequesterUnitField name="company" />
-            <PermitField label="Fecha" name="date" type="date" defaultValue={today} />
-            <PermitField label="Hora" name="time" type="time" defaultValue={currentTime} />
+            <PermitAreaField initialArea={editingPermit?.area ?? null} />
+            <PermitField label="Nombre del trabajo a ejecutar" name="jobName" defaultValue={String(editingPermit?.fields.jobName ?? "")} />
+            <PermitField label="Ubicación del área de trabajo" name="location" defaultValue={String(editingPermit?.fields.location ?? "")} />
+            <RequesterUnitField name="company" initialValue={editingPermit ? String(editingPermit.fields.company ?? "") : undefined} />
+            <PermitField label="Fecha" name="date" type="date" defaultValue={String(editingPermit?.fields.date ?? today)} />
+            <PermitField label="Hora" name="time" type="time" defaultValue={String(editingPermit?.fields.time ?? currentTime)} />
           </div>
         </SectionCard>
 
@@ -135,10 +149,10 @@ export default async function NewJsaPage({ searchParams }: NewJsaPageProps) {
                 </span>
                 <span className="flex gap-2">
                   <label className={optionClass}>
-                    <input type="radio" name={question.field} value="yes" required className="h-4 w-4" /> Sí
+                    <input type="radio" name={question.field} value="yes" required defaultChecked={editingPermit?.fields[question.field] === "yes"} className="h-4 w-4" /> Sí
                   </label>
                   <label className={optionClass}>
-                    <input type="radio" name={question.field} value="no" required className="h-4 w-4" /> No
+                    <input type="radio" name={question.field} value="no" required defaultChecked={editingPermit?.fields[question.field] === "no"} className="h-4 w-4" /> No
                   </label>
                 </span>
               </fieldset>
@@ -146,7 +160,7 @@ export default async function NewJsaPage({ searchParams }: NewJsaPageProps) {
           </div>
         </SectionCard>
 
-        <JsaAnalysis legend={legend} />
+        <JsaAnalysis legend={legend} initialPermit={editingPermit} />
 
         <SectionCard
           step={5}
@@ -160,7 +174,7 @@ export default async function NewJsaPage({ searchParams }: NewJsaPageProps) {
               </legend>
               {jsaChecklists.map((item) => (
                 <label key={item.slug} className="flex min-h-11 items-center gap-2 text-sm sm:min-h-10">
-                  <input type="checkbox" name="checklists" value={item.slug} className="h-4 w-4" />
+                  <input type="checkbox" name="checklists" value={item.slug} defaultChecked={String(editingPermit?.fields.checklists ?? "").split(",").includes(item.slug)} className="h-4 w-4" />
                   {item.label}
                 </label>
               ))}
@@ -170,14 +184,14 @@ export default async function NewJsaPage({ searchParams }: NewJsaPageProps) {
               <p className="mb-1 text-xs text-neutral-dark">Selecciona el impacto ambiental relacionado con el trabajo.</p>
               {jsaEnvironmental.map((item) => (
                 <label key={item.slug} className="flex min-h-11 items-center gap-2 text-sm sm:min-h-10">
-                  <input type="checkbox" name="environmental" value={item.slug} className="h-4 w-4" />
+                  <input type="checkbox" name="environmental" value={item.slug} defaultChecked={String(editingPermit?.fields.environmental ?? "").split(",").includes(item.slug)} className="h-4 w-4" />
                   {item.label}
                 </label>
               ))}
               <label htmlFor="campo-environmentalOther" className={`${labelClass} mt-2`}>
                 Otro
               </label>
-              <input id="campo-environmentalOther" name="environmentalOther" placeholder="Otro" className={inputClass} />
+              <input id="campo-environmentalOther" name="environmentalOther" defaultValue={String(editingPermit?.fields.environmentalOther ?? "")} placeholder="Otro" className={inputClass} />
             </fieldset>
           </div>
         </SectionCard>
@@ -187,11 +201,20 @@ export default async function NewJsaPage({ searchParams }: NewJsaPageProps) {
           title="Participantes"
           description="Personal que participa en el análisis de los riesgos y aspectos ambientales. Cada participante firma después de crear el JSA."
         >
-          <ParticipantFields options={executorOptions} maxParticipants={jsaMaxParticipants} />
+          {editingPermit && existingParticipants.length > 0 && (
+            <div className="mb-4 rounded-xl border border-neutral-light p-4">
+              <p className="mb-2 text-sm font-bold text-brand-navy">Participantes actuales (se conservan sus datos y firmas)</p>
+              <ul className="space-y-1 text-sm">
+                {existingParticipants.map((participant) => <li key={participant.position}>#{participant.position} · {participant.name} · {participant.job} · {participant.company}</li>)}
+              </ul>
+            </div>
+          )}
+          <p className="mb-3 text-sm text-neutral-dark">{editingPermit ? "Agrega participantes nuevos; no se modificarán las firmas de quienes ya participaron." : "Personal que participa en el análisis de los riesgos y aspectos ambientales. Cada participante firma después de crear el JSA."}</p>
+          <ParticipantFields options={participantOptions} maxParticipants={jsaMaxParticipants} startPosition={participantOffset} initialProviderId={editingPermit?.providerId ?? null} requireParticipant={!editingPermit} />
         </SectionCard>
 
-        <JsaSubmitButton className={`${primaryButtonClass} px-8`} pendingLabel="Creando…">
-          Crear JSA
+        <JsaSubmitButton className={`${primaryButtonClass} px-8`} pendingLabel={editingPermit ? "Guardando…" : "Creando…"}>
+          {editingPermit ? "Guardar cambios" : "Crear JSA"}
         </JsaSubmitButton>
       </JsaForm>
     </>

@@ -7,11 +7,12 @@ export const heightsVerificationCount = 4;
 export const heightsMaxExtensionHours = 4;
 export const heightsRevalidationHour = 18;
 
-export type MedicalEvaluation = "fit" | "unfit";
+export type MedicalEvaluation = "fit" | "unfit" | "absent";
 
 export const medicalEvaluationLabels: Record<MedicalEvaluation, string> = {
   fit: "APTO",
   unfit: "NO APTO",
+  absent: "NO ASISTIÓ",
 };
 
 /** A diferencia del FO-0131, la lista del FO-0060 solo admite SI / NO. */
@@ -125,7 +126,8 @@ export function get_heights_verification_key(position: number): string {
 
 export function get_heights_executors(permit: WorkPermit): string[] {
   const executors: string[] = [];
-  for (let position = 1; position <= heightsMaxExecutors; position += 1) {
+  const count = Number(permit.fields.executorCount ?? heightsMaxExecutors);
+  for (let position = 1; position <= Math.min(count, 100); position += 1) {
     const name = permit.fields[`executor${position}`];
     if (typeof name === "string" && name) executors.push(name);
   }

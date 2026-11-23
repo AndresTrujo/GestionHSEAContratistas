@@ -27,7 +27,7 @@ import {
   type PermitActor,
 } from "./actor";
 import { read_permit_area } from "./area";
-import { read_executors, register_executor_participants } from "./ejecutantes";
+import { can_sign_participant, read_executors, register_executor_participants } from "./ejecutantes";
 import { sign_step } from "./firma";
 import { resolve_requester_unit } from "./unidad_solicitante";
 
@@ -64,12 +64,12 @@ async function append_audit(
 }
 
 /** Carga un permiso de trabajos calientes que siga abierto; si no (o no es accesible), vuelve al listado. */
-async function load_open_permit(formData: FormData, actor: PermitActor): Promise<WorkPermit> {
+async function load_open_permit(formData: FormData, actor: PermitActor, allowClosed = false): Promise<WorkPermit> {
   const permit = await get_repositories().permits.get_by_id(
     read_text(formData, "permitId"),
   );
-  if (!permit || permit.permitTypeSlug !== hotWorkSlug || !can_access_permit(actor, permit)) redirect(basePath);
-  if (permit.status === "closed") redirect(`${basePath}/${permit.id}`);
+  if (!permit || permit.fields.deletedAt || permit.permitTypeSlug !== hotWorkSlug || !can_access_permit(actor, permit)) redirect(basePath);
+  if (permit.status === "closed" && !allowClosed) redirect(`${basePath}/${permit.id}`);
   return permit;
 }
 
@@ -104,6 +104,10 @@ export async function create_hot_work_permit(formData: FormData): Promise<void> 
     fields[`executor${index + 1}`] = name;
   });
   const executorCount = executors.names.filter(Boolean).length;
+  const submittedExecutorCount = Number(read_text(formData, "executorCount"));
+  fields.executorCount = Number.isInteger(submittedExecutorCount) && submittedExecutorCount >= 6
+    ? Math.min(submittedExecutorCount, 100)
+    : 6;
 
   const requiredFields = [
     "department",
@@ -171,8 +175,9 @@ export async function create_hot_work_permit(formData: FormData): Promise<void> 
 export async function sign_hot_work_permit(formData: FormData): Promise<void> {
   const actor = await require_permit_actor();
   const employeeNumber = actor.actorId;
-  const permit = await load_open_permit(formData, actor);
   const key = read_text(formData, "key");
+  const allowClosed = /^executor_participant_\d+$/.test(key);
+  const permit = await load_open_permit(formData, actor, allowClosed);
   const detailPath = `${basePath}/${permit.id}`;
   if (!can_sign_key(actor, key)) redirect(`${detailPath}?error=role`);
 
@@ -183,8 +188,16 @@ export async function sign_hot_work_permit(formData: FormData): Promise<void> {
     Number.isInteger(verificationPosition) &&
     verificationPosition >= 1 &&
     verificationPosition <= hotWorkVerificationCount;
-  if (!isApprovalKey && !isVerificationKey) redirect(detailPath);
+  const executorParticipantMatch = /^executor_participant_(\d+)$/.exec(key);
+  const executorParticipantPosition = executorParticipantMatch ? Number(executorParticipantMatch[1]) : 0;
+  const isExecutorParticipantKey = executorParticipantPosition > 0 &&
+    Boolean(permit.fields[`executorAddedAt_${executorParticipantPosition}`]) &&
+    Boolean(String(permit.fields[`executor${executorParticipantPosition}`] ?? "").trim());
+  if (!isApprovalKey && !isVerificationKey && !isExecutorParticipantKey) redirect(detailPath);
   if (find_signature(permit, key)) redirect(detailPath);
+  if (isExecutorParticipantKey && !(await can_sign_participant(actor, permit.id, executorParticipantPosition, "executor"))) {
+    redirect(`${detailPath}?error=participant_not_you`);
+  }
 
   if (isApprovalKey) {
     if (permit.status !== "submitted") redirect(detailPath);
@@ -193,7 +206,7 @@ export async function sign_hot_work_permit(formData: FormData): Promise<void> {
       (item) => find_signature(permit, item.key)?.employeeNumber === employeeNumber,
     );
     if (alreadySigned && actor.actorType === "EMPLEADO" && !actor.isAdmin) redirect(`${detailPath}?error=same_person`);
-  } else {
+  } else if (isVerificationKey) {
     if (permit.status !== "approved") redirect(detailPath);
     const validUntil = get_valid_until(permit);
     if (validUntil && validUntil.getTime() < Date.now()) {

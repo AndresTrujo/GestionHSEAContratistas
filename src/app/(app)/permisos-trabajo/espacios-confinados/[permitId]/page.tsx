@@ -1,3 +1,4 @@
+import { DeletePermitButton } from "@/components/permisos/DeletePermitButton";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { notFound } from "next/navigation";
 import {
@@ -10,6 +11,7 @@ import {
   thClass,
 } from "@/components/administracion/estilos";
 import { DetailCard } from "@/components/permisos/DetailCard";
+import { ExecutorRowActions } from "@/components/permisos/ExecutorRowActions";
 import { FormAlert } from "@/components/permisos/FormAlert";
 import { PermitDetailHeader } from "@/components/permisos/PermitDetailHeader";
 import { SectionCard } from "@/components/permisos/SectionCard";
@@ -40,7 +42,7 @@ import type { ConfinedEvaluation } from "@/config/espacios_confinados";
 import { find_permit_type } from "@/config/tipos_permiso";
 import { get_repositories } from "@/lib/data/proveedor_datos";
 import { signErrorMessages } from "@/lib/permisos/mensajes_firma";
-import { can_access_permit, require_permit_actor } from "@/lib/permisos/actor";
+import { can_access_permit, can_edit_permit, require_permit_actor } from "@/lib/permisos/actor";
 import {
   record_confined_movement,
   record_confined_reading,
@@ -56,10 +58,12 @@ const errorMessages: Record<string, string> = {
   ...signErrorMessages,
   same_person: "Una misma persona no puede firmar dos roles del permiso.",
   signature: "La firma no es válida; dibújala de nuevo.",
+  participant_not_you: "Solo la persona asignada puede firmar como ejecutante agregado.",
   medical: "El servicio médico debe evaluar a todos los ejecutantes.",
   initial_limits:
     "La lectura inicial está fuera de límites; no se puede autorizar la entrada.",
   inside: "Todos los ejecutantes deben haber salido antes de la firma final de HSEA.",
+  executor_inside: "No puedes retirar a una persona que todavía no ha registrado su salida del espacio confinado.",
   unfit: "Este ejecutante fue evaluado como NO APTO y no puede entrar.",
   expired: "El permiso superó sus 8 horas de vigencia; ya no admite entradas ni lecturas.",
   atmosphere: "La última lectura está fuera de límites; evacuar y no permitir la entrada.",
@@ -79,10 +83,13 @@ export default async function ConfinedPermitDetailPage({
   const { error } = await searchParams;
   const repositories = get_repositories();
   const permit = await repositories.permits.get_by_id(permitId);
-  if (!permit || permit.permitTypeSlug !== confinedSlug || !can_access_permit(await require_permit_actor(), permit)) notFound();
+  const actor = await require_permit_actor();
+  if (!permit || permit.fields.deletedAt || permit.permitTypeSlug !== confinedSlug || !can_access_permit(actor, permit)) notFound();
+  const canEdit = await can_edit_permit(actor, permit);
 
   const events = await repositories.audit.list_events_by_entity("permisos_trabajo", permit.id);
   const executors = get_confined_executors(permit);
+  const addedExecutorPositions = Array.from({ length: 100 }, (_, index) => index + 1).filter((position) => Boolean(permit.fields[`executorAddedAt_${position}`]) && !permit.fields[`executorRemovedAt_${position}`]);
   const validUntil = get_confined_valid_until(permit);
   const isExpired = validUntil !== null && validUntil.getTime() < Date.now();
   const isApproved = permit.status === "approved";
@@ -112,6 +119,8 @@ export default async function ConfinedPermitDetailPage({
         formCode={permitType?.formCode}
         status={permit.status}
       >
+        {actor.isAdmin === true && <div className="mb-5"><DeletePermitButton permitId={permit.id} label="Eliminar Permiso" /></div>}
+        {canEdit && <p className="mb-5"><a href={`/permisos-trabajo/${confinedSlug}/nuevo?editar=${permit.id}`} className="inline-flex min-h-11 items-center rounded-xl border border-brand-navy px-4 py-2 text-sm font-bold text-brand-navy hover:bg-neutral-light/40">Editar permiso</a></p>}
         {error && errorMessages[error] && <FormAlert>{errorMessages[error]}</FormAlert>}
         {latestOutOfLimits && !isClosed && (
           <p role="alert" className="mb-5 rounded-xl border border-red-700 bg-red-700 px-4 py-3 text-sm font-bold text-white">
@@ -157,6 +166,7 @@ export default async function ConfinedPermitDetailPage({
                   <th scope="col" className={thClass}>#</th>
                   <th scope="col" className={thClass}>Nombre</th>
                   <th scope="col" className={thClass}>Evaluación médica</th>
+                  <th scope="col" className={thClass}>Acciones</th>
                   <th scope="col" className={thClass}>Entrada</th>
                   <th scope="col" className={thClass}>Salida</th>
                 </tr>
@@ -172,11 +182,12 @@ export default async function ConfinedPermitDetailPage({
                   return (
                     <tr key={position}>
                       <td className={tdClass}>{position}</td>
-                      <td className={tdClass}>{name}</td>
+                      <td className={tdClass}>{name}{permit.fields[`executorRemovedAt_${position}`] && <span className="ml-2 text-xs font-bold text-red-700">(Retirado)</span>}</td>
                       <td className={`${tdClass} font-bold ${evaluation === "unfit" ? "text-red-700" : ""}`}>
                         {evaluation === "unfit" && <span aria-hidden="true">✕ </span>}
                         {evaluation ? confinedEvaluationLabels[evaluation] : "Pendiente"}
                       </td>
+                      <td className={tdClass}><ExecutorRowActions permitId={permit.id} position={position} evaluation={evaluation} canEdit={canEdit && !permit.fields[`executorRemovedAt_${position}`]} /></td>
                       <td className={tdClass}>
                         {typeof entryAt === "string" ? (
                           format_time(entryAt)
@@ -349,6 +360,25 @@ export default async function ConfinedPermitDetailPage({
       </details>
 
       <div className="mb-6">
+      {addedExecutorPositions.length > 0 && (
+        <div className="mb-6">
+          <SectionCard title="Firma de ejecutantes agregados">
+            <p className="mb-3 text-sm text-neutral-dark">Estas personas se incorporaron después de crear el permiso. Solo ellas tienen una firma individual pendiente; las firmas anteriores se conservan.</p>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {addedExecutorPositions.map((position) => (
+                <SignatureBox
+                  key={position}
+                  action={sign_confined_permit}
+                  permit={permit}
+                  signatureKey={`executor_participant_${position}`}
+                  label={String(permit.fields[`executor${position}`] ?? `Ejecutante ${position}`)}
+                  canSign
+                />
+              ))}
+            </div>
+          </SectionCard>
+        </div>
+      )}
         <SectionCard title="Autorización de entrada">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {confinedApprovalSignatures.map((item) => (
@@ -359,31 +389,6 @@ export default async function ConfinedPermitDetailPage({
                 signatureKey={item.key}
                 label={item.label}
                 canSign={permit.status === "submitted"}
-                modalFields={
-                  item.key === "medical_service" ? (
-                    <fieldset className="mb-3 space-y-2 text-sm">
-                      <legend className="mb-1 font-bold">Evaluación médica</legend>
-                      {executors.map((name, index) => (
-                        <div key={index} className="flex flex-wrap items-center justify-between gap-2">
-                          <span>
-                            {index + 1}. {name}
-                          </span>
-                          <span className="flex gap-2">
-                            {Object.entries(confinedEvaluationLabels).map(([value, label]) => (
-                              <label
-                                key={value}
-                                className="flex min-h-11 items-center gap-2 rounded-lg border border-neutral-light px-3 has-[:checked]:border-brand-navy has-[:checked]:bg-brand-navy has-[:checked]:text-white sm:min-h-10"
-                              >
-                                <input type="radio" name={`medical${index + 1}`} value={value} required className="h-4 w-4" />
-                                {label}
-                              </label>
-                            ))}
-                          </span>
-                        </div>
-                      ))}
-                    </fieldset>
-                  ) : undefined
-                }
               />
             ))}
           </div>

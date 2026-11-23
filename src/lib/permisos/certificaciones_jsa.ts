@@ -41,7 +41,11 @@ export async function find_jsa_certification_issues(formData: FormData, actor: P
   const issues: CertificationIssue[] = [];
   const checked = new Set<number>();
 
-  for (let position = 1; position <= jsaMaxParticipants; position += 1) {
+  const rawCount = Number(String(formData.get("participantCount") ?? ""));
+  const participantCount = Number.isInteger(rawCount) && rawCount >= jsaMaxParticipants && rawCount <= 100
+    ? rawCount
+    : jsaMaxParticipants;
+  for (let position = 1; position <= participantCount; position += 1) {
     const raw = String(formData.get(`participantStaff${position}`) ?? "").trim();
     const member = raw ? staff.find((candidate) => String(candidate.id) === raw) : undefined;
     if (!member || checked.has(member.id)) continue;
