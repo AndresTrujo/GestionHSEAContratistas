@@ -62,6 +62,7 @@ const errorMessages: Record<string, string> = {
   initial_limits:
     "La lectura inicial está fuera de límites; no se puede autorizar la entrada.",
   inside: "Todos los ejecutantes deben haber salido antes de la firma final de HSEA.",
+  executor_inside: "No puedes retirar a una persona que todavía no ha registrado su salida del espacio confinado.",
   unfit: "Este ejecutante fue evaluado como NO APTO y no puede entrar.",
   expired: "El permiso superó sus 8 horas de vigencia; ya no admite entradas ni lecturas.",
   atmosphere: "La última lectura está fuera de límites; evacuar y no permitir la entrada.",
