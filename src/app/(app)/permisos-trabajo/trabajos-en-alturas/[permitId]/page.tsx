@@ -142,11 +142,8 @@ export default async function HeightsPermitDetailPage({
                     <tr key={index}>
                       <td className={tdClass}>{position}</td>
                       <td className={tdClass}>{name}</td>
+                      
                       <td className={tdClass}><ExecutorRowActions permitId={permit.id} position={position} evaluation={evaluation} canEdit={canEdit} /></td>
-                      <td className={`${tdClass} font-bold ${evaluation === "unfit" ? "text-red-700" : ""}`}>
-                        {evaluation === "unfit" && <span aria-hidden="true">✕ </span>}
-                        {evaluation ? medicalEvaluationLabels[evaluation] : "Pendiente"}
-                      </td>
                     </tr>
                   );
                 })}
