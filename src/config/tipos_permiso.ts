@@ -90,8 +90,16 @@ export function is_next_approval_signature(permit: WorkPermit, key: string): boo
   const permitType = find_permit_type(permit.permitTypeSlug);
   if (!permitType) return true;
 
+  // Algunos formatos llaman "requester" al responsable que solicita/ejecuta el trabajo.
+  const firstRole: SignerRole | null = permitType.signerRoles.includes("executor")
+    ? "executor"
+    : permitType.signerRoles.includes("requester")
+      ? "requester"
+      : null;
   // Solo se consideran los roles que realmente existen en el formato.
-  const order = approvalSignatureOrder.filter((role) => permitType.signerRoles.includes(role));
+  const order = [firstRole, "operational_manager", "hsea"].filter(
+    (role): role is SignerRole => role !== null && permitType.signerRoles.includes(role),
+  );
   const position = order.indexOf(key as SignerRole);
   if (position <= 0) return true;
 
