@@ -23,7 +23,7 @@ import type { ChecklistAnswer } from "@/config/trabajos_calientes";
 import { find_permit_type } from "@/config/tipos_permiso";
 import { get_repositories } from "@/lib/data/proveedor_datos";
 import { signErrorMessages } from "@/lib/permisos/mensajes_firma";
-import { can_access_permit, require_permit_actor } from "@/lib/permisos/actor";
+import { can_access_permit, can_edit_permit, require_permit_actor } from "@/lib/permisos/actor";
 import {
   register_post_inspection,
   sign_hot_work_permit,
@@ -50,7 +50,9 @@ export default async function HotWorkPermitDetailPage({
   const { error } = await searchParams;
   const repositories = get_repositories();
   const permit = await repositories.permits.get_by_id(permitId);
-  if (!permit || permit.permitTypeSlug !== hotWorkSlug || !can_access_permit(await require_permit_actor(), permit)) notFound();
+  const actor = await require_permit_actor();
+  if (!permit || permit.permitTypeSlug !== hotWorkSlug || !can_access_permit(actor, permit)) notFound();
+  const canEdit = await can_edit_permit(actor, permit);
 
   const events = await repositories.audit.list_events_by_entity("permisos_trabajo", permit.id);
   const validUntil = get_valid_until(permit);
@@ -77,6 +79,7 @@ export default async function HotWorkPermitDetailPage({
         formCode={permitType?.formCode}
         status={permit.status}
       >
+        {canEdit && <p className="mb-5"><a href={`/permisos-trabajo/${hotWorkSlug}/nuevo?editar=${permit.id}`} className="inline-flex min-h-11 items-center rounded-xl border border-brand-navy px-4 py-2 text-sm font-bold text-brand-navy hover:bg-neutral-light/40">Editar permiso</a></p>}
         {error && errorMessages[error] && <FormAlert>{errorMessages[error]}</FormAlert>}
         {validUntil && !isClosed && (
           <p
