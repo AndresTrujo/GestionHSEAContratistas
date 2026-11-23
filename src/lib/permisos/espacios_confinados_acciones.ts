@@ -301,7 +301,7 @@ export async function record_confined_movement(formData: FormData): Promise<void
     !Number.isInteger(position) ||
     position < 1 ||
     position > executors.length ||
-    permit.fields[`executorRemovedAt_${position}`] ||
+    (permit.fields[`executorRemovedAt_${position}`] && kind !== "exit") ||
     (kind !== "entry" && kind !== "exit")
   ) {
     redirect(detailPath);
