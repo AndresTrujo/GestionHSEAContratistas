@@ -104,6 +104,7 @@ export async function create_hot_work_permit(formData: FormData): Promise<void> 
     fields[`executor${index + 1}`] = name;
   });
   const executorCount = executors.names.filter(Boolean).length;
+  fields.executorCount = executorCount;
 
   const requiredFields = [
     "department",
