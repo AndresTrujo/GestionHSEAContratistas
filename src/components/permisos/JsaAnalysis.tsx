@@ -17,8 +17,8 @@ const noHazards: string[] = [];
 export function JsaAnalysis({ legend, initialPermit }: { legend: ReactNode; initialPermit?: WorkPermit | null }) {
   const initialSteps = initialPermit ? get_jsa_steps(initialPermit) : [];
   const initialStepCount = Math.max(jsaInitialSteps, initialSteps.length);
-  const initialStepHazards = Object.fromEntries(initialSteps.map((step) => [step.number, step.hazards.split(/[,\\s]+/).filter(Boolean)]));
-  const risksFromSteps = new Set(initialSteps.flatMap((step) => step.hazards.split(/[,\\s]+/).filter(Boolean)));
+  const initialStepHazards = Object.fromEntries(initialSteps.map((step) => [step.number, step.hazards.split(/[,\s]+/).filter(Boolean)]));
+  const risksFromSteps = new Set(initialSteps.flatMap((step) => step.hazards.split(/[,\s]+/).filter(Boolean)));
   const initialRisks = initialPermit ? get_jsa_selected_risk_ids(initialPermit) : [];
   const [stepCount, set_step_count] = useState(initialStepCount);
   const [filledSteps, set_filled_steps] = useState<Record<number, boolean>>(
