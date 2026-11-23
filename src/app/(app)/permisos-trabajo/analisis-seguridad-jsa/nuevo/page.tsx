@@ -25,6 +25,7 @@ import {
 import { find_permit_type } from "@/config/tipos_permiso";
 import { can_access_permit, can_edit_permit, require_permit_actor } from "@/lib/permisos/actor";
 import { get_repositories } from "@/lib/data/proveedor_datos";
+import { get_time_mx, get_today_mx } from "@/lib/data/identidad";
 import { executorErrorMessages, load_executor_options } from "@/lib/permisos/ejecutantes";
 import { check_jsa_certifications, create_jsa, update_jsa } from "@/lib/permisos/jsa_acciones";
 
@@ -47,8 +48,8 @@ export default async function NewJsaPage({ searchParams }: NewJsaPageProps) {
   const existingParticipants = editingPermit ? get_jsa_participants(editingPermit) : [];
   const participantOffset = editingPermit ? Math.max(0, ...existingParticipants.map((item) => item.position)) : 0;
   const now = new Date();
-  const today = now.toLocaleDateString("en-CA");
-  const currentTime = now.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+  const today = get_today_mx();
+  const currentTime = get_time_mx(now);
   const permitType = find_permit_type(jsaSlug);
 
   const legend = (

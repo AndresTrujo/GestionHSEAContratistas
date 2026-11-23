@@ -1,4 +1,5 @@
 import { SubmitButton } from "@/components/ui/SubmitButton";
+import { get_today_mx } from "@/lib/data/identidad";
 import { primaryButtonClass } from "@/components/administracion/estilos";
 import { ContractorPicker } from "@/components/permisos/ContractorPicker";
 import { FormAlert } from "@/components/permisos/FormAlert";
@@ -20,7 +21,7 @@ interface NewPhonePageProps {
 export default async function NewPhonePermitPage({ searchParams }: NewPhonePageProps) {
   const { error } = await searchParams;
   const executorOptions = await load_executor_options(await require_permit_actor());
-  const today = new Date().toLocaleDateString("en-CA");
+  const today = get_today_mx();
   const permitType = find_permit_type(phoneSlug);
 
   return (

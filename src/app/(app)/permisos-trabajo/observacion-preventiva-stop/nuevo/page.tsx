@@ -1,4 +1,5 @@
 import { SubmitButton } from "@/components/ui/SubmitButton";
+import { get_today_mx } from "@/lib/data/identidad";
 import { inputClass, labelClass, primaryButtonClass } from "@/components/administracion/estilos";
 import { FormAlert } from "@/components/permisos/FormAlert";
 import { PermitAreaField } from "@/components/permisos/PermitAreaField";
@@ -27,7 +28,7 @@ export default async function NewStopObservationPage({
 }: NewStopPageProps) {
   const { error } = await searchParams;
   const executorOptions = await load_executor_options(await require_permit_actor());
-  const today = new Date().toLocaleDateString("en-CA");
+  const today = get_today_mx();
   const permitType = find_permit_type(stopSlug);
 
   return (

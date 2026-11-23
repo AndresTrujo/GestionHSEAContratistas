@@ -6,7 +6,7 @@ import { get_repositories } from "@/lib/data/proveedor_datos";
 import { get_employee_full_name } from "@/lib/data/identidad";
 
 export function format_date_time(iso: string): string {
-  return new Date(iso).toLocaleString("es-MX");
+  return new Intl.DateTimeFormat("es-MX", { timeZone: "America/Mexico_City", dateStyle: "short", timeStyle: "short" }).format(new Date(iso));
 }
 
 interface SignatureBoxProps {
