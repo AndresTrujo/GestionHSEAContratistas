@@ -79,6 +79,12 @@ function read_field(formData: FormData, name: string): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function read_dynamic_count(formData: FormData, field: string, fallback: number): number {
+  const raw = read_field(formData, field);
+  const count = Number(raw);
+  return raw && Number.isInteger(count) && count >= fallback && count <= 100 ? count : fallback;
+}
+
 /** Empleado TFS activo a partir de su número (el que envía el selector); null si no existe o está inactivo. */
 export async function resolve_tfs_employee(
   employeeNumber: string,
