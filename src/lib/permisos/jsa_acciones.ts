@@ -227,11 +227,17 @@ export async function update_jsa(formData: FormData): Promise<void> {
   fields.environmental = read_list(formData, "environmental", jsaEnvironmental.map((item) => item.slug)).join(",");
   fields.environmentalOther = read_text(formData, "environmentalOther");
 
-  const participants = await read_jsa_participants(formData, actor, jsaMaxParticipants);
-  if (!participants.ok) redirect(`${basePath}/nuevo?editar=${permit.id}&error=${participants.errorCode}`);
   const previousParticipants = await repositories.participants.list_by_permit(permit.id);
   const previousParticipantPositions = get_jsa_participants(permit).map((row) => row.position);
   const lastPreviousPosition = Math.max(0, ...previousParticipantPositions);
+  const hasNewParticipantInput = [...formData.entries()].some(([name, value]) => {
+    const match = /^(?:participantStaff|participantEmployee|participant)(\d+)(?:Name|Job|Company)?$/.exec(name);
+    return Boolean(match && Number(match[1]) > lastPreviousPosition && typeof value === "string" && value.trim());
+  });
+  const participants = hasNewParticipantInput
+    ? await read_jsa_participants(formData, actor, jsaMaxParticipants)
+    : { ok: true as const, providerId: permit.providerId, rows: [] };
+  if (!participants.ok) redirect(`${basePath}/nuevo?editar=${permit.id}&error=${participants.errorCode}`);
   if (participants.rows.some((row) => row.position <= lastPreviousPosition)) {
     redirect(`${basePath}/nuevo?editar=${permit.id}&error=participant_invalid`);
   }
@@ -260,7 +266,7 @@ export async function update_jsa(formData: FormData): Promise<void> {
     ...previousParticipantPositions,
     ...participants.rows.map((row) => row.position),
   )));
-  if ((await find_jsa_certification_issues(certificationForm, actor)).length > 0) {
+  if (participants.rows.length > 0 && (await find_jsa_certification_issues(certificationForm, actor)).length > 0) {
     redirect(`${basePath}/nuevo?editar=${permit.id}&error=certifications`);
   }
 
