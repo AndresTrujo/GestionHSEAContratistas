@@ -207,7 +207,7 @@ async function update_executor_permit(
 async function load_editable(formData: FormData, slug: string) {
   const actor = await require_permit_actor();
   const permit = await get_repositories().permits.get_by_id(read_text(formData, "permitId"));
-  if (!permit || permit.permitTypeSlug !== slug || !can_access_permit(actor, permit) || !(await can_edit_permit(actor, permit))) {
+  if (!permit || permit.fields.deletedAt || permit.permitTypeSlug !== slug || !can_access_permit(actor, permit) || !(await can_edit_permit(actor, permit))) {
     redirect(`/permisos-trabajo/${slug}`);
   }
   return { actor, permit };
