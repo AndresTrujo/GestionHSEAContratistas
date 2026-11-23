@@ -57,7 +57,7 @@ export default async function HotWorkPermitDetailPage({
 
   const events = await repositories.audit.list_events_by_entity("permisos_trabajo", permit.id);
   const executors = get_executors(permit);
-  const addedExecutorPositions = Array.from({ length: 100 }, (_, index) => index + 1).filter((position) => Boolean(permit.fields[`executorAddedAt_${position}`]));
+  const addedExecutorPositions = Array.from({ length: 100 }, (_, index) => index + 1).filter((position) => Boolean(permit.fields[`executorAddedAt_${position}`]) && !permit.fields[`executorRemovedAt_${position}`]);
   const validUntil = get_valid_until(permit);
   const isExpired = validUntil !== null && validUntil.getTime() < Date.now();
   const isClosed = permit.status === "closed";
