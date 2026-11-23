@@ -46,9 +46,6 @@ export default async function NewJsaPage({ searchParams }: NewJsaPageProps) {
     : executorOptions;
   const existingParticipants = editingPermit ? get_jsa_participants(editingPermit) : [];
   const participantOffset = editingPermit ? Math.max(0, ...existingParticipants.map((item) => item.position)) : 0;
-  const participantOptions = editingPermit?.providerId
-    ? { ...executorOptions, fixedProviderId: Number(editingPermit.providerId) }
-    : executorOptions;
   const now = new Date();
   const today = now.toLocaleDateString("en-CA");
   const currentTime = now.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
