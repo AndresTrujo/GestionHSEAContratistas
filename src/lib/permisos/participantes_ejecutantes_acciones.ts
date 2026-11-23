@@ -11,14 +11,14 @@ import { can_access_permit, can_edit_permit, require_permit_actor } from "./acto
 const allowedSlugs = new Set([heightsSlug, hotWorkSlug, confinedSlug]);
 const evaluationLabels = { fit: "APTO", unfit: "NO APTO", absent: "NO ASISTIÓ" } as const;
 
-function readText(formData: FormData, key: string): string {
+function read_text(formData: FormData, key: string): string {
   const value = formData.get(key);
   return typeof value === "string" ? value.trim() : "";
 }
 
-async function loadEditable(formData: FormData) {
+async function load_editable(formData: FormData) {
   const actor = await require_permit_actor();
-  const id = readText(formData, "permitId");
+  const id = read_text(formData, "permitId");
   const permit = await get_repositories().permits.get_by_id(id);
   if (!permit || permit.fields.deletedAt || !allowedSlugs.has(permit.permitTypeSlug) || !can_access_permit(actor, permit) || !(await can_edit_permit(actor, permit))) {
     redirect("/permisos-trabajo");
@@ -27,9 +27,9 @@ async function loadEditable(formData: FormData) {
 }
 
 export async function update_executor_medical_evaluation(formData: FormData): Promise<void> {
-  const { actor, permit, detailPath } = await loadEditable(formData);
-  const position = Number(readText(formData, "position"));
-  const evaluation = readText(formData, "evaluation");
+  const { actor, permit, detailPath } = await load_editable(formData);
+  const position = Number(read_text(formData, "position"));
+  const evaluation = read_text(formData, "evaluation");
   if (!Number.isInteger(position) || position < 1 || position > 100 ||
       !Object.prototype.hasOwnProperty.call(evaluationLabels, evaluation) ||
       !String(permit.fields[`executor${position}`] ?? "").trim() ||
@@ -59,8 +59,8 @@ export async function update_executor_medical_evaluation(formData: FormData): Pr
 }
 
 export async function remove_executor_from_permit(formData: FormData): Promise<void> {
-  const { actor, permit, detailPath } = await loadEditable(formData);
-  const position = Number(readText(formData, "position"));
+  const { actor, permit, detailPath } = await load_editable(formData);
+  const position = Number(read_text(formData, "position"));
   if (!Number.isInteger(position) || position < 1 || position > 100 ||
       !String(permit.fields[`executor${position}`] ?? "").trim() ||
       permit.fields[`executorRemovedAt_${position}`]) {
