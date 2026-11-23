@@ -62,9 +62,15 @@ function parse_signatures(value: unknown): PermitSignature[] {
   const result: PermitSignature[] = [];
   for (const item of parsed) {
     if (typeof item !== "object" || item === null) continue;
-    const { key, employeeNumber, signedAt, image } = item as Record<string, unknown>;
+    const { key, employeeNumber, employeeName, signedAt, image } = item as Record<string, unknown>;
     if (typeof key !== "string" || typeof employeeNumber !== "string" || typeof signedAt !== "string") continue;
-    result.push({ key, employeeNumber, signedAt, image: typeof image === "string" ? image : null });
+    result.push({
+      key,
+      employeeNumber,
+      employeeName: typeof employeeName === "string" ? employeeName : undefined,
+      signedAt,
+      image: typeof image === "string" ? image : null,
+    });
   }
   return result;
 }
@@ -97,6 +103,7 @@ interface RoleSignatureRow {
   usuario_proveedor_id: number | null;
   firmado_en: Date;
   imagen_firma: string | null;
+  nombre_firmante: string;
 }
 
 /**
@@ -112,7 +119,7 @@ async function load_role_signatures(
   if (permitIds.length === 0) return result;
   // Los ids viajan como un arreglo JSON (OPENJSON) para no toparse con el límite de 2100 parámetros.
   const { rows } = await db.query<RoleSignatureRow>(
-    `SELECT permiso_id, rol_firma, no_empleado, usuario_proveedor_id, firmado_en,
+    `SELECT permiso_id, rol_firma, no_empleado, usuario_proveedor_id, firmado_en, nombre_firmante,
             ${includeImages ? "imagen_firma" : "CAST(NULL AS nvarchar(max)) AS imagen_firma"}
        FROM firmas_permiso WHERE permiso_id IN (SELECT value FROM OPENJSON($1)) ORDER BY id`,
     [JSON.stringify(permitIds)],
@@ -122,6 +129,7 @@ async function load_role_signatures(
     list.push({
       key: row.rol_firma,
       employeeNumber: row.no_empleado !== null ? String(row.no_empleado) : `P-${row.usuario_proveedor_id}`,
+      employeeName: row.nombre_firmante,
       signedAt: row.firmado_en.toISOString(),
       image: row.imagen_firma,
     });
