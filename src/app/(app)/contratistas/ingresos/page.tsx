@@ -17,7 +17,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { register_entry_action, register_manual_exit_action } from "@/lib/contratistas/acciones";
 import { format_duration, get_overlap_worked_ms, get_week_start_sunday } from "@/lib/contratistas/horas";
 import { require_employee_permission } from "@/lib/auth/guardas";
-import { get_today_mx } from "@/lib/data/identidad";
+import { get_start_of_day_mx, get_today_mx } from "@/lib/data/identidad";
 import { get_repositories } from "@/lib/data/proveedor_datos";
 
 interface EntriesPageProps {
@@ -78,7 +78,7 @@ export default async function EntriesPage({ searchParams }: EntriesPageProps) {
   const allowedToday = todayEntries.filter((entry) => entry.result === "PERMITIDO").length;
   const deniedToday = todayEntries.filter((entry) => entry.result === "DENEGADO").length;
   const nowMs = new Date().getTime();
-  const weekStartMs = new Date(`${get_week_start_sunday(today)}T00:00:00-06:00`).getTime();
+  const weekStartMs = get_start_of_day_mx(get_week_start_sunday(today));
   const weeklyStats = new Map<number, { workedMs: number; visits: number }>();
   for (const entry of weeklyEntries) {
     if (entry.result !== "PERMITIDO") continue;
