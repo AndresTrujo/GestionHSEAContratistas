@@ -11,11 +11,13 @@ interface AreaOption {
 interface AreaSelectorProps {
   departments: AreaOption[];
   subdepartments: (AreaOption & { departmentId: number })[];
+  initialDepartmentId?: number | null;
+  initialSubdepartmentId?: number | null;
 }
 
 /** Departamento (obligatorio) y subdepartamento (opcional, de ese departamento). */
-export function AreaSelector({ departments, subdepartments }: AreaSelectorProps) {
-  const [departmentId, set_department_id] = useState("");
+export function AreaSelector({ departments, subdepartments, initialDepartmentId = null, initialSubdepartmentId = null }: AreaSelectorProps) {
+  const [departmentId, set_department_id] = useState(initialDepartmentId === null ? "" : String(initialDepartmentId));
   const options = subdepartments.filter((item) => String(item.departmentId) === departmentId);
 
   return (
@@ -38,7 +40,7 @@ export function AreaSelector({ departments, subdepartments }: AreaSelectorProps)
       </div>
       <div>
         <label htmlFor="subdepartmentId" className={labelClass}>Subdepartamento (si aplica)</label>
-        <select id="subdepartmentId" name="subdepartmentId" defaultValue="" disabled={options.length === 0} className={`${inputClass} disabled:bg-neutral-light/20`} key={departmentId}>
+        <select id="subdepartmentId" name="subdepartmentId" defaultValue={initialSubdepartmentId === null ? "" : String(initialSubdepartmentId)} disabled={options.length === 0} className={`${inputClass} disabled:bg-neutral-light/20`} key={departmentId}>
           <option value="">Todo el departamento</option>
           {options.map((item) => (
             <option key={item.id} value={item.id}>{item.name}</option>
