@@ -7,7 +7,6 @@ import {
   confinedApprovalSignatures,
   confinedChecklistIds,
   confinedClosingSignature,
-  confinedEvaluationLabels,
   confinedGases,
   confinedMaxExecutors,
   confinedReadingCount,
