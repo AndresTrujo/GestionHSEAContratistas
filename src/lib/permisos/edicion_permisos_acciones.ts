@@ -85,10 +85,16 @@ async function update_executor_permit(
   }
   if (options.requiredFields.some((name) => !fields[name])) redirect(failure);
 
-  const executors = await read_executors(formData, actor, permit.permitTypeSlug, options.maxExecutors);
-  if (!executors.ok) redirect(`/permisos-trabajo/${permit.permitTypeSlug}/nuevo?editar=${permit.id}&error=${executors.errorCode}`);
   const oldPositions = executor_positions(permit.fields);
   const oldMax = Math.max(0, ...oldPositions);
+  const hasNewExecutorInput = [...formData.entries()].some(([name, value]) => {
+    const match = /^(?:executorTfs|executorEmployee|executor)(\\d+)$/.exec(name);
+    return Boolean(match && Number(match[1]) > oldMax && typeof value === "string" && value.trim());
+  });
+  const executors = hasNewExecutorInput
+    ? await read_executors(formData, actor, permit.permitTypeSlug, options.maxExecutors)
+    : { ok: true as const, providerId: permit.providerId, names: [], providerParticipants: [], executorParticipants: [] };
+  if (!executors.ok) redirect(`/permisos-trabajo/${permit.permitTypeSlug}/nuevo?editar=${permit.id}&error=${executors.errorCode}`);
   const addedPositions: number[] = [];
   executors.names.forEach((name, index) => {
     if (!name) return;
