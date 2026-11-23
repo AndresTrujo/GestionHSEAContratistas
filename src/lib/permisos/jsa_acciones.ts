@@ -244,7 +244,21 @@ export async function update_jsa(formData: FormData): Promise<void> {
     return false;
   }));
   if (duplicatesExisting) redirect(`${basePath}/nuevo?editar=${permit.id}&error=participant_invalid`);
-  if ((await find_jsa_certification_issues(formData, actor)).length > 0) {
+  const certificationForm = new FormData();
+  for (const [name, value] of formData.entries()) {
+    if (typeof value === "string") certificationForm.append(name, value);
+  }
+  if (permit.providerId && !certificationForm.has("providerId")) certificationForm.set("providerId", permit.providerId);
+  for (const linked of previousParticipants) {
+    if (linked.role !== "participant" || linked.participant.kind !== "EMPLEADO_PROVEEDOR") continue;
+    certificationForm.set(`participantStaff${linked.position}`, String(linked.participant.providerEmployeeId));
+  }
+  certificationForm.set("participantCount", String(Math.max(
+    jsaMaxParticipants,
+    ...previousParticipantPositions,
+    ...participants.rows.map((row) => row.position),
+  )));
+  if ((await find_jsa_certification_issues(certificationForm, actor)).length > 0) {
     redirect(`${basePath}/nuevo?editar=${permit.id}&error=certifications`);
   }
 
