@@ -245,7 +245,7 @@ export async function update_jsa(formData: FormData): Promise<void> {
   const now = new Date().toISOString();
   await repositories.permits.save({
     ...permit,
-    providerId: participants.providerId ?? permit.providerId,
+    providerId: participants.rows.length > 0 ? (participants.providerId ?? permit.providerId) : permit.providerId,
     area: selectedArea.area,
     fields,
     // No se modifica el estado ni se eliminan firmas: un JSA autorizado sigue autorizado.
