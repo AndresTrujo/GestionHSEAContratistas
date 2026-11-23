@@ -42,6 +42,8 @@ export interface PermitSignature {
   /** Rol (SignerRole) o paso del formato (p. ej. "verification_1"). */
   key: string;
   employeeNumber: string;
+  /** Nombre completo del firmante capturado al registrar la firma. */
+  employeeName?: string;
   signedAt: string; // ISO 8601
   /** Trazo manuscrito como data URL PNG; null si la firma no se dibujó. */
   image: string | null;
