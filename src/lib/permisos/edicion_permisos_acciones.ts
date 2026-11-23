@@ -60,7 +60,6 @@ async function update_executor_permit(
   permit: WorkPermit,
   options: {
     maxExecutors: number;
-    workType: string;
     unitField: "department" | "company";
     listFields: Record<string, string[]>;
     requiredFields: string[];
@@ -147,7 +146,6 @@ async function update_executor_permit(
 
   const selectedArea = await read_permit_area(formData);
   if (!selectedArea) redirect(failure);
-  const addedProviderIds = executors.providerParticipants.map((item) => item.providerEmployeeId);
   if (addedProviderIds.length > 0) {
     const existingParticipants = await repositories.participants.list_by_permit(permit.id);
     if (executors.providerParticipants.some((item) => existingParticipants.some(
@@ -196,7 +194,6 @@ export async function update_heights_permit(formData: FormData): Promise<void> {
   const { actor, permit } = await load_editable(formData, heightsSlug);
   await update_executor_permit(formData, actor, permit, {
     maxExecutors: heightsMaxExecutors,
-    workType: "ALTURAS",
     unitField: "department",
     listFields: { ppe: heightsPpeOptions.map((item) => item.slug) },
     requiredFields: ["department", "date", "workArea", "description", "startTime", "endTime"],
@@ -207,7 +204,6 @@ export async function update_hot_work_permit(formData: FormData): Promise<void> 
   const { actor, permit } = await load_editable(formData, hotWorkSlug);
   await update_executor_permit(formData, actor, permit, {
     maxExecutors: hotWorkMaxExecutors,
-    workType: "CALIENTES",
     unitField: "department",
     listFields: { activities: hotWorkActivities.map((item) => item.slug) },
     requiredFields: ["department", "date", "workArea", "description", "requesterName", "requesterPosition", "startTime", "endTime"],
@@ -218,7 +214,6 @@ export async function update_confined_permit(formData: FormData): Promise<void> 
   const { actor, permit } = await load_editable(formData, confinedSlug);
   await update_executor_permit(formData, actor, permit, {
     maxExecutors: 6,
-    workType: "CONFINADOS",
     unitField: "company",
     listFields: Object.fromEntries(confinedRiskCategories.map((category) => [
       category.key,
