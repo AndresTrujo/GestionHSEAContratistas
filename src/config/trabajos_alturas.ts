@@ -125,7 +125,8 @@ export function get_heights_verification_key(position: number): string {
 
 export function get_heights_executors(permit: WorkPermit): string[] {
   const executors: string[] = [];
-  for (let position = 1; position <= heightsMaxExecutors; position += 1) {
+  const count = Number(permit.fields.executorCount ?? heightsMaxExecutors);
+  for (let position = 1; position <= Math.min(count, 100); position += 1) {
     const name = permit.fields[`executor${position}`];
     if (typeof name === "string" && name) executors.push(name);
   }
