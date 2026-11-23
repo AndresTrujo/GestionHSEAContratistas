@@ -43,6 +43,23 @@ describe("secuencia de firmas de autorización", () => {
     expect(is_next_approval_signature(permit, "hsea")).toBe(true);
   });
 
+  it("usa al solicitante como primer firmante en formatos que no tienen rol executor", () => {
+    const permit = {
+      ...make_permit(),
+      permitTypeSlug: "espacios-confinados",
+    };
+    expect(is_next_approval_signature(permit, "operational_manager")).toBe(false);
+    permit.signatures.push({
+      key: "requester",
+      employeeNumber: "103",
+      employeeName: "Responsable del trabajo",
+      signedAt: new Date().toISOString(),
+      image: null,
+    });
+    expect(is_next_approval_signature(permit, "operational_manager")).toBe(true);
+    expect(is_next_approval_signature(permit, "hsea")).toBe(false);
+  });
+
   it("no bloquea firmas adicionales que no forman parte de la secuencia", () => {
     expect(is_next_approval_signature(make_permit(), "medical_service")).toBe(true);
   });
