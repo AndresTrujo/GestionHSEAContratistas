@@ -1,4 +1,5 @@
 ﻿import type { WorkPermit } from "@/domain/permisos";
+import { get_date_mx, get_hour_mx } from "@/lib/data/identidad";
 
 /** Estructura del formato FO-0060 (Permiso para trabajos en alturas). */
 export const heightsSlug = "trabajos-en-alturas";
@@ -139,7 +140,7 @@ export function find_heights_signature(permit: WorkPermit, key: string) {
 }
 
 export function get_local_date(date: Date): string {
-  return date.toLocaleDateString("en-CA");
+  return get_date_mx(date);
 }
 
 /** El permiso es válido solo en la fecha solicitada. */
@@ -151,7 +152,7 @@ export function is_valid_today(permit: WorkPermit): boolean {
 export function needs_revalidation(permit: WorkPermit, now: Date): boolean {
   return (
     is_valid_today(permit) &&
-    now.getHours() >= heightsRevalidationHour &&
+    get_hour_mx(now) >= heightsRevalidationHour &&
     !find_heights_signature(permit, "extension")
   );
 }
