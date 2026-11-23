@@ -1,4 +1,4 @@
-﻿import type { PermitType } from "@/domain/permisos";
+﻿import type { PermitType, SignerRole, WorkPermit } from "@/domain/permisos";
 
 /** Catálogo de formatos controlados de HSEA (fuente: archivos FO-xxxx vigentes). */
 export const permitTypes: PermitType[] = [
@@ -80,4 +80,22 @@ export const permitTypes: PermitType[] = [
 
 export function find_permit_type(slug: string): PermitType | undefined {
   return permitTypes.find((permitType) => permitType.slug === slug);
+}
+
+/** Orden obligatorio de las tres firmas principales de autorización. */
+const approvalSignatureOrder: SignerRole[] = ["executor", "operational_manager", "hsea"];
+
+/** Indica si una firma principal es la siguiente que corresponde registrar en el permiso. */
+export function is_next_approval_signature(permit: WorkPermit, key: string): boolean {
+  const permitType = find_permit_type(permit.permitTypeSlug);
+  if (!permitType) return true;
+
+  // Solo se consideran los roles que realmente existen en el formato.
+  const order = approvalSignatureOrder.filter((role) => permitType.signerRoles.includes(role));
+  const position = order.indexOf(key as SignerRole);
+  if (position <= 0) return true;
+
+  return order.slice(0, position).every((previousRole) =>
+    permit.signatures.some((signature) => signature.key === previousRole),
+  );
 }
