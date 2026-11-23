@@ -133,6 +133,7 @@ export async function create_confined_permit(formData: FormData): Promise<void> 
     fields[`executor${index + 1}`] = name;
   });
   const executorCount = executors.names.filter(Boolean).length;
+  fields.executorCount = executorCount;
   if (executorCount === 0) redirect(failure);
 
   // Cada categoría de riesgo requiere al menos una opción ("No aplica" incluida).
