@@ -227,6 +227,23 @@ export async function update_jsa(formData: FormData): Promise<void> {
 
   const participants = await read_jsa_participants(formData, actor, jsaMaxParticipants);
   if (!participants.ok) redirect(`${basePath}/nuevo?editar=${permit.id}&error=${participants.errorCode}`);
+  const previousParticipants = await repositories.participants.list_by_permit(permit.id);
+  const previousParticipantPositions = get_jsa_participants(permit).map((row) => row.position);
+  const lastPreviousPosition = Math.max(0, ...previousParticipantPositions);
+  if (participants.rows.some((row) => row.position <= lastPreviousPosition)) {
+    redirect(`${basePath}/nuevo?editar=${permit.id}&error=participant_invalid`);
+  }
+  const duplicatesExisting = participants.rows.some((row) => row.link && previousParticipants.some((existing) => {
+    if (existing.role !== "participant") return false;
+    if (row.link?.kind === "EMPLEADO" && existing.participant.kind === "EMPLEADO") {
+      return row.link.employeeNumber === existing.participant.employeeNumber;
+    }
+    if (row.link?.kind === "EMPLEADO_PROVEEDOR" && existing.participant.kind === "EMPLEADO_PROVEEDOR") {
+      return row.link.providerEmployeeId === existing.participant.providerEmployeeId;
+    }
+    return false;
+  }));
+  if (duplicatesExisting) redirect(`${basePath}/nuevo?editar=${permit.id}&error=participant_invalid`);
   if ((await find_jsa_certification_issues(formData, actor)).length > 0) {
     redirect(`${basePath}/nuevo?editar=${permit.id}&error=certifications`);
   }
@@ -236,7 +253,6 @@ export async function update_jsa(formData: FormData): Promise<void> {
     fields[`participant${row.position}Job`] = row.job;
     fields[`participant${row.position}Company`] = row.company;
   }
-  const previousParticipantPositions = get_jsa_participants(permit).map((row) => row.position);
   fields.participantCount = Math.max(jsaMaxParticipants, ...previousParticipantPositions, ...participants.rows.map((row) => row.position));
   if (fields.participantCount > 100) redirect(failure);
 
