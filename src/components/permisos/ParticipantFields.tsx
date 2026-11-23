@@ -10,10 +10,11 @@ interface ParticipantFieldsProps {
   maxParticipants: number;
   startPosition?: number;
   initialProviderId?: string | null;
+  requireParticipant?: boolean;
 }
 
 /** Muestra seis participantes inicialmente y agrega dos espacios al completar todos los visibles. */
-export function ParticipantFields({ options, maxParticipants, startPosition = 0, initialProviderId = null }: ParticipantFieldsProps) {
+export function ParticipantFields({ options, maxParticipants, startPosition = 0, initialProviderId = null, requireParticipant = true }: ParticipantFieldsProps) {
   const initialProvider = options.fixedProviderId === null ? (initialProviderId ?? "") : String(options.fixedProviderId);
   const [providerId, set_provider_id] = useState(initialProvider);
   const [visibleCount, set_visible_count] = useState(Math.min(maxParticipants, 100 - startPosition));
@@ -52,7 +53,7 @@ export function ParticipantFields({ options, maxParticipants, startPosition = 0,
             <label key={`${providerId}-${position}`} className="block">
               <span className={labelClass}>{label}</span>
               {provider ? (
-                <select name={`participantStaff${position}`} defaultValue="" required={index === 0} onChange={(event) => updatePosition(position, event.target.value)} className={inputClass}>
+                <select name={`participantStaff${position}`} defaultValue="" required={requireParticipant && index === 0} onChange={(event) => updatePosition(position, event.target.value)} className={inputClass}>
                   <option value="">Elige un colaborador de {provider.name}</option>
                   {provider.staff.map((member) => (
                     <option key={member.id} value={member.id} disabled={member.semaphore !== "VERDE"}>
