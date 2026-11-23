@@ -1,5 +1,6 @@
 ﻿import type { WorkPermit } from "@/domain/permisos";
 import { get_date_mx, get_hour_mx } from "@/lib/data/identidad";
+import { get_date_mx, get_hour_mx } from "@/lib/data/identidad";
 
 /** Estructura del formato FO-0060 (Permiso para trabajos en alturas). */
 export const heightsSlug = "trabajos-en-alturas";
