@@ -164,11 +164,12 @@ export const confinedClosingSignature = {
   label: "Departamento HSEA",
 } as const;
 
-export type ConfinedEvaluation = "fit" | "unfit";
+export type ConfinedEvaluation = "fit" | "unfit" | "absent";
 
 export const confinedEvaluationLabels: Record<ConfinedEvaluation, string> = {
   fit: "APTO",
   unfit: "NO APTO",
+  absent: "NO ASISTIÓ",
 };
 
 export function find_confined_signature(permit: WorkPermit, key: string) {
