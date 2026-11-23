@@ -68,7 +68,7 @@ export function can_sign_key(actor: PermitActor, key: string): boolean {
 export async function can_edit_permit(actor: PermitActor, permit: WorkPermit): Promise<boolean> {
   if (actor.actorType === "EMPLEADO") {
     if (permit.requestedByEmployeeNumber === actor.actorId) return true;
-    return get_repositories().access.has_permission(actor.actorId, "permisos:crear", permit.area ?? undefined);
+    return get_repositories().access.has_permission(actor.actorId, "permisos:crear");
   }
   if (actor.providerId === null || permit.providerId !== actor.providerId || actor.providerUserId === null) return false;
   const repositories = get_repositories();
