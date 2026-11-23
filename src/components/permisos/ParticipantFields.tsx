@@ -63,7 +63,7 @@ export function ParticipantFields({ options, maxParticipants, startPosition = 0,
                   ))}
                 </select>
               ) : (
-                <TfsEmployeePicker name={`participantEmployee${position}`} required={requireParticipant && index === 0} onValueChange={(value) => update_position(position, value)} />
+                <TfsEmployeePicker name={`participantEmployee${position}`} required={requireParticipant && index === 0} on_value_change={(value) => update_position(position, value)} />
               )}
             </label>
           );
