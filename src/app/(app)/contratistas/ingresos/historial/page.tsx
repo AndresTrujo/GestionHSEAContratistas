@@ -86,27 +86,30 @@ export default async function EntryHistoryPage({ searchParams }: HistoryPageProp
   const totalMs = summaries.reduce((sum, item) => sum + item.totalMs, 0);
 
   // Agrupación por día (hora de Ciudad de México), proveedor y colaborador.
+  // Jerarquía de navegación: día > proveedor > colaborador > registros.
   const byDay = new Map<string, Map<number, Map<number, typeof entries>>>();
   for (const entry of entries) {
     const day = get_date_mx(entry.enteredAt);
     const providerId = employeeInfo.get(entry.providerEmployeeId)?.providerId ?? 0;
-    const providerGroups = byDay.get(day) ?? new Map<number, Map<number, typeof entries>>();
-    const employeeGroups = providerGroups.get(providerId) ?? new Map<number, typeof entries>();
-    employeeGroups.set(entry.providerEmployeeId, [...(employeeGroups.get(entry.providerEmployeeId) ?? []), entry]);
-    providerGroups.set(providerId, employeeGroups);
-    byDay.set(day, providerGroups);
+    const providersForDay = byDay.get(day) ?? new Map<number, Map<number, typeof entries>>();
+    const employeesForProvider = providersForDay.get(providerId) ?? new Map<number, typeof entries>();
+    employeesForProvider.set(entry.providerEmployeeId, [...(employeesForProvider.get(entry.providerEmployeeId) ?? []), entry]);
+    providersForDay.set(providerId, employeesForProvider);
+    byDay.set(day, providersForDay);
   }
-  const groups = [...byDay.entries()].flatMap(([day, providerGroups]) =>
-    [...providerGroups.entries()].flatMap(([providerId, employeeGroups]) =>
-      [...employeeGroups.entries()].map(([employeeId, items]) => ({
-        day, providerId,
-        company: providerNames.get(providerId) ?? (providerId ? `Proveedor ${providerId}` : "Proveedor no identificado"),
-        employeeId, info: employeeInfo.get(employeeId),
+  const days = [...byDay.entries()].sort(([a], [b]) => b.localeCompare(a)).map(([day, providerGroups]) => ({
+    day,
+    providers: [...providerGroups.entries()].map(([providerId, employeeGroups]) => ({
+      providerId,
+      company: providerNames.get(providerId) ?? (providerId ? `Proveedor ${providerId}` : "Proveedor no identificado"),
+      employees: [...employeeGroups.entries()].map(([employeeId, items]) => ({
+        employeeId,
+        name: employeeInfo.get(employeeId)?.name ?? `Colaborador ${employeeId}`,
         items: items.sort((a, b) => b.enteredAt.localeCompare(a.enteredAt)),
         workedMs: items.reduce((sum, entry) => sum + (get_worked_ms(entry) ?? 0), 0),
-      })),
-    ),
-  ).sort((a, b) => b.day.localeCompare(a.day) || a.company.localeCompare(b.company, "es") || (a.info?.name ?? "").localeCompare(b.info?.name ?? "", "es"));
+      })).sort((a, b) => a.name.localeCompare(b.name, "es")),
+    })).sort((a, b) => a.company.localeCompare(b.company, "es")),
+  }));
 
   function build_href(nextPeriod: HoursPeriod): string {
     const urlParams = new URLSearchParams();
@@ -259,55 +262,61 @@ export default async function EntryHistoryPage({ searchParams }: HistoryPageProp
       <section className={cardClass} aria-labelledby="titulo-registros">
         <h2 id="titulo-registros" className="mb-1 text-2xl uppercase">Registros por día, proveedor y colaborador</h2>
         <p className="mb-4 text-sm text-neutral-dark">
-          Todos los registros, incluidos los intentos denegados, agrupados por fecha, proveedor y colaborador. Se leen hasta {maxEntries} registros.
+          Abre un día para consultar sus proveedores y después despliega cada proveedor para ver a sus colaboradores y movimientos. Se leen hasta {maxEntries} registros.
         </p>
-        {groups.length === 0 ? (
+        {days.length === 0 ? (
           <p className="rounded-lg bg-neutral-light/20 px-4 py-6 text-center text-sm text-neutral-dark">No hay registros con ese filtro.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className={tableClass}>
-              <caption className="sr-only">Entradas y salidas agrupadas por colaborador</caption>
-              <thead>
-                <tr>
-                  <th scope="col" className={thClass}>Entrada</th>
-                  <th scope="col" className={thClass}>Salida</th>
-                  <th scope="col" className={thClass}>Tiempo en planta</th>
-                  <th scope="col" className={thClass}>Resultado</th>
-                  <th scope="col" className={thClass}>Semáforo</th>
-                  <th scope="col" className={thClass}>EPP</th>
-                  <th scope="col" className={thClass}>Observaciones</th>
-                  <th scope="col" className={thClass}>Registró</th>
-                </tr>
-              </thead>
-              {groups.map((group) => (
-                <tbody key={group.day + "-" + group.providerId + "-" + group.employeeId}>
-                  <tr><th scope="colgroup" colSpan={8} className="bg-brand-navy/10 px-3 py-2 text-left font-bold capitalize">
-                    {new Intl.DateTimeFormat("es-MX", { timeZone: "UTC", dateStyle: "full" }).format(new Date(group.day + "T12:00:00Z"))}
-                  </th></tr>
-                  <tr><th scope="colgroup" colSpan={8} className="bg-neutral-light/40 px-3 py-2 text-left font-bold">Proveedor: {group.company}</th></tr>
-                  <tr><th scope="colgroup" colSpan={8} className="bg-neutral-light/20 px-3 py-2 text-left font-bold">
-                    {group.info?.name}<span className="font-normal text-neutral-dark">{" "}· {group.items.length} registro{group.items.length === 1 ? "" : "s"} · {format_duration(group.workedMs)} acumuladas</span>
-                  </th></tr>
-                  {group.items.map((entry) => {
-                    const worked = get_worked_ms(entry);
-                    return (
-                      <tr key={entry.id} className="hover:bg-neutral-light/10">
-                        <td className={tdClass}>{format_time(entry.enteredAt)}</td>
-                        <td className={tdClass}>{entry.result === "DENEGADO" ? "—" : entry.exitedAt ? format_time(entry.exitedAt) : <span className="font-bold text-brand-green">Dentro de planta</span>}</td>
-                        <td className={tdClass}>{worked === null ? "—" : format_duration(worked)}</td>
-                        <td className={tdClass + " font-bold " + (entry.result === "PERMITIDO" ? "text-brand-green" : "text-red-700")}>{entry.result === "PERMITIDO" ? "Permitido" : "Denegado"}</td>
-                        <td className={tdClass}><SemaphoreBadge semaphore={entry.semaphoreAtEntry} /></td>
-                        <td className={tdClass}>{entry.eppComplete ? "Completo" : "Incompleto"}</td>
-                        <td className={tdClass}>{[entry.denialReason, entry.notes].filter(Boolean).join(" · ") || "—"}</td>
-                        <td className={tdClass}>{entry.registeredByEmployeeNumber}
-                          {entry.exitRegisteredByEmployeeNumber && entry.exitRegisteredByEmployeeNumber !== entry.registeredByEmployeeNumber && <span className="block text-xs text-neutral-dark">Salida: {entry.exitRegisteredByEmployeeNumber}</span>}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              ))}
-            </table>
+          <div className="space-y-3">
+            {days.map((dayGroup) => (
+              <details key={dayGroup.day} className="group rounded-xl border border-neutral-light">
+                <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 rounded-xl bg-brand-navy/5 px-4 py-3 font-bold text-brand-navy [&::-webkit-details-marker]:hidden">
+                  <span className="capitalize">{new Intl.DateTimeFormat("es-MX", { timeZone: "UTC", dateStyle: "full" }).format(new Date(dayGroup.day + "T12:00:00Z"))}</span>
+                  <span className="flex items-center gap-2 text-sm font-normal text-neutral-dark">{dayGroup.providers.length} proveedor{dayGroup.providers.length === 1 ? "" : "es"} <span className="transition group-open:rotate-180">⌄</span></span>
+                </summary>
+                <div className="space-y-2 border-t border-neutral-light p-3">
+                  {dayGroup.providers.map((providerGroup) => (
+                    <details key={providerGroup.providerId} className="group/provider rounded-lg border border-neutral-light">
+                      <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-2 font-semibold [&::-webkit-details-marker]:hidden">
+                        <span>{providerGroup.company}</span>
+                        <span className="text-sm font-normal text-neutral-dark">{providerGroup.employees.length} colaborador{providerGroup.employees.length === 1 ? "" : "es"} <span className="inline-block transition group-open/provider:rotate-180">⌄</span></span>
+                      </summary>
+                      <div className="space-y-2 border-t border-neutral-light bg-neutral-light/10 p-3">
+                        {providerGroup.employees.map((employeeGroup) => (
+                          <details key={employeeGroup.employeeId} className="rounded-lg border border-neutral-light bg-white">
+                            <summary className="flex min-h-12 cursor-pointer list-none flex-wrap items-center justify-between gap-2 px-4 py-2 [&::-webkit-details-marker]:hidden">
+                              <span className="font-semibold text-brand-navy">{employeeGroup.name}</span>
+                              <span className="text-sm text-neutral-dark">{employeeGroup.items.length} registro{employeeGroup.items.length === 1 ? "" : "s"} · {format_duration(employeeGroup.workedMs)} acumuladas</span>
+                            </summary>
+                            <div className="overflow-x-auto border-t border-neutral-light">
+                              <table className={tableClass}>
+                                <caption className="sr-only">Movimientos de {employeeGroup.name}</caption>
+                                <thead><tr>
+                                  <th scope="col" className={thClass}>Entrada</th><th scope="col" className={thClass}>Salida</th><th scope="col" className={thClass}>Tiempo en planta</th><th scope="col" className={thClass}>Resultado</th><th scope="col" className={thClass}>Semáforo</th><th scope="col" className={thClass}>EPP</th><th scope="col" className={thClass}>Observaciones</th><th scope="col" className={thClass}>Registró</th>
+                                </tr></thead>
+                                <tbody>{employeeGroup.items.map((entry) => {
+                                  const worked = get_worked_ms(entry);
+                                  return <tr key={entry.id} className="hover:bg-neutral-light/10">
+                                    <td className={tdClass}>{format_time(entry.enteredAt)}</td>
+                                    <td className={tdClass}>{entry.result === "DENEGADO" ? "—" : entry.exitedAt ? format_time(entry.exitedAt) : <span className="font-bold text-brand-green">Dentro de planta</span>}</td>
+                                    <td className={tdClass}>{worked === null ? "—" : format_duration(worked)}</td>
+                                    <td className={tdClass + " font-bold " + (entry.result === "PERMITIDO" ? "text-brand-green" : "text-red-700")}>{entry.result === "PERMITIDO" ? "Permitido" : "Denegado"}</td>
+                                    <td className={tdClass}><SemaphoreBadge semaphore={entry.semaphoreAtEntry} /></td>
+                                    <td className={tdClass}>{entry.eppComplete ? "Completo" : "Incompleto"}</td>
+                                    <td className={tdClass}>{[entry.denialReason, entry.notes].filter(Boolean).join(" · ") || "—"}</td>
+                                    <td className={tdClass}>{entry.registeredByEmployeeNumber}{entry.exitRegisteredByEmployeeNumber && entry.exitRegisteredByEmployeeNumber !== entry.registeredByEmployeeNumber && <span className="block text-xs text-neutral-dark">Salida: {entry.exitRegisteredByEmployeeNumber}</span>}</td>
+                                  </tr>;
+                                })}</tbody>
+                              </table>
+                            </div>
+                          </details>
+                        ))}
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              </details>
+            ))}
           </div>
         )}
       </section>
