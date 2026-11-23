@@ -2,7 +2,8 @@ import { createHash } from "node:crypto";
 import type { SignerIdentity } from "@/domain/acceso";
 import type { PermitSignature, SignerRole, WorkPermit } from "@/domain/permisos";
 import { hseaDepartmentName } from "@/config/permisos";
-import { find_permit_type } from "@/config/tipos_permiso";
+import { find_permit_type, is_next_approval_signature } from "@/config/tipos_permiso";
+import { get_employee_full_name } from "@/lib/data/identidad";
 import { get_repositories } from "@/lib/data/proveedor_datos";
 import type { PermitActor } from "./actor";
 
@@ -53,12 +54,29 @@ export async function sign_step(
   const repositories = get_repositories();
   const signer = to_signer(actor);
 
+  // La autorización solo puede avanzar de responsable de ejecución a responsable del área y después a HSE.
+  if (!is_next_approval_signature(permit, key)) {
+    return { ok: false, errorCode: "order" };
+  }
+
   if (!is_signer_role(permit, key)) {
     // Las verificaciones durante el trabajo las firma cualquier empleado TFS del departamento HSEA.
     if (key.startsWith("verification_") && !(await is_hsea_employee(actor))) {
       return { ok: false, errorCode: "firma_NO_ES_HSEA" };
     }
-    return { ok: true, signature: { key, employeeNumber: actor.actorId, signedAt: new Date().toISOString(), image } };
+    const employee = actor.actorType === "EMPLEADO"
+      ? await repositories.employees.find_by_number(actor.actorId)
+      : null;
+    return {
+      ok: true,
+      signature: {
+        key,
+        employeeNumber: actor.actorId,
+        employeeName: employee ? get_employee_full_name(employee) : undefined,
+        signedAt: new Date().toISOString(),
+        image,
+      },
+    };
   }
 
   if (!permit.area) return { ok: false, errorCode: "firma_SIN_AREA" };
@@ -74,6 +92,6 @@ export async function sign_step(
   if (!result.ok) return { ok: false, errorCode: `firma_${result.reason}` };
   return {
     ok: true,
-    signature: { key, employeeNumber: actor.actorId, signedAt: result.signature.signedAt, image },
+    signature: { key, employeeNumber: actor.actorId, employeeName: result.signature.signerName, signedAt: result.signature.signedAt, image },
   };
 }
