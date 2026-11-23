@@ -67,7 +67,7 @@ export async function remove_executor_from_permit(formData: FormData): Promise<v
     redirect(detailPath);
   }
   if (permit.permitTypeSlug === confinedSlug && permit.fields[`entry${position}At`] && !permit.fields[`exit${position}At`]) {
-    redirect(`${detailPath}?error=inside`);
+    redirect(`${detailPath}?error=executor_inside`);
   }
   const now = new Date().toISOString();
   // Baja lógica: se conserva el nombre, la posición, firmas y movimientos como evidencia histórica.
