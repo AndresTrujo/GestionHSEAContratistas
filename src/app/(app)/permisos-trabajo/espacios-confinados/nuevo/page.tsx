@@ -1,4 +1,5 @@
 import { SubmitButton } from "@/components/ui/SubmitButton";
+import { get_today_mx } from "@/lib/data/identidad";
 import { notFound } from "next/navigation";
 import { inputClass, labelClass, primaryButtonClass } from "@/components/administracion/estilos";
 import { ExecutorFields } from "@/components/permisos/ExecutorFields";
@@ -72,7 +73,7 @@ export default async function NewConfinedPermitPage({
   const existingExecutors = editingPermit ? get_confined_executors(editingPermit) : [];
   const executorOffset = editingPermit ? Math.max(0, ...Object.entries(editingPermit.fields).flatMap(([key, value]) => { const match = /^executor(\d+)$/.exec(key); return match && typeof value === "string" && value.trim() ? [Number(match[1])] : []; })) : 0;
   const executorOptions = await load_executor_options(actor);
-  const today = new Date().toLocaleDateString("en-CA");
+  const today = get_today_mx();
   const permitType = find_permit_type(confinedSlug);
 
   return (
