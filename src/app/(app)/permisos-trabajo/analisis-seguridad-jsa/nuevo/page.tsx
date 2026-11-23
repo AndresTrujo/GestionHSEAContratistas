@@ -206,7 +206,7 @@ export default async function NewJsaPage({ searchParams }: NewJsaPageProps) {
             </div>
           )}
           <p className="mb-3 text-sm text-neutral-dark">{editingPermit ? "Agrega participantes nuevos; no se modificarán las firmas de quienes ya participaron." : "Personal que participa en el análisis de los riesgos y aspectos ambientales. Cada participante firma después de crear el JSA."}</p>
-          <ParticipantFields options={executorOptions} maxParticipants={jsaMaxParticipants} startPosition={participantOffset} initialProviderId={editingPermit?.providerId ?? null} />
+          <ParticipantFields options={executorOptions} maxParticipants={jsaMaxParticipants} startPosition={participantOffset} initialProviderId={editingPermit?.providerId ?? null} requireParticipant={!editingPermit} />
         </SectionCard>
 
         <JsaSubmitButton className={`${primaryButtonClass} px-8`} pendingLabel={editingPermit ? "Guardando…" : "Creando…"}>
