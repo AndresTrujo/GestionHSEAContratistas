@@ -134,19 +134,18 @@ export default async function HeightsPermitDetailPage({
               <tbody>
                 {executors.map((name, index) => {
                   const position = index + 1;
-                  if (permit.fields[`executorRemovedAt_${position}`]) return null;
                   const evaluation = permit.fields[`medical${position}`] as
                     | MedicalEvaluation
                     | undefined;
                   return (
                     <tr key={index}>
                       <td className={tdClass}>{position}</td>
-                      <td className={tdClass}>{name}</td>
+                      <td className={tdClass}>{name}{permit.fields[`executorRemovedAt_${position}`] && <span className="ml-2 text-xs font-bold text-red-700">(Retirado)</span>}</td>
                       <td className={`${tdClass} font-bold ${evaluation === "unfit" ? "text-red-700" : ""}`}>
                         {evaluation === "unfit" && <span aria-hidden="true">✕ </span>}
                         {evaluation ? medicalEvaluationLabels[evaluation] : "Pendiente"}
                       </td>
-                      <td className={tdClass}><ExecutorRowActions permitId={permit.id} position={position} evaluation={evaluation} canEdit={canEdit} /></td>
+                      <td className={tdClass}><ExecutorRowActions permitId={permit.id} position={position} evaluation={evaluation} canEdit={canEdit && !permit.fields[`executorRemovedAt_${position}`]} /></td>
                     </tr>
                   );
                 })}
