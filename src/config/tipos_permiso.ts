@@ -82,32 +82,23 @@ export function find_permit_type(slug: string): PermitType | undefined {
   return permitTypes.find((permitType) => permitType.slug === slug);
 }
 
-/** Orden obligatorio de las tres firmas principales de autorización. */
-const approvalSignatureOrder: SignerRole[] = ["executor", "operational_manager", "hsea"];
+/** Secuencia de firmas de autorización por formato, en el mismo orden en que se muestran. */
+const approvalSignatureOrder: Partial<Record<string, SignerRole[]>> = {
+  "trabajos-calientes": ["executor", "operational_manager", "hsea", "tfs_executor"],
+  "trabajos-en-alturas": ["executor", "operational_manager", "hsea", "medical_service"],
+  "espacios-confinados": ["requester", "operational_manager", "medical_service", "lookout"],
+  "analisis-seguridad-jsa": ["executor", "operational_manager", "hsea"],
+};
 
-/** Indica si una firma principal es la siguiente que corresponde registrar en el permiso. */
+/** Indica si una firma de autorización es la siguiente que corresponde registrar. */
 export function is_next_approval_signature(permit: WorkPermit, key: string): boolean {
-  const permitType = find_permit_type(permit.permitTypeSlug);
-  if (!permitType) return true;
+  const order = approvalSignatureOrder[permit.permitTypeSlug];
+  if (!order) return true;
 
-  // Algunos formatos llaman "requester" al responsable que solicita/ejecuta el trabajo.
-  const firstRole: SignerRole | null = permitType.signerRoles.includes("executor")
-    ? "executor"
-    : permitType.signerRoles.includes("requester")
-      ? "requester"
-      : null;
-  // Construye la secuencia con roles válidos para el formato actual.
-  const order: SignerRole[] = [];
-  if (firstRole && permitType.signerRoles.includes(firstRole)) {
-    order.push(firstRole);
-  }
-  for (const role of approvalSignatureOrder.slice(1)) {
-    if (permitType.signerRoles.includes(role)) {
-      order.push(role);
-    }
-  }
   const position = order.indexOf(key as SignerRole);
-  if (position <= 0) return true;
+  // Firmas adicionales (verificaciones, participantes y cierre HSEA de confinados)
+  // mantienen sus reglas propias y no forman parte de la secuencia de autorización.
+  if (position === -1) return true;
 
   return order.slice(0, position).every((previousRole) =>
     permit.signatures.some((signature) => signature.key === previousRole),
