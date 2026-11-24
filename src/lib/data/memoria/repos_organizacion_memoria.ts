@@ -358,7 +358,7 @@ export function create_organization_repositories(
       async create_employee(input: NewEmployeeInput, actorEmployeeNumber) {
         require_permission(actorEmployeeNumber, "organizacion:administrar");
         const employeeNumber = input.employeeNumber.trim();
-        if (!/^\\d+$/.test(employeeNumber) || !Number.isSafeInteger(Number(employeeNumber)) || Number(employeeNumber) <= 0) {
+        if (!/^\d+$/.test(employeeNumber) || !Number.isSafeInteger(Number(employeeNumber)) || Number(employeeNumber) <= 0) {
           throw new ValidationError("El número de empleado debe ser un entero positivo");
         }
         if (find_employee(employeeNumber)) throw new ValidationError("Ya existe un empleado con ese número");
@@ -368,7 +368,7 @@ export function create_organization_repositories(
         if (!firstName || !paternalSurname || !jobTitle) {
           throw new ValidationError("Nombre, apellido paterno y puesto son obligatorios");
         }
-        if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(input.hireDate) ||
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(input.hireDate) ||
             Number.isNaN(Date.parse(input.hireDate)) ||
             new Date(input.hireDate).toISOString().slice(0, 10) !== input.hireDate) {
           throw new ValidationError("La fecha de ingreso no es válida");
