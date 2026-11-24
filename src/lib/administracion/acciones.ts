@@ -239,7 +239,7 @@ export async function create_tfs_employee_action(_previous: ActionState, formDat
       throw new ValidationError("El subdepartamento no es válido");
     }
     const manager = read_optional(formData, "directManagerEmployeeNumber");
-    if (manager && (!/^\\d+$/.test(manager) || !Number.isSafeInteger(Number(manager)))) {
+    if (manager && (!/^\d+$/.test(manager) || !Number.isSafeInteger(Number(manager)))) {
       throw new ValidationError("El número del jefe directo no es válido");
     }
     const input: NewEmployeeInput = {
