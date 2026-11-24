@@ -30,7 +30,7 @@ import type { HeightsAnswer, MedicalEvaluation } from "@/config/trabajos_alturas
 import { find_permit_type } from "@/config/tipos_permiso";
 import { get_repositories } from "@/lib/data/proveedor_datos";
 import { signErrorMessages } from "@/lib/permisos/mensajes_firma";
-import { can_access_permit, can_edit_permit, can_manage_executor_medical_evaluation, can_edit_permit, require_permit_actor } from "@/lib/permisos/actor";
+import { can_access_permit, can_edit_permit, can_manage_executor_medical_evaluation, require_permit_actor } from "@/lib/permisos/actor";
 import {
   close_heights_permit,
   sign_heights_permit,
