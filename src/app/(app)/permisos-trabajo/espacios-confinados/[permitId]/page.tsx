@@ -42,7 +42,7 @@ import type { ConfinedEvaluation } from "@/config/espacios_confinados";
 import { find_permit_type } from "@/config/tipos_permiso";
 import { get_repositories } from "@/lib/data/proveedor_datos";
 import { signErrorMessages } from "@/lib/permisos/mensajes_firma";
-import { can_access_permit, can_edit_permit, require_permit_actor } from "@/lib/permisos/actor";
+import { can_access_permit, can_edit_permit, can_manage_executor_medical_evaluation, can_edit_permit, require_permit_actor } from "@/lib/permisos/actor";
 import {
   record_confined_movement,
   record_confined_reading,
@@ -86,6 +86,7 @@ export default async function ConfinedPermitDetailPage({
   const actor = await require_permit_actor();
   if (!permit || permit.fields.deletedAt || permit.permitTypeSlug !== confinedSlug || !can_access_permit(actor, permit)) notFound();
   const canEdit = await can_edit_permit(actor, permit);
+  const canManageExecutorMedicalEvaluation = can_manage_executor_medical_evaluation(actor);
 
   const events = await repositories.audit.list_events_by_entity("permisos_trabajo", permit.id);
   const executors = get_confined_executors(permit);
@@ -166,7 +167,7 @@ export default async function ConfinedPermitDetailPage({
                   <th scope="col" className={thClass}>#</th>
                   <th scope="col" className={thClass}>Nombre</th>
                   <th scope="col" className={thClass}>Evaluación médica</th>
-                  <th scope="col" className={thClass}>Acciones</th>
+                  {canManageExecutorMedicalEvaluation && <th scope="col" className={thClass}>Acciones</th>}
                   <th scope="col" className={thClass}>Entrada</th>
                   <th scope="col" className={thClass}>Salida</th>
                 </tr>
@@ -187,7 +188,7 @@ export default async function ConfinedPermitDetailPage({
                         {evaluation === "unfit" && <span aria-hidden="true">✕ </span>}
                         {evaluation ? confinedEvaluationLabels[evaluation] : "Pendiente"}
                       </td>
-                      <td className={tdClass}><ExecutorRowActions permitId={permit.id} position={position} evaluation={evaluation} canEdit={canEdit && !permit.fields[`executorRemovedAt_${position}`]} /></td>
+                      {canManageExecutorMedicalEvaluation && <td className={tdClass}><ExecutorRowActions permitId={permit.id} position={position} evaluation={evaluation} canEvaluate canRemove={canEdit && !permit.fields[`executorRemovedAt_${position}`]} /></td>}
                       <td className={tdClass}>
                         {typeof entryAt === "string" ? (
                           format_time(entryAt)
