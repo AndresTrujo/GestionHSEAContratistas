@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import type { RoleScope } from "@/domain/acceso";
-import type { AreaPosition, AreaRef } from "@/domain/organizacion";
+import type { AreaPosition, AreaRef, Gender, NewEmployeeInput } from "@/domain/organizacion";
 import type { ProviderStatus } from "@/domain/contratistas";
 import { require_employee_session } from "@/lib/auth/guardas";
 import { is_expected_error, ValidationError } from "@/lib/data/errores";
@@ -222,6 +222,41 @@ export async function create_subdepartment_action(_previous: ActionState, formDa
     if (departmentId === null) throw new ValidationError("Elige el departamento");
     await get_repositories().organization.create_subdepartment(departmentId, read_text(formData, "name"), actor);
     return { message: "Subdepartamento creado." };
+  });
+}
+
+export async function create_tfs_employee_action(_previous: ActionState, formData: FormData): Promise<ActionState> {
+  return run_action(["/administracion/empleados", "/administracion/organizacion", "/administracion/roles"], async (actor) => {
+    const employeeNumber = read_text(formData, "employeeNumber");
+    const genderValue = read_text(formData, "gender");
+    const gender: Gender | null =
+      genderValue === "MASCULINO" || genderValue === "FEMENINO" ? genderValue : null;
+    const departmentId = read_id(formData, "departmentId");
+    if (departmentId === null) throw new ValidationError("Elige el departamento");
+    const subdepartmentValue = read_text(formData, "subdepartmentId");
+    const subdepartmentId = subdepartmentValue ? Number(subdepartmentValue) : null;
+    if (subdepartmentValue && (!Number.isSafeInteger(subdepartmentId) || subdepartmentId! <= 0)) {
+      throw new ValidationError("El subdepartamento no es válido");
+    }
+    const manager = read_optional(formData, "directManagerEmployeeNumber");
+    if (manager && (!/^\\d+$/.test(manager) || !Number.isSafeInteger(Number(manager)))) {
+      throw new ValidationError("El número del jefe directo no es válido");
+    }
+    const input: NewEmployeeInput = {
+      employeeNumber,
+      firstName: read_text(formData, "firstName"),
+      middleName: read_optional(formData, "middleName"),
+      paternalSurname: read_text(formData, "paternalSurname"),
+      maternalSurname: read_optional(formData, "maternalSurname"),
+      gender,
+      hireDate: read_text(formData, "hireDate"),
+      jobTitle: read_text(formData, "jobTitle"),
+      departmentId,
+      subdepartmentId,
+      directManagerEmployeeNumber: manager,
+    };
+    await get_repositories().employees.create_employee(input, actor);
+    return { message: `Empleado TFS ${employeeNumber} registrado correctamente.` };
   });
 }
 
