@@ -31,7 +31,7 @@ async function load_editable(formData: FormData, requireEdit = true) {
 }
 
 export async function update_executor_medical_evaluation(formData: FormData): Promise<void> {
-  const { actor, permit, detailPath } = await load_editable(formData);
+  const { actor, permit, detailPath } = await load_editable(formData, false);
   const position = Number(read_text(formData, "position"));
   const evaluation = read_text(formData, "evaluation");
   if (!Number.isInteger(position) || position < 1 || position > 100 ||
