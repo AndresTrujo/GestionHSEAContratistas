@@ -66,7 +66,7 @@ export function get_hour_mx(instant: Date): number {
 
 /** Inicio del día YYYY-MM-DD en CDMX, convertido a instante UTC sin fijar un offset. */
 export function get_start_of_day_mx(date: string): number {
-  const match = /^(\\d{4})-(\\d{2})-(\\d{2})$/.exec(date);
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
   if (!match) throw new Error("Fecha inválida; se esperaba YYYY-MM-DD");
   const target = Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
   let guess = target;
