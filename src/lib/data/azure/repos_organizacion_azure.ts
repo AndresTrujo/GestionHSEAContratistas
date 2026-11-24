@@ -631,7 +631,7 @@ export function create_organization_repositories_azure(): OrganizationRepositori
             if (!firstName || !paternalSurname || !jobTitle) {
               throw new ValidationError("Nombre, apellido paterno y puesto son obligatorios");
             }
-            if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(input.hireDate) ||
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(input.hireDate) ||
                 Number.isNaN(Date.parse(input.hireDate)) ||
                 new Date(input.hireDate).toISOString().slice(0, 10) !== input.hireDate) {
               throw new ValidationError("La fecha de ingreso no es válida");
