@@ -30,6 +30,7 @@ import type {
   Department,
   Employee,
   Gender,
+  NewEmployeeInput,
   PermitArea,
   Subdepartment,
 } from "@/domain/organizacion";
@@ -616,6 +617,84 @@ async function check_pin_db(
 export function create_organization_repositories_azure(): OrganizationRepositories {
   return {
     employees: {
+      async create_employee(input: NewEmployeeInput, actorEmployeeNumber) {
+        try {
+          return await with_transaction(async (db) => {
+            await require_permission_db(db, actorEmployeeNumber, "organizacion:administrar");
+            const employeeNumber = Number(input.employeeNumber);
+            if (!Number.isSafeInteger(employeeNumber) || employeeNumber <= 0) {
+              throw new ValidationError("El número de empleado debe ser un entero positivo");
+            }
+            const firstName = input.firstName.trim();
+            const paternalSurname = input.paternalSurname.trim();
+            const jobTitle = input.jobTitle.trim();
+            if (!firstName || !paternalSurname || !jobTitle) {
+              throw new ValidationError("Nombre, apellido paterno y puesto son obligatorios");
+            }
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(input.hireDate) ||
+                Number.isNaN(Date.parse(input.hireDate)) ||
+                new Date(input.hireDate).toISOString().slice(0, 10) !== input.hireDate) {
+              throw new ValidationError("La fecha de ingreso no es válida");
+            }
+            if (input.gender !== null && input.gender !== "MASCULINO" && input.gender !== "FEMENINO") {
+              throw new ValidationError("El género seleccionado no es válido");
+            }
+            const department = await db.query<{ linea_mando_id: number }>(
+              "SELECT linea_mando_id FROM departamentos WHERE id = $1 AND activo = 1",
+              [input.departmentId],
+            );
+            const departmentRow = department.rows[0];
+            if (!departmentRow) throw new ValidationError("El departamento no existe o está inactivo");
+            if (input.subdepartmentId !== null) {
+              const subdepartment = await db.query(
+                "SELECT 1 FROM subdepartamentos WHERE id = $1 AND departamento_id = $2 AND activo = 1",
+                [input.subdepartmentId, input.departmentId],
+              );
+              if (subdepartment.rowCount === 0) {
+                throw new ValidationError("El subdepartamento no pertenece al departamento elegido");
+              }
+            }
+            if (input.directManagerEmployeeNumber) {
+              const manager = await db.query(
+                "SELECT 1 FROM empleados WHERE no_empleado = $1 AND activo = 1",
+                [Number(input.directManagerEmployeeNumber)],
+              );
+              if (manager.rowCount === 0) throw new ValidationError("El jefe directo no existe o está inactivo");
+              if (Number(input.directManagerEmployeeNumber) === employeeNumber) {
+                throw new ValidationError("Un empleado no puede ser su propio jefe");
+              }
+            }
+            const actorNumber = to_employee_int(actorEmployeeNumber);
+            await db.query(
+              `INSERT INTO empleados
+                 (no_empleado, primer_nombre, segundo_nombre, apellido_paterno, apellido_materno,
+                  genero, fecha_ingreso, fecha_baja, activo, puesto, linea_mando_id, departamento_id,
+                  subdepartamento_id, jefe_no_empleado, creado_por, actualizado_por)
+               VALUES ($1, $2, $3, $4, $5, $6, CAST($7 AS date), NULL, 1, $8, $9, $10, $11, $12, $13, $13)`,
+              [
+                employeeNumber, firstName, input.middleName?.trim() || null,
+                paternalSurname, input.maternalSurname?.trim() || null, input.gender,
+                input.hireDate, jobTitle, departmentRow.linea_mando_id, input.departmentId,
+                input.subdepartmentId, input.directManagerEmployeeNumber ? Number(input.directManagerEmployeeNumber) : null,
+                actorNumber,
+              ],
+            );
+            const created = await db.query<EmployeeRow>("SELECT * FROM empleados WHERE no_empleado = $1", [employeeNumber]);
+            const row = created.rows[0];
+            if (!row) throw new Error("No se pudo recuperar el empleado recién creado");
+            await append_audit_db(db, employee_actor(actorEmployeeNumber), "crear", "empleados", String(employeeNumber), {
+              employeeNumber: String(employeeNumber),
+              departmentId: input.departmentId,
+              subdepartmentId: input.subdepartmentId,
+            });
+            return map_employee(row);
+          });
+        } catch (error) {
+          if (is_unique_violation(error)) throw new ValidationError("Ya existe un empleado con ese número");
+          if (is_foreign_key_violation(error)) throw new ValidationError("El área o el jefe indicado ya no existe");
+          throw error;
+        }
+      },
       async find_by_number(employeeNumber) {
         const number = Number(employeeNumber);
         if (!Number.isSafeInteger(number)) return null;

@@ -52,6 +52,7 @@ import type {
   CommandLine,
   Department,
   Employee,
+  NewEmployeeInput,
   PermitArea,
   Subdepartment,
 } from "@/domain/organizacion";
@@ -304,11 +305,10 @@ export interface PermitParticipantRepository {
   ): Promise<PermitParticipant[]>;
 }
 
-/**
- * Empleados TFS (solo lectura por ahora; el alta/baja llega por importación de RH).
- * Por omisión no se incluyen inactivos.
- */
+/** Empleados TFS. Por omisión no se incluyen inactivos. */
 export interface EmployeeRepository {
+  /** Alta manual de un empleado TFS; exige organizacion:administrar y deja auditoría. */
+  create_employee(input: NewEmployeeInput, actorEmployeeNumber: string): Promise<Employee>;
   find_by_number(employeeNumber: string): Promise<Employee | null>;
   list_by_department(
     departmentId: number,

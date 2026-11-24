@@ -83,3 +83,19 @@ export interface PermitArea {
   departmentId: number;
   subdepartmentId: number | null;
 }
+
+
+/** Datos mínimos para dar de alta manualmente a un empleado TFS. */
+export interface NewEmployeeInput {
+  employeeNumber: string;
+  firstName: string;
+  middleName: string | null;
+  paternalSurname: string;
+  maternalSurname: string | null;
+  gender: Gender | null;
+  hireDate: string;
+  jobTitle: string;
+  departmentId: number;
+  subdepartmentId: number | null;
+  directManagerEmployeeNumber: string | null;
+}
