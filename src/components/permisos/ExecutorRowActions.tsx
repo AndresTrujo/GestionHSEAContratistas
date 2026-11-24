@@ -4,8 +4,8 @@ interface ExecutorRowActionsProps {
   permitId: string;
   position: number;
   evaluation?: string;
-  canEdit: boolean;
-  showMedicalEvaluation?: boolean;
+  canRemove: boolean;
+  canEvaluate: boolean;
 }
 
 const choices = [
@@ -14,11 +14,11 @@ const choices = [
   { value: "absent", label: "No asistió" },
 ] as const;
 
-export function ExecutorRowActions({ permitId, position, evaluation, canEdit, showMedicalEvaluation = true }: ExecutorRowActionsProps) {
-  if (!canEdit) return <span className="text-sm text-neutral-dark">—</span>;
+export function ExecutorRowActions({ permitId, position, evaluation, canRemove, canEvaluate }: ExecutorRowActionsProps) {
+  if (!canRemove && !canEvaluate) return null;
   return (
     <div className="flex flex-wrap gap-2">
-      {showMedicalEvaluation && choices.map((choice) => (
+      {canEvaluate && choices.map((choice) => (
         <form key={choice.value} action={update_executor_medical_evaluation}>
           <input type="hidden" name="permitId" value={permitId} />
           <input type="hidden" name="position" value={position} />
@@ -28,13 +28,13 @@ export function ExecutorRowActions({ permitId, position, evaluation, canEdit, sh
           </button>
         </form>
       ))}
-      <form action={remove_executor_from_permit}>
+      {canRemove && <form action={remove_executor_from_permit}>
         <input type="hidden" name="permitId" value={permitId} />
         <input type="hidden" name="position" value={position} />
         <button type="submit" className="min-h-9 rounded-lg border border-red-300 px-3 py-1 text-xs font-bold text-red-700 hover:bg-red-50">
           Eliminar
         </button>
-      </form>
+      </form>}
     </div>
   );
 }
