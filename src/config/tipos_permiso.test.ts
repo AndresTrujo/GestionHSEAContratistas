@@ -2,10 +2,13 @@ import { describe, expect, it } from "vitest";
 import type { WorkPermit } from "@/domain/permisos";
 import { is_next_approval_signature } from "./tipos_permiso";
 
-function make_permit(signatures: WorkPermit["signatures"] = []): WorkPermit {
+function make_permit(
+  permitTypeSlug: string,
+  signatures: WorkPermit["signatures"] = [],
+): WorkPermit {
   return {
     id: "test-permit",
-    permitTypeSlug: "analisis-seguridad-jsa",
+    permitTypeSlug,
     status: "submitted",
     requestedByEmployeeNumber: "100",
     providerId: null,
@@ -18,49 +21,54 @@ function make_permit(signatures: WorkPermit["signatures"] = []): WorkPermit {
   };
 }
 
+function add_signature(permit: WorkPermit, key: string): void {
+  permit.signatures.push({
+    key,
+    employeeNumber: String(permit.signatures.length + 101),
+    employeeName: key,
+    signedAt: new Date().toISOString(),
+    image: null,
+  });
+}
+
 describe("secuencia de firmas de autorización", () => {
-  it("permite primero la firma del responsable de ejecución", () => {
-    const permit = make_permit();
-    expect(is_next_approval_signature(permit, "executor")).toBe(true);
-    expect(is_next_approval_signature(permit, "operational_manager")).toBe(false);
-    expect(is_next_approval_signature(permit, "hsea")).toBe(false);
+  it.each([
+    {
+      type: "trabajos-calientes",
+      order: ["executor", "operational_manager", "hsea", "tfs_executor"],
+    },
+    {
+      type: "trabajos-en-alturas",
+      order: ["executor", "operational_manager", "hsea", "medical_service"],
+    },
+    {
+      type: "espacios-confinados",
+      order: ["requester", "operational_manager", "medical_service", "lookout"],
+    },
+    {
+      type: "analisis-seguridad-jsa",
+      order: ["executor", "operational_manager", "hsea"],
+    },
+  ])("desbloquea una por una las firmas de $type", ({ type, order }) => {
+    const permit = make_permit(type);
+
+    expect(is_next_approval_signature(permit, order[0])).toBe(true);
+    for (let index = 1; index < order.length; index += 1) {
+      expect(is_next_approval_signature(permit, order[index])).toBe(false);
+      add_signature(permit, order[index - 1]);
+      expect(is_next_approval_signature(permit, order[index])).toBe(true);
+    }
   });
 
-  it("habilita al responsable del área después de ejecución y a HSE después del área", () => {
-    const permit = make_permit([
-      { key: "executor", employeeNumber: "101", employeeName: "Ejecutor", signedAt: new Date().toISOString(), image: null },
-    ]);
-    expect(is_next_approval_signature(permit, "operational_manager")).toBe(true);
-    expect(is_next_approval_signature(permit, "hsea")).toBe(false);
-
-    permit.signatures.push({
-      key: "operational_manager",
-      employeeNumber: "102",
-      employeeName: "Responsable del área",
-      signedAt: new Date().toISOString(),
-      image: null,
-    });
+  it("no incluye el cierre HSEA ni las verificaciones en la secuencia de autorización de confinados", () => {
+    const permit = make_permit("espacios-confinados");
     expect(is_next_approval_signature(permit, "hsea")).toBe(true);
+    expect(is_next_approval_signature(permit, "verification_1")).toBe(true);
   });
 
-  it("usa al solicitante como primer firmante en formatos que no tienen rol executor", () => {
-    const permit = {
-      ...make_permit(),
-      permitTypeSlug: "espacios-confinados",
-    };
-    expect(is_next_approval_signature(permit, "operational_manager")).toBe(false);
-    permit.signatures.push({
-      key: "requester",
-      employeeNumber: "103",
-      employeeName: "Responsable del trabajo",
-      signedAt: new Date().toISOString(),
-      image: null,
-    });
-    expect(is_next_approval_signature(permit, "operational_manager")).toBe(true);
-    expect(is_next_approval_signature(permit, "hsea")).toBe(false);
-  });
-
-  it("no bloquea firmas adicionales que no forman parte de la secuencia", () => {
-    expect(is_next_approval_signature(make_permit(), "medical_service")).toBe(true);
+  it("no bloquea firmas adicionales fuera de la secuencia principal", () => {
+    const permit = make_permit("trabajos-en-alturas");
+    expect(is_next_approval_signature(permit, "verification_1")).toBe(true);
+    expect(is_next_approval_signature(permit, "executor_participant_1")).toBe(true);
   });
 });
