@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { add_months_to_date, get_date_mx } from "./identidad";
+import { add_months_to_date, get_date_mx, get_start_of_day_mx } from "./identidad";
 
 describe("add_months_to_date", () => {
   it("suma meses conservando el día", () => {
@@ -17,5 +17,14 @@ describe("get_date_mx", () => {
     // 03:00 UTC del 5 de octubre son las 21:00 del 4 de octubre en Ciudad de México.
     expect(get_date_mx("2026-10-05T03:00:00Z")).toBe("2026-10-04");
     expect(get_date_mx("2026-10-05T15:00:00Z")).toBe("2026-10-05");
+  });
+});
+
+describe("get_start_of_day_mx", () => {
+  it("acepta fecha ISO válida y devuelve medianoche de CDMX como instante UTC", () => {
+    expect(new Date(get_start_of_day_mx("2026-11-24")).toISOString()).toBe("2026-11-24T06:00:00.000Z");
+  });
+  it("rechaza fechas fuera del formato YYYY-MM-DD", () => {
+    expect(() => get_start_of_day_mx("24/11/2026")).toThrow("Fecha inválida; se esperaba YYYY-MM-DD");
   });
 });
