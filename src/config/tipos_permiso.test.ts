@@ -56,7 +56,7 @@ describe("secuencia de firmas de autorización", () => {
     for (let index = 1; index < order.length; index += 1) {
       expect(is_next_approval_signature(permit, order[index]!)).toBe(false);
       add_signature(permit, order[index - 1]!);
-      expect(is_next_approval_signature(permit, order[index])).toBe(true);
+      expect(is_next_approval_signature(permit, order[index]!)).toBe(true);
     }
   });
 
