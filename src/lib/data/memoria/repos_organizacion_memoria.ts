@@ -22,6 +22,7 @@ import type {
   AreaAssignment,
   AreaRef,
   Employee,
+  NewEmployeeInput,
   PermitArea,
 } from "@/domain/organizacion";
 import { hash_pin, is_valid_pin_format, verify_pin_hash } from "@/lib/auth/pin";
@@ -354,6 +355,67 @@ export function create_organization_repositories(
 
   return {
     employees: {
+      async create_employee(input: NewEmployeeInput, actorEmployeeNumber) {
+        require_permission(actorEmployeeNumber, "organizacion:administrar");
+        const employeeNumber = input.employeeNumber.trim();
+        if (!/^\\d+$/.test(employeeNumber) || !Number.isSafeInteger(Number(employeeNumber)) || Number(employeeNumber) <= 0) {
+          throw new ValidationError("El número de empleado debe ser un entero positivo");
+        }
+        if (find_employee(employeeNumber)) throw new ValidationError("Ya existe un empleado con ese número");
+        const firstName = input.firstName.trim();
+        const paternalSurname = input.paternalSurname.trim();
+        const jobTitle = input.jobTitle.trim();
+        if (!firstName || !paternalSurname || !jobTitle) {
+          throw new ValidationError("Nombre, apellido paterno y puesto son obligatorios");
+        }
+        if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(input.hireDate) ||
+            Number.isNaN(Date.parse(input.hireDate)) ||
+            new Date(input.hireDate).toISOString().slice(0, 10) !== input.hireDate) {
+          throw new ValidationError("La fecha de ingreso no es válida");
+        }
+        const department = store.departments.find((item) => item.id === input.departmentId && item.active);
+        if (!department) throw new ValidationError("El departamento no existe o está inactivo");
+        if (input.subdepartmentId !== null && !store.subdepartments.some(
+          (item) => item.id === input.subdepartmentId && item.departmentId === input.departmentId && item.active,
+        )) {
+          throw new ValidationError("El subdepartamento no pertenece al departamento elegido");
+        }
+        if (input.gender !== null && input.gender !== "MASCULINO" && input.gender !== "FEMENINO") {
+          throw new ValidationError("El género seleccionado no es válido");
+        }
+        if (input.directManagerEmployeeNumber) {
+          const manager = require_active_employee(input.directManagerEmployeeNumber);
+          if (manager.employeeNumber === employeeNumber) throw new ValidationError("Un empleado no puede ser su propio jefe");
+        }
+        const now = new Date().toISOString();
+        const employee: Employee = {
+          employeeNumber,
+          firstName,
+          middleName: input.middleName?.trim() || null,
+          paternalSurname,
+          maternalSurname: input.maternalSurname?.trim() || null,
+          gender: input.gender,
+          hireDate: input.hireDate,
+          terminationDate: null,
+          active: true,
+          jobTitle,
+          commandLineId: department.commandLineId,
+          departmentId: input.departmentId,
+          subdepartmentId: input.subdepartmentId,
+          directManagerEmployeeNumber: input.directManagerEmployeeNumber || null,
+          createdAt: now,
+          createdBy: actorEmployeeNumber,
+          updatedAt: now,
+          updatedBy: actorEmployeeNumber,
+        };
+        store.employees.push(employee);
+        await append_audit(actorEmployeeNumber, "crear", "empleados", employeeNumber, {
+          employeeNumber,
+          departmentId: input.departmentId,
+          subdepartmentId: input.subdepartmentId,
+        });
+        return employee;
+      },
       async find_by_number(employeeNumber) {
         return find_employee(employeeNumber) ?? null;
       },
