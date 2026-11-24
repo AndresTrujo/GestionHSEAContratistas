@@ -15,6 +15,7 @@ export interface PermitActor {
   providerUserId: number | null;
   /** ADMIN_HSEA: exento de la segregación de firmas de empleados TFS. */
   isAdmin?: boolean;
+  roleCodes?: string[];
 }
 
 /** Pasos de firma que un usuario de proveedor puede firmar (siempre en permisos de su propia empresa). */
@@ -30,6 +31,7 @@ export async function require_permit_actor(): Promise<PermitActor> {
       providerId: null,
       providerUserId: null,
       isAdmin: session.roleCodes.includes(adminRoleCode),
+      roleCodes: session.roleCodes,
     };
   }
   return {
@@ -38,6 +40,7 @@ export async function require_permit_actor(): Promise<PermitActor> {
     providerId: String(session.providerId),
     providerUserId: session.providerUserId,
     isAdmin: false,
+    roleCodes: [],
   };
 }
 
@@ -77,4 +80,12 @@ export async function can_edit_permit(actor: PermitActor, permit: WorkPermit): P
     repositories.providers.get_provider(Number(actor.providerId)),
   ]);
   return user !== null && user.active && user.providerId === Number(actor.providerId) && provider?.status === "ACTIVO";
+}
+
+/** Solo ADMIN_HSEA, SUPERVISOR_HSEA y SERVICIO_MEDICO pueden evaluar ejecutantes. */
+export function can_manage_executor_medical_evaluation(actor: PermitActor): boolean {
+  if (actor.actorType !== "EMPLEADO") return false;
+  return (actor.roleCodes ?? []).some((code) =>
+    code === adminRoleCode || code === "SUPERVISOR_HSEA" || code === "SERVICIO_MEDICO"
+  );
 }
