@@ -83,8 +83,10 @@ export default async function HotWorkPermitDetailPage({
         formCode={permitType?.formCode}
         status={permit.status}
       >
-        {actor.isAdmin === true && <div className="mb-5"><DeletePermitButton permitId={permit.id} label="Eliminar Permiso" /></div>}
-        {canEdit && <p className="mb-5"><a href={`/permisos-trabajo/${hotWorkSlug}/nuevo?editar=${permit.id}`} className="inline-flex min-h-11 items-center rounded-xl border border-brand-navy px-4 py-2 text-sm font-bold text-brand-navy hover:bg-neutral-light/40">Editar permiso</a></p>}
+        <div className="mb-5 flex flex-wrap items-center gap-3">
+          {canEdit && <a href={`/permisos-trabajo/${hotWorkSlug}/nuevo?editar=${permit.id}`} className="inline-flex min-h-11 items-center rounded-xl border border-brand-navy px-4 py-2 text-sm font-bold text-brand-navy hover:bg-neutral-light/40">Editar permiso</a>}
+          {actor.isAdmin === true && <DeletePermitButton permitId={permit.id} label="Eliminar Permiso" />}
+        </div>
         {error && errorMessages[error] && <FormAlert>{errorMessages[error]}</FormAlert>}
         {validUntil && !isClosed && (
           <p
