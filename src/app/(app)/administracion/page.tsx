@@ -15,6 +15,12 @@ const sections: { title: string; description: string; href: string; permission: 
     permission: "roles:administrar",
   },
   {
+    title: "Alta de empleados TFS",
+    description: "Registrar manualmente empleados TFS en el catálogo de la organización.",
+    href: "/administracion/empleados",
+    permission: "organizacion:administrar",
+  },
+  {
     title: "Organización y cargos de área",
     description: "Gerentes y encargados por línea, departamento y subdepartamento.",
     href: "/administracion/organizacion",
@@ -48,7 +54,7 @@ export default async function AdministrationPage() {
   return (
     <>
       <Breadcrumbs items={[{ label: "Inicio", href: "/inicio" }, { label: "Administración" }]} />
-      <PageHeader title="Administración" subtitle="Roles, organización, proveedores y consulta de auditoría." />
+      <PageHeader title="Administración" subtitle="Roles, empleados TFS, organización, proveedores y consulta de auditoría." />
       {recentErrors !== null && recentErrors > 0 && (
         <ServerErrorAlert count={recentErrors} windowHours={alertWindowHours} showLink />
       )}
