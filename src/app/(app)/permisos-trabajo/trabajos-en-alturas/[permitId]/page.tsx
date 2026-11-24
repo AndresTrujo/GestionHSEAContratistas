@@ -30,7 +30,7 @@ import type { HeightsAnswer, MedicalEvaluation } from "@/config/trabajos_alturas
 import { find_permit_type } from "@/config/tipos_permiso";
 import { get_repositories } from "@/lib/data/proveedor_datos";
 import { signErrorMessages } from "@/lib/permisos/mensajes_firma";
-import { can_access_permit, can_edit_permit, require_permit_actor } from "@/lib/permisos/actor";
+import { can_access_permit, can_edit_permit, can_manage_executor_medical_evaluation, can_edit_permit, require_permit_actor } from "@/lib/permisos/actor";
 import {
   close_heights_permit,
   sign_heights_permit,
@@ -65,6 +65,7 @@ export default async function HeightsPermitDetailPage({
   const actor = await require_permit_actor();
   if (!permit || permit.fields.deletedAt || permit.permitTypeSlug !== heightsSlug || !can_access_permit(actor, permit)) notFound();
   const canEdit = await can_edit_permit(actor, permit);
+  const canManageExecutorMedicalEvaluation = can_manage_executor_medical_evaluation(actor);
 
   const events = await repositories.audit.list_events_by_entity("permisos_trabajo", permit.id);
   const executors = get_heights_executors(permit);
@@ -130,7 +131,7 @@ export default async function HeightsPermitDetailPage({
                   <th scope="col" className={thClass}>#</th>
                   <th scope="col" className={thClass}>Nombre</th>
                   <th scope="col" className={thClass}>Evaluación médica</th>
-                  <th scope="col" className={thClass}>Acciones</th>
+                  {canManageExecutorMedicalEvaluation && <th scope="col" className={thClass}>Acciones</th>}
                 </tr>
               </thead>
               <tbody>
@@ -147,7 +148,7 @@ export default async function HeightsPermitDetailPage({
                         {evaluation === "unfit" && <span aria-hidden="true">✕ </span>}
                         {evaluation ? medicalEvaluationLabels[evaluation] : "Pendiente"}
                       </td>
-                      <td className={tdClass}><ExecutorRowActions permitId={permit.id} position={position} evaluation={evaluation} canEdit={canEdit && !permit.fields[`executorRemovedAt_${position}`]} /></td>
+                      {canManageExecutorMedicalEvaluation && <td className={tdClass}><ExecutorRowActions permitId={permit.id} position={position} evaluation={evaluation} canEvaluate canRemove={canEdit && !permit.fields[`executorRemovedAt_${position}`]} /></td>}
                     </tr>
                   );
                 })}
