@@ -39,7 +39,7 @@ describe("secuencia de firmas de autorización", () => {
     },
     {
       type: "trabajos-en-alturas",
-      order: ["medical_service", "executor", "operational_manager", "hsea"],
+      order: ["executor", "operational_manager", "medical_service", "hsea"],
     },
     {
       type: "espacios-confinados",
