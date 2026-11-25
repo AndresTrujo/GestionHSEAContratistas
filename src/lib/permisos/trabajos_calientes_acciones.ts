@@ -202,11 +202,6 @@ export async function sign_hot_work_permit(formData: FormData): Promise<void> {
 
   if (isApprovalKey) {
     if (permit.status !== "submitted") redirect(detailPath);
-    // Segregación: una misma persona no puede firmar dos roles de autorización.
-    const alreadySigned = get_hot_work_approval_signatures(permit).some(
-      (item) => find_signature(permit, item.key)?.employeeNumber === employeeNumber,
-    );
-    if (alreadySigned && actor.actorType === "EMPLEADO" && !actor.isAdmin) redirect(`${detailPath}?error=same_person`);
   } else if (isVerificationKey) {
     if (permit.status !== "approved") redirect(detailPath);
     const validUntil = get_valid_until(permit);
