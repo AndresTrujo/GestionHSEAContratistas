@@ -170,7 +170,7 @@ export default async function HotWorkPermitDetailPage({
         </div>
       )}
       <div className="mb-6">
-        <SectionCard title="Autorización" description="Las cuatro firmas de autorización pasan el permiso a Autorizado.">
+        <SectionCard title="Autorización" description="Las firmas requeridas de autorización pasan el permiso a Autorizado.">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {hotWorkApprovalSignatures.map((item) => (
               <SignatureBox
