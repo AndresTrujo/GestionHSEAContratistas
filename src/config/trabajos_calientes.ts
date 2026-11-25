@@ -96,8 +96,8 @@ export function get_checklist_field(number: number): string {
 export const hotWorkApprovalSignatures = [
   { key: "executor", label: "Responsable de la ejecución" },
   { key: "operational_manager", label: "Responsable operativo del área" },
-  { key: "hsea", label: "HSEA" },
   { key: "tfs_executor", label: "Responsable de la ejecución por parte de TFS" },
+  { key: "hsea", label: "HSEA" },
 ] as const;
 
 export function get_verification_key(position: number): string {

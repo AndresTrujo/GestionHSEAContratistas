@@ -35,11 +35,11 @@ describe("secuencia de firmas de autorización", () => {
   it.each([
     {
       type: "trabajos-calientes",
-      order: ["executor", "operational_manager", "hsea", "tfs_executor"],
+      order: ["executor", "operational_manager", "tfs_executor", "hsea"],
     },
     {
       type: "trabajos-en-alturas",
-      order: ["executor", "operational_manager", "hsea", "medical_service"],
+      order: ["executor", "operational_manager", "medical_service", "hsea"],
     },
     {
       type: "espacios-confinados",

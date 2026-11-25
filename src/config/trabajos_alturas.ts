@@ -117,8 +117,8 @@ export function get_ppe_labels(permit: WorkPermit): string[] {
 export const heightsApprovalSignatures = [
   { key: "executor", label: "Responsable de la ejecución" },
   { key: "operational_manager", label: "Responsable operativo del área" },
-  { key: "hsea", label: "HSEA" },
   { key: "medical_service", label: "Servicio médico" },
+  { key: "hsea", label: "HSEA" },
 ] as const;
 
 export function get_heights_verification_key(position: number): string {
