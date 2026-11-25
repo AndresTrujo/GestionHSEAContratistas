@@ -90,6 +90,7 @@ export async function create_hot_work_permit(formData: FormData): Promise<void> 
     startTime: read_text(formData, "startTime"),
     endTime: read_text(formData, "endTime"),
     postInspectionDone: null,
+    requiresTfsWorkSignature: formData.get("requiresTfsWorkSignature") === "on",
   };
 
   const validSlugs: string[] = hotWorkActivities.map((activity) => activity.slug);
@@ -182,7 +183,7 @@ export async function sign_hot_work_permit(formData: FormData): Promise<void> {
   const detailPath = `${basePath}/${permit.id}`;
   if (!can_sign_key(actor, key)) redirect(`${detailPath}?error=role`);
 
-  const isApprovalKey = hotWorkApprovalSignatures.some((item) => item.key === key);
+  const isApprovalKey = get_hot_work_approval_signatures(permit).some((item) => item.key === key);
   const verificationPosition = Number(key.replace("verification_", ""));
   const isVerificationKey =
     key.startsWith("verification_") &&
@@ -203,7 +204,7 @@ export async function sign_hot_work_permit(formData: FormData): Promise<void> {
   if (isApprovalKey) {
     if (permit.status !== "submitted") redirect(detailPath);
     // Segregación: una misma persona no puede firmar dos roles de autorización.
-    const alreadySigned = hotWorkApprovalSignatures.some(
+    const alreadySigned = get_hot_work_approval_signatures(permit).some(
       (item) => find_signature(permit, item.key)?.employeeNumber === employeeNumber,
     );
     if (alreadySigned && actor.actorType === "EMPLEADO" && !actor.isAdmin) redirect(`${detailPath}?error=same_person`);
@@ -231,7 +232,7 @@ export async function sign_hot_work_permit(formData: FormData): Promise<void> {
     ...permit.signatures,
     attempt.signature,
   ];
-  const allApproved = hotWorkApprovalSignatures.every((item) =>
+  const allApproved = get_hot_work_approval_signatures(permit).every((item) =>
     signatures.some((signature) => signature.key === item.key),
   );
   const status = isApprovalKey && allApproved ? "approved" : permit.status;
