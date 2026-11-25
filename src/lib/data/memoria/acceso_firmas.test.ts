@@ -76,6 +76,19 @@ describe("quién puede firmar", () => {
     expect(second).toEqual({ ok: false, reason: "PERSONA_YA_FIRMO_OTRO_ROL" });
   });
 
+  it("una persona puede firmar varios roles de trabajos calientes si tiene cada autorización", async () => {
+    await repositories.access.assign_role(
+      { employeeNumber: otherEmployeeNumber, roleCode: "RESPONSABLE_TAREA", scope: "GLOBAL", area: { commandLineId: null, departmentId: null, subdepartmentId: null }, reason: "prueba" },
+      firstAdminEmployeeNumber,
+    );
+    const signer = { kind: "EMPLEADO", employeeNumber: otherEmployeeNumber } as const;
+    const base = { permitId: "p-calientes-varios-roles", permitTypeSlug: "trabajos-calientes", signer, area, pin: "", image: null, documentHash: null } as const;
+
+    expect((await repositories.signatures.sign_permit({ ...base, role: "executor" })).ok).toBe(true);
+    expect((await repositories.signatures.sign_permit({ ...base, role: "operational_manager" })).ok).toBe(true);
+    expect((await repositories.signatures.sign_permit({ ...base, role: "tfs_executor" })).ok).toBe(true);
+  });
+
   it("el ADMIN_HSEA sí puede firmar más de un rol del mismo permiso", async () => {
     // El administrador recibe además el rol de encargado de área (GLOBAL) para poder firmar dos roles.
     await repositories.access.assign_role(

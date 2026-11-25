@@ -106,6 +106,10 @@ async function update_executor_permit(
   });
   fields.executorCount = Math.max(6, ...oldPositions, ...addedPositions);
 
+  if (permit.permitTypeSlug === hotWorkSlug) {
+    fields.requiresTfsWorkSignature = formData.get("requiresTfsWorkSignature") === "on";
+  }
+
   if (permit.permitTypeSlug === heightsSlug) {
     const valid = Object.keys({ yes: true, no: true });
     for (const item of heightsChecklistItems) {
