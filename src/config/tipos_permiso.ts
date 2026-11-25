@@ -84,8 +84,8 @@ export function find_permit_type(slug: string): PermitType | undefined {
 
 /** Secuencia de firmas de autorización por formato, en el mismo orden en que se muestran. */
 const approvalSignatureOrder: Partial<Record<string, SignerRole[]>> = {
-  "trabajos-calientes": ["executor", "operational_manager", "hsea", "tfs_executor"],
-  "trabajos-en-alturas": ["executor", "operational_manager", "hsea", "medical_service"],
+  "trabajos-calientes": ["executor", "operational_manager", "tfs_executor", "hsea"],
+  "trabajos-en-alturas": ["medical_service", "executor", "operational_manager", "hsea"],
   "espacios-confinados": ["requester", "operational_manager", "medical_service", "lookout"],
   "analisis-seguridad-jsa": ["executor", "operational_manager", "hsea"],
 };
