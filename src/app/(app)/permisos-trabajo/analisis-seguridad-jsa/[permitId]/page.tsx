@@ -80,12 +80,14 @@ export default async function JsaDetailPage({ params, searchParams }: JsaDetailP
         formCode={permitType?.formCode}
         status={permit.status}
       >
-        {actor.isAdmin === true && <div className="mb-5"><DeletePermitButton permitId={permit.id} label="Eliminar AST" /></div>}
-        {canEdit && (
-          <p className="mb-5">
-            <a href={`${jsaPath}/nuevo?editar=${permit.id}`} className="inline-flex min-h-11 items-center rounded-xl border border-brand-navy px-4 py-2 text-sm font-bold text-brand-navy hover:bg-neutral-light/40">Editar JSA</a>
-          </p>
-        )}
+        <div className="mb-5 flex flex-wrap items-center gap-3">
+          {canEdit && (
+            <a href={`${jsaPath}/nuevo?editar=${permit.id}`} className="inline-flex min-h-11 items-center rounded-xl border border-brand-navy px-4 py-2 text-sm font-bold text-brand-navy hover:bg-neutral-light/40">
+              Editar JSA
+            </a>
+          )}
+          {actor.isAdmin === true && <DeletePermitButton permitId={permit.id} label="Eliminar AST" />}
+        </div>
         <p className="mb-5">
           <span className={`inline-block rounded px-2.5 py-1 text-sm font-bold ${maxLevel.className}`}>
             Riesgo máximo {maxRisk} · {maxLevel.label}
