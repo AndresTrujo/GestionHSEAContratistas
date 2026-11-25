@@ -96,9 +96,15 @@ export function get_checklist_field(number: number): string {
 export const hotWorkApprovalSignatures = [
   { key: "executor", label: "Responsable de la ejecución" },
   { key: "operational_manager", label: "Responsable operativo del área" },
-  { key: "tfs_executor", label: "Responsable de la ejecución por parte de TFS" },
+  { key: "tfs_executor", label: "Responsable del trabajo" },
   { key: "hsea", label: "HSEA" },
 ] as const;
+
+export function get_hot_work_approval_signatures(permit: WorkPermit) {
+  return hotWorkApprovalSignatures.filter(
+    (item) => item.key !== "tfs_executor" || permit.fields.requiresTfsWorkSignature !== false,
+  );
+}
 
 export function get_verification_key(position: number): string {
   return `verification_${position}`;
@@ -127,7 +133,7 @@ export function find_signature(permit: WorkPermit, key: string) {
 
 /** Momento en que se completó la última firma de autorización (inicio de vigencia). */
 export function get_valid_from(permit: WorkPermit): string | null {
-  const times = hotWorkApprovalSignatures.map(
+  const times = get_hot_work_approval_signatures(permit).map(
     (item) => find_signature(permit, item.key)?.signedAt,
   );
   if (times.some((time) => !time)) return null;
