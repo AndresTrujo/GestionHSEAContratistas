@@ -49,6 +49,8 @@ export default async function JsaDetailPage({ params, searchParams }: JsaDetailP
   const actor = await require_permit_actor();
   if (!permit || permit.fields.deletedAt || permit.permitTypeSlug !== jsaSlug || !can_access_permit(actor, permit)) notFound();
   const canEdit = await can_edit_permit(actor, permit);
+  const departments = await repositories.organization.list_departments();
+  const areaDepartment = departments.find((department) => department.id === permit.area?.departmentId);
 
   const events = await repositories.audit.list_events_by_entity("permisos_trabajo", permit.id);
   const steps = get_jsa_steps(permit);
@@ -113,7 +115,8 @@ export default async function JsaDetailPage({ params, searchParams }: JsaDetailP
         items={[
           { label: "Nombre del trabajo a ejecutar", value: String(permit.fields.jobName) },
           { label: "Ubicación del área de trabajo", value: String(permit.fields.location) },
-          { label: "Departamento / compañía", value: String(permit.fields.company) },
+          { label: "Departamento del área de trabajo", value: areaDepartment?.name ?? "No especificado" },
+          { label: "Departamento / compañía del solicitante", value: String(permit.fields.company) },
           { label: "Fecha y hora", value: `${String(permit.fields.date)} · ${String(permit.fields.time)}` },
           { label: "Registrado por", value: permit.requestedByEmployeeNumber },
         ]}
