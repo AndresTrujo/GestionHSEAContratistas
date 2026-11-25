@@ -180,6 +180,7 @@ export default async function HotWorkPermitDetailPage({
                 signatureKey={item.key}
                 label={item.label}
                 canSign={canSignApproval}
+                disabled={item.key === "tfs_executor" && permit.fields.requiresTfsWorkSignature === false}
               />
             ))}
           </div>
