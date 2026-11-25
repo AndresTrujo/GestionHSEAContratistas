@@ -92,6 +92,9 @@ const approvalSignatureOrder: Partial<Record<string, SignerRole[]>> = {
 
 /** Indica si una firma de autorización es la siguiente que corresponde registrar. */
 export function is_next_approval_signature(permit: WorkPermit, key: string): boolean {
+  if (permit.permitTypeSlug === "trabajos-calientes" && key === "tfs_executor" && permit.fields.requiresTfsWorkSignature === false) {
+    return false;
+  }
   const order = approvalSignatureOrder[permit.permitTypeSlug];
   if (!order) return true;
 
