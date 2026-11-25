@@ -95,12 +95,15 @@ export function is_next_approval_signature(permit: WorkPermit, key: string): boo
   const order = approvalSignatureOrder[permit.permitTypeSlug];
   if (!order) return true;
 
-  const position = order.indexOf(key as SignerRole);
+  const effectiveOrder = permit.permitTypeSlug === "trabajos-calientes" && permit.fields.requiresTfsWorkSignature === false
+    ? order.filter((role) => role !== "tfs_executor")
+    : order;
+  const position = effectiveOrder.indexOf(key as SignerRole);
   // Firmas adicionales (verificaciones, participantes y cierre HSEA de confinados)
   // mantienen sus reglas propias y no forman parte de la secuencia de autorización.
   if (position === -1) return true;
 
-  return order.slice(0, position).every((previousRole) =>
+  return effectiveOrder.slice(0, position).every((previousRole) =>
     permit.signatures.some((signature) => signature.key === previousRole),
   );
 }
