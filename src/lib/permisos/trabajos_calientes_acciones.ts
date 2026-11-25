@@ -11,6 +11,7 @@ import {
   get_verification_key,
   hotWorkActivities,
   hotWorkApprovalSignatures,
+  get_hot_work_approval_signatures,
   hotWorkMaxExecutors,
   hotWorkSlug,
   hotWorkVerificationCount,
