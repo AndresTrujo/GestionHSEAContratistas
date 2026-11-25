@@ -37,7 +37,6 @@ interface HotWorkDetailPageProps {
 
 const errorMessages: Record<string, string> = {
   ...signErrorMessages,
-  same_person: "Una misma persona no puede firmar dos roles de autorización.",
   expired: "El permiso superó sus 12 horas de vigencia; ya no admite verificaciones.",
   order: "Las firmas de autorización deben realizarse en orden: ejecución, responsable del área y HSE. Las verificaciones también se firman en orden.",
   signature: "La firma no es válida; dibújala de nuevo.",
