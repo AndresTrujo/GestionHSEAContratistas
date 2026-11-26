@@ -79,6 +79,18 @@ describe("secuencia de firmas de autorización", () => {
     expect(is_next_approval_signature(permit, "hsea")).toBe(true);
   });
 
+  it("omite Responsable del trabajo cuando la firma TFS no es necesaria", () => {
+    const permit = make_permit("trabajos-calientes");
+    permit.fields.requiresTfsWorkSignature = false;
+
+    expect(is_next_approval_signature(permit, "executor")).toBe(true);
+    add_signature(permit, "executor");
+    expect(is_next_approval_signature(permit, "operational_manager")).toBe(true);
+    add_signature(permit, "operational_manager");
+    expect(is_next_approval_signature(permit, "tfs_executor")).toBe(false);
+    expect(is_next_approval_signature(permit, "hsea")).toBe(true);
+  });
+
   it("no incluye el cierre HSEA ni las verificaciones en la secuencia de autorización de confinados", () => {
     const permit = make_permit("espacios-confinados");
     expect(is_next_approval_signature(permit, "hsea")).toBe(true);

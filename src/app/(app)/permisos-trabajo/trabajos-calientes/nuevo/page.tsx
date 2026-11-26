@@ -110,6 +110,13 @@ export default async function NewHotWorkPermitPage({
             <PermitField label="Hora de inicio del trabajo" name="startTime" type="time" defaultValue={String(editingPermit?.fields.startTime ?? "")} />
             <PermitField label="Hora de terminación del trabajo" name="endTime" type="time" defaultValue={String(editingPermit?.fields.endTime ?? "")} />
           </div>
+          <label className="mt-5 flex items-start gap-3 rounded-xl border border-neutral-light p-4 text-sm">
+            <input type="checkbox" name="requiresTfsWorkSignature" defaultChecked={editingPermit?.fields.requiresTfsWorkSignature !== false} className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>
+              <span className="block font-bold text-brand-navy">¿Se requiere la firma del Responsable del trabajo?</span>
+              <span className="mt-1 block text-neutral-dark">Si no se requiere, el campo de firma quedará deshabilitado y no será necesario para autorizar el permiso.</span>
+            </span>
+          </label>
         </SectionCard>
 
         <SectionCard

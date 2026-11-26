@@ -37,7 +37,6 @@ interface HotWorkDetailPageProps {
 
 const errorMessages: Record<string, string> = {
   ...signErrorMessages,
-  same_person: "Una misma persona no puede firmar dos roles de autorización.",
   expired: "El permiso superó sus 12 horas de vigencia; ya no admite verificaciones.",
   order: "Las firmas de autorización deben realizarse en orden: ejecución, responsable del área y HSE. Las verificaciones también se firman en orden.",
   signature: "La firma no es válida; dibújala de nuevo.",
@@ -170,7 +169,7 @@ export default async function HotWorkPermitDetailPage({
         </div>
       )}
       <div className="mb-6">
-        <SectionCard title="Autorización" description="Las cuatro firmas de autorización pasan el permiso a Autorizado.">
+        <SectionCard title="Autorización" description="Las firmas requeridas de autorización pasan el permiso a Autorizado.">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {hotWorkApprovalSignatures.map((item) => (
               <SignatureBox
@@ -180,6 +179,7 @@ export default async function HotWorkPermitDetailPage({
                 signatureKey={item.key}
                 label={item.label}
                 canSign={canSignApproval}
+                disabled={item.key === "tfs_executor" && permit.fields.requiresTfsWorkSignature === false}
               />
             ))}
           </div>

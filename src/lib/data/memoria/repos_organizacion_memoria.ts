@@ -1,5 +1,6 @@
 import { find_permit_type } from "@/config/tipos_permiso";
 import { jsaSlug } from "@/config/jsa";
+import { hotWorkSlug } from "@/config/trabajos_calientes";
 import {
   adminRoleCode,
   get_required_permission,
@@ -282,11 +283,12 @@ export function create_organization_repositories(
     if (permitSignatures.some((s) => s.signerRole === request.role)) {
       return deny("ROL_YA_FIRMADO");
     }
-    // En JSA se permite que un empleado firme más de un rol (participante, responsable del trabajo/área).
-    // Para los demás permisos se conserva la segregación individual de empleados TFS (salvo ADMIN_HSEA).
+    // JSA y trabajos calientes permiten que una persona cubra más de un rol, siempre que tenga cada autorización.
+    // Los demás permisos conservan la segregación individual de empleados TFS (salvo ADMIN_HSEA).
     if (
       request.signer.kind === "EMPLEADO" &&
       request.permitTypeSlug !== jsaSlug &&
+      request.permitTypeSlug !== hotWorkSlug &&
       !is_admin_signer(request.signer) &&
       permitSignatures.some((s) => is_same_signer(s.signer, request.signer))
     ) {
