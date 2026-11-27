@@ -8,6 +8,7 @@ import { get_session } from "@/lib/auth/sesion";
 import { get_repositories } from "@/lib/data/proveedor_datos";
 import { accept_privacy_notice_action } from "@/lib/privacidad/acciones";
 import { get_session_actor_id } from "@/lib/privacidad/actor_aviso";
+import { get_vapid_config } from "@/lib/notificaciones/envio";
 
 export default async function AuthenticatedLayout({
   children,
@@ -48,7 +49,7 @@ export default async function AuthenticatedLayout({
       >
         Saltar al contenido
       </a>
-      <AppHeader identity={identity} navItems={navItems} />
+      <AppHeader identity={identity} navItems={navItems} vapidPublicKey={get_vapid_config()?.publicKey ?? null} />
       <main id="contenido" className="mx-auto max-w-6xl px-4 py-8">
         {children}
       </main>
