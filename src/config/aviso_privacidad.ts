@@ -71,7 +71,7 @@ export const privacyNoticeSections: PrivacyNoticeSection[] = [
   {
     heading: "7. Transferencia de datos",
     paragraphs: [
-      "Sus datos personales podrán ser transferidos y tratados dentro y fuera del país, por TFS Turbine Field Solutions, así como por las empresas que integran el Grupo Empresarial Nuvoil. Asimismo, sus datos personales pondrán ser transferidos a autoridades competentes cuando sean requeridos en ejercicio de sus atribuciones, así como en los demás supuestos permitidos o previstos por la legislación aplicable.",
+      "Sus datos personales podrán ser transferidos y tratados dentro y fuera del país, por TFS Turbine Field Solutions, así como por las empresas que integran el Grupo Empresarial Nuvoil. Asimismo, sus datos personales podrán ser transferidos a autoridades competentes cuando sean requeridos en ejercicio de sus atribuciones, así como en los demás supuestos permitidos o previstos por la legislación aplicable.",
       "Los terceros que, en su caso reciban sus datos personales, estarán obligados a tratarlos de conformidad con las disposiciones aplicables en materia de protección de datos personales y únicamente para las finalidades que correspondan.",
       "Cuando sea necesario obtener su consentimiento para realizar alguna transferencia de sus datos personales, TFS Turbine Field Solutions lo solicitará en los términos establecidos por la legislación aplicable.",
     ],
