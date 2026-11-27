@@ -1,4 +1,5 @@
 ﻿import type { PermitType, SignerRole, WorkPermit } from "@/domain/permisos";
+import { get_jsa_participants, get_participant_key, jsaSlug } from "./jsa";
 
 /** Catálogo de formatos controlados de HSEA (fuente: archivos FO-xxxx vigentes). */
 export const permitTypes: PermitType[] = [
@@ -106,7 +107,12 @@ export function is_next_approval_signature(permit: WorkPermit, key: string): boo
   // mantienen sus reglas propias y no forman parte de la secuencia de autorización.
   if (position === -1) return true;
 
-  return effectiveOrder.slice(0, position).every((previousRole) =>
-    permit.signatures.some((signature) => signature.key === previousRole),
-  );
+  const has_signed = (signatureKey: string) => permit.signatures.some((signature) => signature.key === signatureKey);
+  if (!effectiveOrder.slice(0, position).every(has_signed)) return false;
+
+  // AST: el responsable del área y HSE esperan a que todos los participantes hayan firmado.
+  if (permit.permitTypeSlug === jsaSlug && key !== "executor") {
+    return get_jsa_participants(permit).every((participant) => has_signed(get_participant_key(participant.position)));
+  }
+  return true;
 }

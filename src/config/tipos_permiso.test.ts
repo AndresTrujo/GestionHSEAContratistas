@@ -60,6 +60,25 @@ describe("secuencia de firmas de autorización", () => {
     }
   });
 
+  it("bloquea al responsable del área y a HSE del AST hasta que firmen todos los participantes", () => {
+    const permit = make_permit("analisis-seguridad-jsa");
+    permit.fields = {
+      participantCount: 3,
+      participant1Name: "Ana",
+      participant2Name: "Luis",
+    };
+    add_signature(permit, "executor");
+    add_signature(permit, "participant_1");
+    expect(is_next_approval_signature(permit, "operational_manager")).toBe(false);
+
+    add_signature(permit, "participant_2");
+    expect(is_next_approval_signature(permit, "operational_manager")).toBe(true);
+    expect(is_next_approval_signature(permit, "hsea")).toBe(false);
+
+    add_signature(permit, "operational_manager");
+    expect(is_next_approval_signature(permit, "hsea")).toBe(true);
+  });
+
   it("omite Responsable del trabajo cuando la firma TFS no es necesaria", () => {
     const permit = make_permit("trabajos-calientes");
     permit.fields.requiresTfsWorkSignature = false;
