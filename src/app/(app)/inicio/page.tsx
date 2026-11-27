@@ -4,6 +4,7 @@ import { ModuleIcon } from "@/components/ui/ModuleIcon";
 import { appModules, is_module_visible } from "@/config/modulos";
 import { is_hsea_department_employee } from "@/lib/auth/departamento";
 import { get_session } from "@/lib/auth/sesion";
+import { get_pending_signature_count } from "@/lib/notificaciones/pendientes";
 
 export default async function IndexPage() {
   const session = await get_session();
@@ -23,18 +24,34 @@ export default async function IndexPage() {
     session.permissions.includes("contratistas:registrar_ingresos") &&
     (await is_hsea_department_employee(session.employeeNumber));
 
+  // Solo se cuentan las firmas pendientes de quien tiene acceso a permisos; si falla, la tarjeta se muestra sin contador.
+  const pendingCount = await get_pending_signature_count(session);
+
   return (
     <>
       <h1 className="text-4xl uppercase">Inicio</h1>
       <p className="mb-8 mt-1 text-neutral-dark">
         Hola, <strong className="text-brand-navy">{firstName}</strong>. Elige a dónde quieres ir.
       </p>
-      {visibleModules.length === 0 && !accessHref && !canScan ? (
+      {visibleModules.length === 0 && !accessHref && !canScan && pendingCount === null ? (
         <p className="rounded-xl border border-neutral-light bg-white p-5 text-neutral-dark">
           Tu usuario aún no tiene módulos asignados. Pide a HSEA que te asigne un rol.
         </p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
+          {pendingCount !== null && (
+            <ModuleCard
+              title="Pendientes de mi firma"
+              description={
+                pendingCount === 0
+                  ? "No tienes permisos esperando tu firma."
+                  : `${pendingCount} ${pendingCount === 1 ? "permiso espera" : "permisos esperan"} tu firma.`
+              }
+              href="/pendientes-firma"
+              icon={<ModuleIcon slug="pendientes-firma" />}
+              badge={pendingCount}
+            />
+          )}
           {visibleModules.map((appModule) => (
             <ModuleCard
               key={appModule.slug}

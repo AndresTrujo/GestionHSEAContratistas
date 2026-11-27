@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { get_pending_signatures } from "@/config/notificaciones";
+import { get_next_signatures, get_pending_signatures } from "@/config/notificaciones";
 import type { NotificationKind, NotificationLogEntry } from "@/domain/notificaciones";
 import type { PermitStatus, WorkPermit } from "@/domain/permisos";
 import { decide_reminder } from "./reglas";
 
-const start = Date.parse("2026-11-10T12:00:00.000Z");
+// 10:00 en CDMX (UTC-6): dentro del horario de recordatorios (08:00 a 18:00).
+const start = Date.parse("2026-11-10T16:00:00.000Z");
 
 function minutes_after(minutes: number): string {
   return new Date(start + minutes * 60_000).toISOString();
@@ -51,26 +52,35 @@ describe("decide_reminder", () => {
     expect(decide_reminder([], new Date(minutes_after(120)))).toEqual({ due: false });
   });
 
-  it("espera 30 minutos desde el aviso", () => {
+  it("espera 15 minutos desde el aviso", () => {
     const entries = [make_entry("PENDIENTE", 0)];
-    expect(decide_reminder(entries, new Date(minutes_after(29)))).toEqual({ due: false });
-    expect(decide_reminder(entries, new Date(minutes_after(30)))).toEqual({ due: true, reminderNumber: 1 });
+    expect(decide_reminder(entries, new Date(minutes_after(14)))).toEqual({ due: false });
+    expect(decide_reminder(entries, new Date(minutes_after(15)))).toEqual({ due: true, reminderNumber: 1 });
   });
 
   it("cuenta desde el último recordatorio", () => {
-    const entries = [make_entry("PENDIENTE", 0), make_entry("RECORDATORIO", 31)];
-    expect(decide_reminder(entries, new Date(minutes_after(55)))).toEqual({ due: false });
-    expect(decide_reminder(entries, new Date(minutes_after(61)))).toEqual({ due: true, reminderNumber: 2 });
+    const entries = [make_entry("PENDIENTE", 0), make_entry("RECORDATORIO", 16)];
+    expect(decide_reminder(entries, new Date(minutes_after(30)))).toEqual({ due: false });
+    expect(decide_reminder(entries, new Date(minutes_after(31)))).toEqual({ due: true, reminderNumber: 2 });
   });
 
-  it("se detiene después de 3 recordatorios", () => {
+  it("después de 3 recordatorios sigue uno por hora", () => {
     const entries = [
       make_entry("PENDIENTE", 0),
+      make_entry("RECORDATORIO", 15),
       make_entry("RECORDATORIO", 30),
-      make_entry("RECORDATORIO", 60),
-      make_entry("RECORDATORIO", 90),
+      make_entry("RECORDATORIO", 45),
     ];
-    expect(decide_reminder(entries, new Date(minutes_after(240)))).toEqual({ due: false });
+    expect(decide_reminder(entries, new Date(minutes_after(100)))).toEqual({ due: false });
+    expect(decide_reminder(entries, new Date(minutes_after(105)))).toEqual({ due: true, reminderNumber: 4 });
+  });
+
+  it("no envía fuera del horario y retoma al abrir la ventana", () => {
+    // Aviso a las 17:50; a las 18:20 ya no se envía; al día siguiente a las 08:00 (14:00 UTC) sí.
+    const entries = [make_entry("PENDIENTE", 470)];
+    expect(decide_reminder(entries, new Date(minutes_after(500)))).toEqual({ due: false });
+    expect(decide_reminder(entries, new Date(minutes_after(14 * 60)))).toEqual({ due: false });
+    expect(decide_reminder(entries, new Date(minutes_after(22 * 60)))).toEqual({ due: true, reminderNumber: 1 });
   });
 
   it("ignora los avisos de avance al solicitante", () => {
@@ -110,3 +120,21 @@ describe("get_pending_signatures", () => {
     expect(get_pending_signatures(permit)).toEqual([]);
   });
 });
+
+describe("get_next_signatures", () => {
+  it("en trabajos calientes avisa solo a quien sigue en la secuencia", () => {
+    const permit = make_permit("trabajos-calientes", "submitted", ["requester"]);
+    expect(get_next_signatures(permit).map((item) => item.key)).toEqual(["executor"]);
+  });
+
+  it("avanza al siguiente cuando firma el anterior", () => {
+    const permit = make_permit("trabajos-calientes", "submitted", ["requester", "executor"]);
+    expect(get_next_signatures(permit).map((item) => item.key)).toEqual(["operational_manager"]);
+  });
+
+  it("en el JSA los participantes firman primero y después el responsable del área", () => {
+    const permit = make_permit("analisis-seguridad-jsa", "submitted", ["executor"], { participant1Name: "Ana" });
+    expect(get_next_signatures(permit).map((item) => item.key)).toEqual(["participant_1"]);
+  });
+});
+

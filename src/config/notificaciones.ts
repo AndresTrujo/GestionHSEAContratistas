@@ -3,13 +3,22 @@ import { confinedApprovalSignatures, confinedClosingSignature, confinedSlug } fr
 import { get_jsa_participants, get_participant_key, jsaApprovalSignatures, jsaSlug } from "./jsa";
 import { stopSignatures, stopSlug } from "./observacion_stop";
 import { heightsApprovalSignatures, heightsSlug } from "./trabajos_alturas";
+import { is_next_approval_signature } from "./tipos_permiso";
 import { hotWorkApprovalSignatures, hotWorkSlug } from "./trabajos_calientes";
 
-/** Recordatorio a quien no ha firmado: cada 30 minutos desde el último aviso, máximo 3. */
-export const reminderIntervalMinutes = 30;
-export const maxReminders = 3;
+/**
+ * Recordatorios a quien no ha firmado: los primeros `fastReminders` cada 15 minutos desde el último aviso y
+ * después uno por hora, hasta que firme. Solo se envían dentro del horario laboral (hora de CDMX).
+ */
+export const fastReminderIntervalMinutes = 15;
+export const fastReminders = 3;
+export const slowReminderIntervalMinutes = 60;
+export const reminderWindowStartMinutes = 8 * 60;
+export const reminderWindowEndMinutes = 18 * 60;
 /** Cada cuánto revisa el servidor si hay recordatorios por enviar. */
 export const reminderTickMinutes = 5;
+/** Un permiso sin movimiento por más de estos días deja de recibir recordatorios (se considera abandonado). */
+export const reminderMaxAgeDays = 14;
 
 /** Paso de firma que se espera en una etapa del permiso, con el texto que verá el destinatario. */
 export interface ExpectedSignature {
@@ -55,6 +64,14 @@ export function get_pending_signatures(permit: WorkPermit): ExpectedSignature[] 
   const stages = expectedSignaturesByType[permit.permitTypeSlug]?.(permit);
   const expected = stages?.[permit.status] ?? [];
   return expected.filter((item) => !permit.signatures.some((signature) => signature.key === item.key));
+}
+
+/**
+ * Firmas pendientes que ya se pueden firmar: las aprobaciones son secuenciales, así que solo se avisa a
+ * quien sigue (y a los participantes, que firman en paralelo), no a quien todavía no puede firmar.
+ */
+export function get_next_signatures(permit: WorkPermit): ExpectedSignature[] {
+  return get_pending_signatures(permit).filter((item) => is_next_approval_signature(permit, item.key));
 }
 
 /** Texto de un paso de firma del permiso (cualquier etapa), para avisos de avance. */

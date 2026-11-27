@@ -1,5 +1,6 @@
 import { after } from "next/server";
 import {
+  get_next_signatures,
   get_pending_signatures,
   get_signature_label,
   is_notifiable_permit_type,
@@ -22,7 +23,7 @@ function get_folio(permit: WorkPermit): string {
   return typeof folio === "string" && folio ? folio : (find_permit_type(permit.permitTypeSlug)?.name ?? "tu permiso");
 }
 
-/** Primer aviso a cada persona que puede firmar los pasos pendientes de la etapa actual. */
+/** Primer aviso a cada persona que puede firmar ya los pasos indicados. */
 async function notify_pending(permit: WorkPermit, signatures: ExpectedSignature[], excludeIds: string[]): Promise<void> {
   const description = describe_permit(permit);
   for (const signature of signatures) {
@@ -93,20 +94,20 @@ function run_after(work: () => Promise<void>, context: Record<string, string>): 
 /** Al crear un permiso: avisa a quienes deben firmar. `actorId` es quien lo creó (no se le avisa). */
 export function notify_permit_created(permit: WorkPermit, actorId: string): void {
   if (!is_notifiable_permit_type(permit.permitTypeSlug)) return;
-  run_after(() => notify_pending(permit, get_pending_signatures(permit), [actorId]), { permiso: permit.id });
+  run_after(() => notify_pending(permit, get_next_signatures(permit), [actorId]), { permiso: permit.id });
 }
 
 /**
- * Tras una firma: si el permiso cambió de etapa, avisa a quienes deben firmar la nueva; al usuario de
- * proveedor solicitante le avisa de cada firma de autorización y del resultado.
+ * Tras una firma: avisa a quienes ahora pueden firmar y antes no (el siguiente de la secuencia o los de la
+ * nueva etapa); al usuario de proveedor solicitante le avisa de cada firma de autorización y del resultado.
  */
 export function notify_permit_signed(previous: WorkPermit, updated: WorkPermit, signedKey: string, actorId: string): void {
   if (!is_notifiable_permit_type(updated.permitTypeSlug)) return;
   run_after(
     async () => {
-      if (updated.status !== previous.status) {
-        await notify_pending(updated, get_pending_signatures(updated), [actorId]);
-      }
+      const alreadyNext = new Set(get_next_signatures(previous).map((item) => item.key));
+      const newlyNext = get_next_signatures(updated).filter((item) => !alreadyNext.has(item.key));
+      await notify_pending(updated, newlyNext, [actorId]);
       const wasExpected = get_pending_signatures(previous).some((item) => item.key === signedKey);
       if (wasExpected) await notify_requester_progress(previous, updated, signedKey, actorId);
     },

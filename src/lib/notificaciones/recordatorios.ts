@@ -1,9 +1,8 @@
 import {
-  get_pending_signatures,
-  maxReminders,
+  get_next_signatures,
   notifiablePermitTypeSlugs,
   notifiableStatuses,
-  reminderIntervalMinutes,
+  reminderMaxAgeDays,
   reminderTickMinutes,
 } from "@/config/notificaciones";
 import { find_permit_type } from "@/config/tipos_permiso";
@@ -12,13 +11,12 @@ import { get_repositories } from "@/lib/data/proveedor_datos";
 import { log_server_event } from "@/lib/registro/registro_servidor";
 import { resolve_signature_recipients } from "./destinatarios";
 import { get_vapid_config, send_push } from "./envio";
-import { decide_reminder } from "./reglas";
+import { decide_reminder, is_within_reminder_window } from "./reglas";
 
 const leaseName = "recordatorios_firma";
 /** El candado dura menos que el intervalo: si una instancia muere, otra toma la siguiente vuelta. */
 const leaseSeconds = reminderTickMinutes * 60 - 30;
-/** Ventana de búsqueda: el último recordatorio cae a los 90 min del aviso; se deja margen. */
-const lookbackMinutes = reminderIntervalMinutes * (maxReminders + 1) + 60;
+const lookbackMinutes = reminderMaxAgeDays * 24 * 60;
 
 const globalReminders = globalThis as typeof globalThis & {
   reminderTimer?: ReturnType<typeof setInterval>;
@@ -32,10 +30,11 @@ function get_instance_id(): string {
 }
 
 /**
- * Una vuelta: para cada permiso con firmas pendientes, recuerda a quienes ya se les avisó y siguen
- * pudiendo firmar, si pasaron 30 minutos desde su último aviso y van menos de 3 recordatorios.
+ * Una vuelta: para cada permiso, recuerda la firma que sigue a quienes ya se les avisó y siguen pudiendo
+ * firmar, con el ritmo y el horario de `decide_reminder`.
  */
 export async function run_reminder_tick(now: Date = new Date()): Promise<number> {
+  if (!is_within_reminder_window(now)) return 0;
   const repositories = get_repositories();
   const permits = await repositories.permits.list_active({
     permitTypeSlugs: notifiablePermitTypeSlugs,
@@ -45,7 +44,7 @@ export async function run_reminder_tick(now: Date = new Date()): Promise<number>
 
   let sent = 0;
   for (const permit of permits) {
-    const pending = get_pending_signatures(permit);
+    const pending = get_next_signatures(permit);
     if (pending.length === 0) continue;
     const log = await repositories.notifications.list_log_by_permit(permit.id);
     if (log.length === 0) continue;
@@ -66,7 +65,7 @@ export async function run_reminder_tick(now: Date = new Date()): Promise<number>
         await send_push(permit, recipient, {
           kind: "RECORDATORIO",
           signatureKey: signature.key,
-          title: `Recordatorio ${decision.reminderNumber} de ${maxReminders}: firma pendiente`,
+          title: `Recordatorio ${decision.reminderNumber}: firma pendiente`,
           body: `${typeName}${folio} sigue esperando tu firma como ${signature.label}.`,
         });
         sent += 1;

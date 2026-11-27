@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import type { ActorType } from "@/domain/auditoria";
 import type { WorkPermit } from "@/domain/permisos";
 import { adminRoleCode, providerSignerRoles } from "@/config/permisos";
-import { get_session } from "@/lib/auth/sesion";
+import { get_session, type Session } from "@/lib/auth/sesion";
 import { get_repositories } from "@/lib/data/proveedor_datos";
 
 /** Quien crea o firma un permiso: empleado TFS o usuario de un proveedor. */
@@ -24,6 +24,11 @@ const providerSignableKeys: string[] = [...providerSignerRoles];
 export async function require_permit_actor(): Promise<PermitActor> {
   const session = await get_session();
   if (!session) redirect("/login");
+  return get_actor_from_session(session);
+}
+
+/** El actor de permisos que corresponde a una sesión iniciada. */
+export function get_actor_from_session(session: Session): PermitActor {
   if (session.kind === "EMPLEADO") {
     return {
       actorType: "EMPLEADO",

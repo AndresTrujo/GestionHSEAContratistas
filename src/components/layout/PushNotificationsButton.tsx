@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { remove_push_subscription, save_push_subscription } from "@/lib/notificaciones/acciones";
+import { InstallTutorial } from "./InstallTutorial";
 
 type PushState = "loading" | "unsupported" | "ios_install" | "denied" | "off" | "on";
 
@@ -189,18 +190,8 @@ export function PushNotificationsButton({ vapidPublicKey }: PushNotificationsBut
           )}
 
           {state === "ios_install" && (
-            <div className="mt-2 space-y-2">
-              <p>En iPhone los avisos solo llegan si la app está en tu pantalla de inicio:</p>
-              <ol className="list-decimal space-y-1 pl-5">
-                <li>
-                  Abre esta página en <strong>Safari</strong> y toca <strong>Compartir</strong> (el cuadro con la flecha).
-                </li>
-                <li>
-                  Elige <strong>Agregar a pantalla de inicio</strong>.
-                </li>
-                <li>Abre la app desde el ícono nuevo y activa aquí las notificaciones.</li>
-              </ol>
-              <p className="text-xs">Requiere iOS 16.4 o posterior.</p>
+            <div className="mt-2">
+              <InstallTutorial />
             </div>
           )}
 

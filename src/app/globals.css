@@ -60,3 +60,52 @@ h3 {
   font-family: var(--font-display);
   font-weight: 900;
 }
+
+/* Tutorial de instalación (iPhone): pulso del dedo, hoja de compartir que sube e ícono que aparece. */
+@keyframes tutorial-pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+@keyframes tutorial-sheet-up {
+  from {
+    transform: translateY(110px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes tutorial-pop {
+  0% {
+    transform: scale(0);
+  }
+  70% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.tutorial-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: tutorial-pulse 1.4s ease-out infinite;
+}
+
+.tutorial-sheet-up {
+  animation: tutorial-sheet-up 0.6s ease-out both;
+}
+
+.tutorial-pop {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: tutorial-pop 0.6s 0.2s ease-out both;
+}

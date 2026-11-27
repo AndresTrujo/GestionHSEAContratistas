@@ -7,9 +7,11 @@ interface ModuleCardProps {
   href: string;
   /** Icono decorativo (se oculta a lectores de pantalla; el título ya describe la tarjeta). */
   icon?: ReactNode;
+  /** Contador junto al título (p. ej. pendientes); no se muestra si es 0 o no se indica. */
+  badge?: number;
 }
 
-export function ModuleCard({ title, description, href, icon }: ModuleCardProps) {
+export function ModuleCard({ title, description, href, icon, badge }: ModuleCardProps) {
   return (
     <Link
       href={href}
@@ -21,7 +23,15 @@ export function ModuleCard({ title, description, href, icon }: ModuleCardProps) 
         </div>
       )}
       <div className="min-w-0 flex-1">
-        <h2 className="mb-1 text-xl uppercase leading-tight text-brand-navy">{title}</h2>
+        <h2 className="mb-1 flex flex-wrap items-center gap-2 text-xl uppercase leading-tight text-brand-navy">
+          {title}
+          {badge !== undefined && badge > 0 && (
+            <span className="inline-flex min-w-6 items-center justify-center rounded-full bg-brand-green px-2 py-0.5 font-sans text-xs font-bold normal-case text-white">
+              {badge}
+              <span className="sr-only"> pendientes</span>
+            </span>
+          )}
+        </h2>
         <p className="text-sm text-neutral-dark">{description}</p>
       </div>
       <svg
