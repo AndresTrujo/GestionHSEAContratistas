@@ -1,5 +1,6 @@
 import type { AuditEvent } from "@/domain/auditoria";
 import type { WorkPermit } from "@/domain/permisos";
+import type { PrivacyAcceptance } from "@/domain/privacidad";
 import type { ServerLogEntry } from "@/domain/registro_servidor";
 import type { DataRepositories } from "../repositorios";
 import { get_date_mx } from "../identidad";
@@ -16,6 +17,7 @@ import {
   create_provider_signer_lookup,
 } from "./repos_contratistas_memoria";
 import { create_organization_repositories } from "./repos_organizacion_memoria";
+import { create_privacy_consent_repository } from "./repos_privacidad_memoria";
 
 /**
  * Implementación en memoria con datos dummy, para desarrollar sin BD hosteada.
@@ -25,10 +27,11 @@ interface MemoryStore {
   permits: WorkPermit[];
   auditEvents: AuditEvent[];
   serverLogs: ServerLogEntry[];
+  privacyAcceptances: PrivacyAcceptance[];
 }
 
 function create_store(): MemoryStore {
-  return { permits: [], auditEvents: [], serverLogs: [] };
+  return { permits: [], auditEvents: [], serverLogs: [], privacyAcceptances: [] };
 }
 
 // Se guarda en globalThis para sobrevivir al hot reload de `next dev`.
@@ -128,5 +131,7 @@ export function create_memory_repositories(): DataRepositories {
     permits,
   );
 
-  return { audit, serverLog, permits, ...organization, ...contractors };
+  const privacyConsents = create_privacy_consent_repository(store.privacyAcceptances);
+
+  return { audit, serverLog, permits, privacyConsents, ...organization, ...contractors };
 }

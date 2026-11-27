@@ -1,3 +1,4 @@
+import type { NewPrivacyAcceptance, PrivacyAcceptance } from "@/domain/privacidad";
 import type {
   AddParticipantInput,
   ContractorDocument,
@@ -406,6 +407,14 @@ export interface SignatureRepository {
   list_by_permit(permitId: string): Promise<SignatureRecord[]>;
 }
 
+/** Aceptaciones del aviso de privacidad: evidencia de solo anexar, una por persona y versión. */
+export interface PrivacyConsentRepository {
+  has_accepted(actorId: string, noticeVersion: string): Promise<boolean>;
+  /** Idempotente: si ya aceptó esa versión, no duplica ni modifica la evidencia. Devuelve true si registró una nueva. */
+  record_acceptance(input: NewPrivacyAcceptance): Promise<boolean>;
+  list_by_actor(actorId: string): Promise<PrivacyAcceptance[]>;
+}
+
 export interface DataRepositories {
   audit: AuditRepository;
   serverLog: ServerLogRepository;
@@ -422,4 +431,5 @@ export interface DataRepositories {
   documents: ContractorDocumentRepository;
   entries: EntryLogRepository;
   participants: PermitParticipantRepository;
+  privacyConsents: PrivacyConsentRepository;
 }

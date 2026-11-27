@@ -2,7 +2,12 @@ import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { appModules, is_module_visible } from "@/config/modulos";
+import { PrivacyNoticeModal } from "@/components/layout/PrivacyNoticeModal";
+import { privacyNoticeSections, privacyNoticeTitle, privacyNoticeVersion } from "@/config/aviso_privacidad";
 import { get_session } from "@/lib/auth/sesion";
+import { get_repositories } from "@/lib/data/proveedor_datos";
+import { accept_privacy_notice_action } from "@/lib/privacidad/acciones";
+import { get_session_actor_id } from "@/lib/privacidad/actor_aviso";
 
 export default async function AuthenticatedLayout({
   children,
@@ -15,6 +20,12 @@ export default async function AuthenticatedLayout({
   if (session.kind === "USUARIO_PROVEEDOR" && session.mustChangePassword) {
     redirect("/cambiar-password");
   }
+
+  // Aviso de privacidad (LFPDPPP): sin aceptar la versión vigente, un modal obligatorio cubre la pantalla.
+  const hasAcceptedNotice = await get_repositories().privacyConsents.has_accepted(
+    get_session_actor_id(session),
+    privacyNoticeVersion,
+  );
 
   const identity =
     session.kind === "EMPLEADO"
@@ -41,6 +52,14 @@ export default async function AuthenticatedLayout({
       <main id="contenido" className="mx-auto max-w-6xl px-4 py-8">
         {children}
       </main>
+      {!hasAcceptedNotice && (
+        <PrivacyNoticeModal
+          title={privacyNoticeTitle}
+          version={privacyNoticeVersion}
+          sections={privacyNoticeSections}
+          action={accept_privacy_notice_action}
+        />
+      )}
     </div>
   );
 }

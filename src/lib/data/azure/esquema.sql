@@ -26,7 +26,7 @@
 --   credenciales_firma, documentos_contratista, versiones_documento,
 --   revisiones_documento, revocaciones_revision, permisos_trabajo,
 --   permiso_participantes, registros_ingreso, firmas_permiso,
---   eventos_auditoria, registro_servidor.
+--   eventos_auditoria, registro_servidor, aceptaciones_aviso_privacidad.
 -- Sin triggers: lineas_mando, departamentos, subdepartamentos,
 --   reglas_departamentos_rh, permisos, rol_permisos, cursos, rol_cursos_requeridos,
 --   estados_capacitacion, capacitaciones, tipos_contratista,
@@ -840,6 +840,19 @@ CREATE TABLE dbo.registro_servidor (
   contexto            nvarchar(max) NOT NULL DEFAULT N'{}' CHECK (ISJSON(contexto) = 1)
 );
 CREATE INDEX idx_registro_servidor_nivel ON dbo.registro_servidor(nivel, ocurrido_en DESC);
+
+-- Aceptación del aviso de privacidad (LFPDPPP): una por persona y versión del aviso. Solo se agrega.
+CREATE TABLE dbo.aceptaciones_aviso_privacidad (
+  id              bigint IDENTITY(1,1) NOT NULL PRIMARY KEY,
+  actor_tipo      nvarchar(30)  NOT NULL CHECK (actor_tipo IN (N'EMPLEADO', N'USUARIO_PROVEEDOR')),
+  actor_id        nvarchar(450) NOT NULL,           -- '204692' | 'P-17'
+  version_aviso   nvarchar(100) NOT NULL,
+  hash_aviso      nvarchar(64)  NOT NULL,           -- sha256 del texto aceptado
+  aceptado_en     datetimeoffset(3) NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+  direccion_ip    nvarchar(100) NOT NULL,
+  agente_usuario  nvarchar(500) NOT NULL,
+  CONSTRAINT aceptaciones_aviso_actor_version_key UNIQUE (actor_id, version_aviso)
+);
 GO
 
 -- ---------------------------------------------------------------------
@@ -1282,6 +1295,19 @@ BEGIN
   SET XACT_ABORT ON;
   IF NOT EXISTS (SELECT 1 FROM deleted) RETURN;
   DECLARE @msg nvarchar(2048) = CONCAT(N'firmas_permiso es de solo anexar: no se permite ',
+                                       CASE WHEN EXISTS (SELECT 1 FROM inserted) THEN N'UPDATE' ELSE N'DELETE' END);
+  THROW 50000, @msg, 1;
+END
+GO
+
+CREATE TRIGGER dbo.trg_aceptaciones_aviso_inmutables ON dbo.aceptaciones_aviso_privacidad
+AFTER UPDATE, DELETE
+AS
+BEGIN
+  SET NOCOUNT ON;
+  SET XACT_ABORT ON;
+  IF NOT EXISTS (SELECT 1 FROM deleted) RETURN;
+  DECLARE @msg nvarchar(2048) = CONCAT(N'aceptaciones_aviso_privacidad es de solo anexar: no se permite ',
                                        CASE WHEN EXISTS (SELECT 1 FROM inserted) THEN N'UPDATE' ELSE N'DELETE' END);
   THROW 50000, @msg, 1;
 END
