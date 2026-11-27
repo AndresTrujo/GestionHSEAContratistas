@@ -92,7 +92,7 @@ describe("decide_reminder", () => {
 describe("get_pending_signatures", () => {
   it("lista las aprobaciones que faltan del permiso de trabajos calientes", () => {
     const permit = make_permit("trabajos-calientes", "submitted", ["requester", "hsea"]);
-    expect(get_pending_signatures(permit).map((item) => item.key)).toEqual(["executor", "tfs_executor", "operational_manager"]);
+    expect(get_pending_signatures(permit).map((item) => item.key)).toEqual(["executor", "operational_manager", "tfs_executor"]);
   });
 
   it("en espacios confinados aprobado solo falta el cierre de HSEA", () => {
